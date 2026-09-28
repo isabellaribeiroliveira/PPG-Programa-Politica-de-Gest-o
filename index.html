@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PPG · Programa Política de Gestão</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="login-screen" id="loginScreen">
+
+  <!-- ===== SAC — Univaldo flutuante, central de ajuda antes do login ===== -->
+  <button class="sac-fab" id="sacFab" type="button" title="Precisa de ajuda para entrar?">
+    <span class="sac-fab-emoji">🎯</span>
+    <span class="sac-fab-badge">?</span>
+  </button>
+  <div class="sac-popup" id="sacPopup">
+    <div class="sac-popup-head">
+      <span class="sac-popup-emoji">🎯</span>
+      <div class="sac-popup-title"><b>Central de Ajuda</b><span>SAC · PPG</span></div>
+      <button type="button" class="sac-close" id="sacClose" aria-label="Fechar">✕</button>
+    </div>
+    <div class="sac-popup-body">
+      <p>Precisando de uma mão para entrar? Aqui vão algumas dicas rápidas:</p>
+      <ul>
+        <li>Sua <b>matrícula</b> e <b>senha</b> são as mesmas do sistema interno da empresa.</li>
+        <li>Esqueceu a senha? Fale com a equipe de <b>Qualidade</b>.</li>
+        <li>Só testando o sistema? Toque em <b>"Ver credenciais de teste"</b>, logo abaixo do botão Entrar.</li>
+        <li>Quer conhecer o programa antes de acessar? Role a tela para baixo 👇</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===== Primeira dobra: card de login ===== -->
+  <div class="login-hero">
+    <div class="login-card">
+      <div class="login-mascot-row">
+        <span class="mascot-figure mascot-figure-emoji" id="loginMascotImg">🎯</span>
+      </div>
+      <div class="login-mark">PPG</div>
+      <h2>Programa Política de Gestão</h2>
+      <p id="loginSubtitle">Acesse com sua matrícula e senha para continuar.</p>
+
+      <div class="login-tabs" id="loginTabs">
+        <button type="button" class="login-tab active" data-role="qualidade"><i data-lucide="shield-check"></i> Qualidade</button>
+        <button type="button" class="login-tab" data-role="colaborador"><i data-lucide="user"></i> Colaborador</button>
+      </div>
+
+      <form id="loginForm">
+        <div class="field" style="margin-bottom:12px;"><label>Matrícula</label><input type="text" id="loginMatricula" placeholder="Ex: 1000" required></div>
+        <div class="field" style="margin-bottom:6px;"><label>Senha</label><input type="password" id="loginSenha" placeholder="••••••••" required></div>
+        <div class="login-error" id="loginError">Matrícula ou senha inválida.</div>
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top:16px;">Entrar</button>
+      </form>
+      <button type="button" class="login-forgot-link" id="btnEsqueciSenha">Esqueci minha senha</button>
+
+      <button type="button" class="login-demo-toggle" id="loginDemoToggle">
+        <span>ℹ️ Como faço meu primeiro acesso?</span><i data-lucide="chevron-down"></i>
+      </button>
+      <div class="login-demo-collapsible" id="loginDemoPanel">
+        <div class="login-demo">
+          <p style="margin:0 0 8px;"><b>Primeiro acesso:</b> use sua matrícula também como senha. O sistema vai pedir para você criar uma senha nova na hora.</p>
+          <p style="margin:0;"><b>Esqueceu a senha depois disso?</b> Toque em "Esqueci minha senha" acima — a equipe de Qualidade recebe um aviso por e-mail e libera uma senha temporária para você.</p>
+        </div>
+      </div>
+
+      <button type="button" class="login-scroll-hint" id="loginScrollHint">
+        <span>Conheça o programa</span><i data-lucide="chevron-down"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== Segunda dobra: explicação do programa (rolagem) ===== -->
+  <div class="login-landing" id="loginLanding">
+    <section class="ll-block ll-intro">
+      <h3>O que é o PPG?</h3>
+      <p>O <b>Programa Política de Gestão</b> é a forma da empresa reforçar, de tempos em tempos, temas importantes do dia a dia — segurança da informação, qualidade, ética, sustentabilidade e muito mais — de um jeito rápido, transparente e com prêmios reais para quem participa.</p>
+    </section>
+
+    <section class="ll-steps">
+      <div class="ll-step">
+        <div class="ll-step-num">1</div>
+        <h4>📋 Responda o questionário</h4>
+        <p>Poucas perguntas, direto ao ponto, sobre o tema da rodada atual.</p>
+      </div>
+      <div class="ll-step">
+        <div class="ll-step-num">2</div>
+        <h4>🎯 Acerte 100%</h4>
+        <p>Quem alcança 100% de acertos entra automaticamente na lista de elegíveis.</p>
+      </div>
+      <div class="ll-step">
+        <div class="ll-step-num">3</div>
+        <h4>🎉 Concorra ao sorteio</h4>
+        <p>Sorteio auditável e transparente, com distribuição justa entre setores e filiais.</p>
+      </div>
+    </section>
+
+    <section class="ll-block ll-rules">
+      <h3>Critérios de elegibilidade</h3>
+      <ul>
+        <li>✅ Ter 100% de acertos no questionário da rodada.</li>
+        <li>✅ Não ocupar um cargo de liderança impedido de participar (regra oficial do programa).</li>
+        <li>✅ Não ter sido premiado nos últimos 2 anos.</li>
+      </ul>
+      <p class="hint">Todas as regras, o passo a passo do sorteio e o histórico completo ficam disponíveis para consulta em <b>Regras e Transparência</b>, dentro do sistema.</p>
+    </section>
+
+    <footer class="ll-footer">
+      <span>PPG · Programa Política de Gestão</span>
+      <span>Feito com 💚 pela equipe de Qualidade</span>
+    </footer>
+  </div>
+</div>
+
+<div class="app" id="appRoot" style="display:none;">
+  <aside class="sidebar" id="sidebar">
+    <button class="sidebar-collapse-btn" id="btnCollapseSidebar" title="Recolher/expandir menu">
+      <i data-lucide="chevrons-left"></i>
+    </button>
+    <div class="brand">
+      <div class="brand-mark">PPG</div>
+      <div class="brand-text"><h1>PPG</h1><span>Programa Política de Gestão</span></div>
+    </div>
+    <nav class="menu" id="menu">
+      <!-- ===== Perfil Qualidade ===== -->
+      <button class="menu-item qualidade-only active" data-target="inicio"><i data-lucide="layout-dashboard"></i><span class="label">Início</span></button>
+
+      <div class="menu-group qualidade-only expanded" id="groupCampanhas">
+        <button class="menu-group-header" type="button">
+          <i data-lucide="folder-kanban"></i><span class="label">Campanhas</span><i data-lucide="chevron-down" class="chevron"></i>
+        </button>
+        <div class="menu-group-body">
+          <button class="menu-item sub" data-target="nova"><i data-lucide="plus-circle"></i><span class="label">Nova Campanha</span></button>
+          <button class="menu-item sub" data-target="campanhas"><i data-lucide="list"></i><span class="label">Rodadas</span></button>
+          <button class="menu-item sub" data-target="participantes"><i data-lucide="bar-chart-2"></i><span class="label">Resultados</span></button>
+          <button class="menu-item sub" data-target="historico"><i data-lucide="history"></i><span class="label">Histórico</span></button>
+          <button class="menu-item sub" data-target="banco"><i data-lucide="database"></i><span class="label">Banco de Perguntas</span></button>
+          <button class="menu-item sub" data-target="regras-excecoes"><i data-lucide="scale"></i><span class="label">Regras & Exceções</span></button>
+        </div>
+      </div>
+
+      <button class="menu-item qualidade-only" data-target="elegiveis"><i data-lucide="user-check"></i><span class="label">Elegíveis</span></button>
+      <button class="menu-item qualidade-only" data-target="sorteio"><i data-lucide="dices"></i><span class="label">Sorteio</span></button>
+      <button class="menu-item qualidade-only" data-target="divulgacao"><i data-lucide="megaphone"></i><span class="label">Divulgação</span></button>
+      <button class="menu-item qualidade-only" data-target="auditoria"><i data-lucide="shield-check"></i><span class="label">Auditoria</span></button>
+      <button class="menu-item qualidade-only" data-target="relatorios"><i data-lucide="file-text"></i><span class="label">Relatórios</span></button>
+
+      <!-- ===== Perfil Colaborador ===== -->
+      <button class="menu-item colaborador-only active" data-target="campanha-atual"><i data-lucide="target"></i><span class="label">Campanha Atual</span></button>
+      <button class="menu-item colaborador-only" data-target="historico-colab"><i data-lucide="history"></i><span class="label">Histórico</span></button>
+      <button class="menu-item colaborador-only" data-target="meu-resultado"><i data-lucide="award"></i><span class="label">Meu Resultado</span></button>
+      <button class="menu-item colaborador-only" data-target="regulamento"><i data-lucide="book-open"></i><span class="label">Regulamento</span></button>
+
+      <button class="menu-item" data-target="config"><i data-lucide="settings"></i><span class="label">Configurações</span></button>
+    </nav>
+    <div class="sidebar-foot">v4.0 · Protótipo funcional<br>Dados fictícios para demonstração</div>
+  </aside>
+
+  <div class="overlay" id="overlay"></div>
+
+  <div class="main">
+    <div class="topbar">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <button class="hamburger" id="hamburger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+        <h2 id="pageTitle">Início</h2>
+      </div>
+      <div class="topbar-right">
+        <button class="icon-btn" id="themeToggleTop" title="Alternar tema claro/escuro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+        <div class="user-chip"><div class="who"><div class="n" id="userName">Mariana Queiroz</div><div class="r" id="userRole">Qualidade · Administrador</div></div><div class="avatar" id="avatarInit">MQ</div></div>
+        <button class="icon-btn" id="btnLogout" title="Sair"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg></button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ================= INÍCIO (Qualidade) ================= -->
+      <section class="section active qualidade-only" id="sec-inicio">
+        <div class="hero-banner">
+          <div><h2>Painel da Qualidade</h2><p>Visão geral das campanhas do Programa Política de Gestão.</p></div>
+          <div class="hero-icon"><i data-lucide="shield-check" style="width:26px;height:26px;color:#fff;"></i></div>
+        </div>
+
+        <div id="qualidadeTip"></div>
+
+        <div class="kpi-grid">
+          <div class="kpi clickable" onclick="goToRodadas()"><div class="kpi-icon"><i data-lucide="layers"></i></div><div class="label">Total de campanhas</div><div class="value" id="kpiTotalCampanhas">0</div><div class="sub">desde o início do programa</div></div>
+          <div class="kpi alt1 clickable" onclick="goToRodadas()"><div class="kpi-icon"><i data-lucide="play-circle"></i></div><div class="label">Em andamento</div><div class="value" id="kpiAndamento">0</div><div class="sub">aceitando respostas agora</div></div>
+          <div class="kpi alt3 clickable" onclick="goToRodadas()"><div class="kpi-icon"><i data-lucide="calendar-clock"></i></div><div class="label">Programadas</div><div class="value" id="kpiProgramadas">0</div><div class="sub">ainda não iniciadas</div></div>
+          <div class="kpi alt2 clickable" onclick="goToResultadosLatest()"><div class="kpi-icon"><i data-lucide="users"></i></div><div class="label">Participantes (rodada)</div><div class="value" id="kpiParticipantes">0</div><div class="sub">na campanha mais recente</div></div>
+          <div class="kpi clickable" onclick="goToElegiveisLatest()"><div class="kpi-icon"><i data-lucide="user-check"></i></div><div class="label">Elegíveis (rodada)</div><div class="value" id="kpiElegiveis">0</div><div class="sub">após aplicar regras de elegibilidade</div></div>
+          <div class="kpi alt4 clickable" onclick="goToHistoricoAdmin()"><div class="kpi-icon"><i data-lucide="trophy"></i></div><div class="label">Ganhadores sorteados</div><div class="value" id="kpiGanhadores">0</div><div class="sub">premiações realizadas</div></div>
+        </div>
+
+        <div class="two-col">
+          <div class="panel"><h3>Participação por campanha</h3><div class="hint">Número de respostas válidas recebidas</div><div class="bars" id="chartParticipacao"></div></div>
+          <div class="panel"><h3>Percentual de acertos</h3><div class="hint">Distribuição da última campanha encerrada</div><div class="donut-wrap" id="chartDonut"></div></div>
+        </div>
+        <div class="two-col">
+          <div class="panel"><h3>Ganhadores por setor</h3><div class="hint">Clique em um setor para ver os nomes</div><div id="chartSetor"></div></div>
+          <div class="panel"><h3>Ganhadores por filial</h3><div class="hint">Clique em uma filial para ver os nomes</div><div id="chartFilial"></div></div>
+        </div>
+        <div class="panel"><h3>Últimas campanhas</h3><div class="hint">Resumo rápido do status atual</div>
+          <div class="table-wrap"><table><thead><tr><th>Campanha</th><th>Período</th><th>Participantes</th><th>Status</th></tr></thead><tbody id="tblUltimasCampanhas"></tbody></table></div>
+        </div>
+      </section>
+
+      <!-- ================= RODADAS (Qualidade) ================= -->
+      <section class="section qualidade-only" id="sec-campanhas">
+        <div class="section-head"><div><h2>Rodadas de Campanhas</h2><p>Todas as campanhas cadastradas, programadas, em andamento e encerradas.</p></div></div>
+        <div class="campaign-grid" id="campaignGrid"></div>
+      </section>
+
+      <!-- ================= NOVA CAMPANHA (Qualidade) ================= -->
+      <section class="section qualidade-only" id="sec-nova">
+        <div class="section-head"><div><h2 id="novaTitle">Nova Campanha</h2><p>Cadastre a campanha e monte o questionário diretamente no sistema.</p></div></div>
+        <form class="panel" id="formCampanha">
+
+          <div class="form-subhead"><div class="fsh-icon"><i data-lucide="clipboard-list"></i></div><h3>Informações gerais</h3></div>
+          <div class="hint">Visíveis para os colaboradores após a divulgação da campanha</div>
+          <div class="form-grid">
+            <div class="field full"><label><i data-lucide="type" style="width:13px;height:13px;"></i> Nome da campanha</label><input type="text" name="nome" placeholder="Ex: PPG 2026.2 – Gestão de Riscos" required></div>
+            <div class="field full"><label>Descrição</label><textarea name="descricao" rows="2" placeholder="Breve descrição do tema da campanha"></textarea></div>
+            <div class="field full"><label>Objetivo da campanha</label><textarea name="objetivo" rows="2" placeholder="Ex: Reforçar boas práticas de gestão de riscos operacionais"></textarea></div>
+          </div>
+
+          <div class="form-subhead"><div class="fsh-icon"><i data-lucide="calendar-range"></i></div><h3>Cronograma</h3></div>
+          <div class="hint">Controla automaticamente quando os colaboradores podem responder</div>
+          <div class="form-grid">
+            <div class="field"><label><i data-lucide="play" style="width:13px;height:13px;"></i> Início</label><input type="datetime-local" name="inicio" required></div>
+            <div class="field"><label><i data-lucide="square" style="width:13px;height:13px;"></i> Encerramento</label><input type="datetime-local" name="fim" required></div>
+            <div class="field"><label>Status</label><select name="status"><option value="programada">Programada</option><option value="andamento">Em andamento</option><option value="encerrada">Encerrada</option></select></div>
+          </div>
+
+          <div class="form-subhead"><div class="fsh-icon"><i data-lucide="gift"></i></div><h3>Premiação</h3></div>
+          <div class="form-grid">
+            <div class="field"><label>Quantidade de ganhadores</label><input type="number" name="qtdGanhadores" min="1" value="4"></div>
+            <div class="field"><label>Descrição do prêmio</label><input type="text" name="premio" placeholder="Ex: Vale-compras R$ 200,00"></div>
+            <div class="field full"><label>Critérios específicos da campanha <span class="lock-note">🔒 Somente Qualidade</span></label><textarea name="criterios" rows="2" placeholder="Ex: Priorizar setores que ainda não foram contemplados em 2026"></textarea></div>
+          </div>
+
+          <div class="form-subhead"><div class="fsh-icon"><i data-lucide="help-circle"></i></div><h3>Questionário</h3><span class="lock-note" style="margin-left:auto;">🔒 Gabarito visível apenas para a Qualidade</span></div>
+          <div class="hint">Monte as perguntas diretamente no sistema, ou reaproveite uma pergunta já cadastrada no Banco de Perguntas.</div>
+
+          <div class="bq-picker">
+            <div class="field" style="margin-bottom:8px;"><label>Inserir pergunta do Banco de Perguntas</label>
+              <select id="bqPickerSelect"></select>
+            </div>
+            <button type="button" class="btn btn-ghost btn-sm" id="btnInserirDoBanco">+ Inserir no questionário</button>
+          </div>
+
+          <div id="questionList"></div>
+          <button type="button" class="btn btn-ghost btn-sm" id="btnAddQuestion">+ Adicionar pergunta nova</button>
+          <div style="display:flex; gap:10px; margin-top:22px;">
+            <button type="submit" class="btn btn-primary" id="btnSubmitCampanha">Cadastrar campanha</button>
+            <button type="button" class="btn btn-outline" id="btnResetForm">Limpar</button>
+            <button type="button" class="btn btn-outline" id="btnCancelEdit" style="display:none;">Cancelar edição</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- ================= RESULTADOS / PARTICIPANTES (Qualidade) ================= -->
+      <section class="section qualidade-only" id="sec-participantes">
+        <div class="section-head"><div><h2>Resultados</h2><p>Respostas registradas para a campanha selecionada — uma resposta por matrícula.</p></div></div>
+        <div class="panel">
+          <div style="display:flex; gap:12px; align-items:flex-end; margin-bottom:16px; flex-wrap:wrap;">
+            <div class="field" style="min-width:260px;"><label>Campanha</label><select id="selectCampanhaParticipantes"></select></div>
+          </div>
+          <div class="sorteio-stats" id="participantesStats"></div>
+          <div class="table-wrap"><table><thead><tr><th>Colaborador</th><th>Matrícula</th><th>Função</th><th>Setor</th><th>Filial</th><th>Data/hora resposta</th><th>% Acertos</th></tr></thead><tbody id="tblParticipantes"></tbody></table></div>
+        </div>
+        <div class="panel">
+          <h3>Questões com maior índice de erro / acerto</h3>
+          <div class="hint">Ajuda a identificar pontos de reforço no treinamento</div>
+          <div class="two-col">
+            <div><div class="hint" style="margin-bottom:8px; font-weight:700; color:var(--error);">Maior índice de erro</div><div id="questoesErro"></div></div>
+            <div><div class="hint" style="margin-bottom:8px; font-weight:700; color:var(--success);">Maior índice de acerto</div><div id="questoesAcerto"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= ELEGÍVEIS (Qualidade) ================= -->
+      <section class="section qualidade-only" id="sec-elegiveis">
+        <div class="section-head"><div><h2>Elegíveis ao sorteio</h2><p>Regras aplicadas automaticamente: 100% de acertos, função permitida e sem premiação nos últimos 2 anos.</p></div></div>
+        <div class="panel">
+          <div class="field" style="max-width:320px; margin-bottom:16px;"><label>Campanha</label><select id="selectCampanhaElegiveis"></select></div>
+          <div class="table-wrap"><table><thead><tr><th>#</th><th>Colaborador</th><th>Matrícula</th><th>Função</th><th>Setor</th><th>Filial</th><th>Data/hora resposta</th></tr></thead><tbody id="tblElegiveis"></tbody></table></div>
+        </div>
+        <div class="panel">
+          <h3>Excluídos automaticamente</h3>
+          <div class="hint">Colaboradores com 100% de acertos, porém desclassificados por regra de elegibilidade</div>
+          <div class="table-wrap"><table><thead><tr><th>Colaborador</th><th>Matrícula</th><th>Função</th><th>Setor</th><th>Motivo da exclusão</th></tr></thead><tbody id="tblExcluidos"></tbody></table></div>
+        </div>
+      </section>
+
+      <!-- ================= SORTEIO (Qualidade) ================= -->
+      <section class="section qualidade-only" id="sec-sorteio">
+        <div class="section-head"><div><h2>Sorteio dos ganhadores</h2><p>Processo aleatório, transparente e auditável, com distribuição justa entre setores e filiais.</p></div></div>
+        <div class="panel">
+          <div class="sorteio-setup">
+            <div class="field" style="min-width:280px;"><label>Campanha</label><select id="selectCampanhaSorteio"></select></div>
+            <button class="btn btn-primary" id="btnSortear"><i data-lucide="dices" style="width:16px;height:16px;"></i> Iniciar sorteio</button>
+            <button class="btn btn-outline" id="btnResetSorteio">Reiniciar</button>
+          </div>
+          <div class="sorteio-stats" id="sorteioStats"></div>
+          <div class="eligible-strip" id="eligibleStrip"></div>
+          <div class="slots" id="slots"></div>
+          <div id="randomSeedWrap" style="display:none;"><div class="hint" style="margin-bottom:2px;">Número aleatório utilizado no processo (registro de auditoria):</div><span class="random-seed" id="randomSeedValue"></span></div>
+          <div class="justification" id="justificationBox"></div>
+          <div id="sorteioResultActions" style="display:none; gap:10px; margin-top:14px;">
+            <button class="btn btn-ghost" id="btnValidarSorteio">✓ Validar resultado</button>
+            <button class="btn btn-outline" id="btnRegistrarHistorico">Registrar no histórico</button>
+            <button class="btn btn-outline" id="btnRelatorioOficial">📄 Gerar relatório oficial</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= RELATÓRIOS (Qualidade) ================= -->
+      <section class="section qualidade-only" id="sec-relatorios">
+        <div class="section-head"><div><h2>Relatórios</h2><p>Exportação de dados para auditoria e prestação de contas — .xlsx baixa um arquivo real; .pdf abre a visualização de impressão do navegador.</p></div></div>
+        <div class="panel">
+          <div class="field" style="max-width:320px; margin-bottom:18px;"><label>Campanha</label><select id="selectCampanhaRelatorio"></select></div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px;">
+            <div class="panel" style="margin:0; box-shadow:none; border:1px solid var(--border);"><h3 style="font-size:13.5px;">Lista de participantes</h3><p class="hint" style="margin-bottom:12px;">Todos os que responderam</p><div style="display:flex; gap:8px;"><button class="btn btn-outline btn-sm report-btn" data-report="participantes" data-type="Excel">.xlsx</button><button class="btn btn-outline btn-sm report-btn" data-report="participantes" data-type="PDF">.pdf</button></div></div>
+            <div class="panel" style="margin:0; box-shadow:none; border:1px solid var(--border);"><h3 style="font-size:13.5px;">Elegíveis ao sorteio</h3><p class="hint" style="margin-bottom:12px;">Após aplicação das regras de elegibilidade</p><div style="display:flex; gap:8px;"><button class="btn btn-outline btn-sm report-btn" data-report="elegiveis" data-type="Excel">.xlsx</button><button class="btn btn-outline btn-sm report-btn" data-report="elegiveis" data-type="PDF">.pdf</button></div></div>
+            <div class="panel" style="margin:0; box-shadow:none; border:1px solid var(--border);"><h3 style="font-size:13.5px;">Ganhadores sorteados</h3><p class="hint" style="margin-bottom:12px;">Com data e hora do sorteio</p><div style="display:flex; gap:8px;"><button class="btn btn-outline btn-sm report-btn" data-report="ganhadores" data-type="Excel">.xlsx</button><button class="btn btn-outline btn-sm report-btn" data-report="ganhadores" data-type="PDF">.pdf</button></div></div>
+            <div class="panel" style="margin:0; box-shadow:none; border:1px solid var(--border);"><h3 style="font-size:13.5px;">Distribuição por setor/filial</h3><p class="hint" style="margin-bottom:12px;">Verificação de equidade nas premiações</p><div style="display:flex; gap:8px;"><button class="btn btn-outline btn-sm report-btn" data-report="distribuicao" data-type="Excel">.xlsx</button><button class="btn btn-outline btn-sm report-btn" data-report="distribuicao" data-type="PDF">.pdf</button></div></div>
+            <div class="panel" style="margin:0; box-shadow:none; border:1px solid var(--border);"><h3 style="font-size:13.5px;">Registro de auditoria do sorteio</h3><p class="hint" style="margin-bottom:12px;">Critérios aplicados, número aleatório e responsável</p><div style="display:flex; gap:8px;"><button class="btn btn-outline btn-sm report-btn" data-report="auditoria" data-type="Excel">.xlsx</button><button class="btn btn-outline btn-sm report-btn" data-report="auditoria" data-type="PDF">.pdf</button></div></div>
+            <div class="panel" style="margin:0; box-shadow:none; border:1px solid var(--border);"><h3 style="font-size:13.5px;">Histórico completo</h3><p class="hint" style="margin-bottom:12px;">Todas as campanhas já realizadas</p><div style="display:flex; gap:8px;"><button class="btn btn-outline btn-sm report-btn" data-report="historico" data-type="Excel">.xlsx</button><button class="btn btn-outline btn-sm report-btn" data-report="historico" data-type="PDF">.pdf</button></div></div>
+            <div class="panel" style="margin:0; box-shadow:none; border:1px solid var(--border);"><h3 style="font-size:13.5px;">Comparativo entre campanhas</h3><p class="hint" style="margin-bottom:12px;">Participantes, elegíveis e média lado a lado — .pdf inclui gráfico</p><div style="display:flex; gap:8px;"><button class="btn btn-outline btn-sm report-btn" data-report="comparativo" data-type="Excel">.xlsx</button><button class="btn btn-outline btn-sm report-btn" data-report="comparativo" data-type="PDF">.pdf</button></div></div>
+            <div class="panel" style="margin:0; box-shadow:none; border:1px solid var(--border);"><h3 style="font-size:13.5px;">Evolução histórica</h3><p class="hint" style="margin-bottom:12px;">Tendência de participação e acertos ao longo do tempo — .pdf inclui gráfico</p><div style="display:flex; gap:8px;"><button class="btn btn-outline btn-sm report-btn" data-report="evolucao" data-type="Excel">.xlsx</button><button class="btn btn-outline btn-sm report-btn" data-report="evolucao" data-type="PDF">.pdf</button></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= HISTÓRICO (Qualidade) ================= -->
+      <section class="section qualidade-only" id="sec-historico">
+        <div class="section-head"><div><h2>Histórico de campanhas</h2><p>Registro completo de elegíveis, critérios aplicados e sorteios, para auditoria.</p></div></div>
+        <div class="panel"><div class="timeline" id="timeline"></div></div>
+      </section>
+
+      <!-- ================= BANCO DE PERGUNTAS (Qualidade) ================= -->
+      <section class="section qualidade-only" id="sec-banco">
+        <div class="section-head"><div><h2>Banco de Perguntas</h2><p>Cadastre, edite, importe e reutilize perguntas entre campanhas, com alerta de repetição.</p></div></div>
+
+        <div class="panel">
+          <div class="bq-alert"><i data-lucide="info" style="width:15px;height:15px;"></i> Perguntas usadas há menos de 2 anos recebem um alerta — mas a Qualidade pode reutilizá-las se necessário.</div>
+          <div class="bq-toolbar">
+            <label class="btn btn-outline btn-sm" style="cursor:pointer;">
+              📥 Importar Excel/CSV <input type="file" id="bqImportFile" accept=".csv,.xlsx,.xls" style="display:none;">
+            </label>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Código</th><th>Categoria</th><th>Tema</th><th>Procedimento</th><th>Utilizações</th><th>Situação</th><th>Status</th><th>Ações</th></tr></thead>
+              <tbody id="bqTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <form class="panel" id="bqForm">
+          <h3>Cadastrar / editar pergunta</h3>
+          <div class="hint">Preencha os metadados e as alternativas — o código é gerado automaticamente</div>
+          <div class="form-grid">
+            <div class="field"><label>Código</label><input type="text" id="bqCodigo" placeholder="Gerado automaticamente" disabled></div>
+            <div class="field"><label>Categoria</label><input type="text" id="bqCategoria" placeholder="Ex: Segurança" required></div>
+            <div class="field"><label>Tema</label><input type="text" id="bqTema" placeholder="Ex: Proteção de Dados" required></div>
+            <div class="field"><label>Procedimento relacionado</label><input type="text" id="bqProcedimento" placeholder="Ex: POL-SEG-02"></div>
+            <div class="field full"><label>Enunciado</label><input type="text" id="bqTexto" placeholder="Digite a pergunta" required></div>
+            <div class="field"><label>Tipo</label>
+              <select id="bqTipo" onchange="renderBQOptionInputs(this.value)">
+                <option value="unica">Resposta única</option>
+                <option value="multipla">Múltipla escolha</option>
+                <option value="multiplas_respostas">Resposta múltipla</option>
+                <option value="vf">Verdadeiro ou falso</option>
+              </select>
+            </div>
+            <div class="field"><label>Status</label><select id="bqStatus"><option value="ativa">Ativa</option><option value="inativa">Inativa</option></select></div>
+            <div class="field full"><label>Alternativas — marque a(s) correta(s)</label><div id="bqOptionsWrap"></div></div>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:14px;">
+            <button type="submit" class="btn btn-primary">Salvar pergunta</button>
+            <button type="button" class="btn btn-outline" id="btnResetBQ">Limpar</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- ================= REGRAS & EXCEÇÕES (Qualidade) ================= -->
+      <section class="section qualidade-only" id="sec-regras-excecoes">
+        <div class="section-head"><div><h2>Regras & Exceções</h2><p>Toda alteração ou exceção às regras padrão de elegibilidade fica registrada aqui, com justificativa e responsável.</p></div></div>
+
+        <div class="panel">
+          <div class="bq-alert"><i data-lucide="alert-triangle" style="width:15px;height:15px;"></i> As 3 regras de elegibilidade (100% de acertos, cargo não impedido, não ter ganhado nos últimos 2 anos) são aplicadas automaticamente. Use esta página apenas quando uma exceção pontual e justificada precisar ser registrada.</div>
+        </div>
+
+        <form class="panel" id="formExcecao">
+          <h3>Registrar alteração ou exceção</h3>
+          <div class="form-grid">
+            <div class="field"><label>Campanha afetada</label><select id="excCampanha" required></select></div>
+            <div class="field"><label>Regra original</label><input type="text" id="excRegraOriginal" placeholder="Ex: Não ter sido premiado nos últimos 2 anos" required></div>
+            <div class="field full"><label>Alteração / exceção aplicada</label><input type="text" id="excAlteracao" placeholder="Ex: Colaborador X liberado por decisão da diretoria em 10/06/2026" required></div>
+            <div class="field full"><label>Justificativa</label><input type="text" id="excJustificativa" placeholder="Explique o motivo da exceção" required></div>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:14px;">
+            <button type="submit" class="btn btn-primary">Registrar exceção</button>
+          </div>
+        </form>
+
+        <div class="panel">
+          <h3>Histórico de alterações e exceções</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Data/hora</th><th>Responsável</th><th>Campanha</th><th>Regra original</th><th>Alteração aplicada</th><th>Justificativa</th></tr></thead>
+              <tbody id="tblExcecoes"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= DIVULGAÇÃO (Qualidade) ================= -->
+      <section class="section qualidade-only" id="sec-divulgacao">
+        <div class="section-head"><div><h2>Divulgação</h2><p>Gere uma arte de divulgação da campanha (com link e QR Code) e, após o sorteio, o banner dos ganhadores.</p></div></div>
+
+        <div class="panel">
+          <h3>Divulgar uma campanha</h3>
+          <div class="form-grid">
+            <div class="field full"><label>Campanha</label><select id="divCampanha"></select></div>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:14px;">
+            <button class="btn btn-primary" id="btnGerarDivulgacao">🪧 Gerar arte de divulgação</button>
+          </div>
+        </div>
+        <div class="panel" id="divPreviewWrap" style="display:none;"></div>
+
+        <div class="panel">
+          <h3>Banner dos ganhadores</h3>
+          <p class="hint">Disponível somente para campanhas com sorteio já registrado no histórico (oficial).</p>
+          <div class="form-grid">
+            <div class="field full"><label>Campanha</label><select id="divCampanhaGanhadores"></select></div>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:14px;">
+            <button class="btn btn-primary" id="btnGerarBannerGanhadores">🏆 Gerar banner dos ganhadores</button>
+          </div>
+        </div>
+        <div class="panel" id="bannerGanhadoresWrap" style="display:none;"></div>
+      </section>
+
+      <!-- ================= AUDITORIA (Qualidade) ================= -->
+      <section class="section qualidade-only" id="sec-auditoria">
+        <div class="section-head"><div><h2>Auditoria</h2><p>Rastreabilidade completa de cada participação, com filtros, gráficos e exportação.</p></div></div>
+
+        <div class="panel">
+          <h3>Filtros</h3>
+          <div class="form-grid">
+            <div class="field"><label>Campanha</label><select id="audFiltroCampanha"><option value="">Todas</option></select></div>
+            <div class="field"><label>Setor</label><select id="audFiltroSetor"><option value="">Todos</option></select></div>
+            <div class="field"><label>Filial</label><select id="audFiltroFilial"><option value="">Todas</option></select></div>
+            <div class="field"><label>Função</label><select id="audFiltroFuncao"><option value="">Todas</option></select></div>
+            <div class="field"><label>De</label><input type="date" id="audFiltroDataDe"></div>
+            <div class="field"><label>Até</label><input type="date" id="audFiltroDataAte"></div>
+            <div class="field"><label>Elegibilidade</label><select id="audFiltroStatus"><option value="">Todos</option><option value="elegivel">Elegível</option><option value="excluido">Excluído (qualquer motivo)</option><option value="naoelegivel">Excluído — não atingiu 100%</option><option value="cargoimpedido">Excluído — cargo impedido</option><option value="premiadorecente">Excluído — premiado(a) recente</option></select></div>
+            <div class="field full"><label>Buscar (nome, matrícula ou código de resposta)</label><input type="text" id="audFiltroBusca" placeholder="Ex: Ana Souza, 100004 ou PPG-2026-08-000012"></div>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:14px;">
+            <button class="btn btn-primary btn-sm" id="audAplicarFiltros">Aplicar filtros</button>
+            <button class="btn btn-outline btn-sm" id="audLimparFiltros">Limpar filtros</button>
+            <button class="btn btn-outline btn-sm" id="audExportXlsx">📊 Exportar .xlsx</button>
+            <button class="btn btn-outline btn-sm" id="audExportPdf">📄 Exportar .pdf</button>
+          </div>
+        </div>
+
+        <div class="sorteio-stats" id="audResumo"></div>
+
+        <div class="two-col">
+          <div class="panel"><h3>Participação por setor</h3><div class="hint">Considera os registros filtrados acima</div><div id="audChartSetor"></div></div>
+          <div class="panel"><h3>Participação por filial</h3><div class="hint">Considera os registros filtrados acima</div><div id="audChartFilial"></div></div>
+        </div>
+        <div class="panel"><h3>Evolução histórica</h3><div class="hint">Participantes por campanha, em ordem cronológica</div><div id="audChartEvolucao"></div></div>
+
+        <div class="panel">
+          <h3>Registro detalhado de participações</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Nome</th><th>Matrícula</th><th>CPF</th><th>Função</th><th>Setor</th><th>Filial</th><th>Campanha</th><th>Código</th><th>Início</th><th>Fim</th><th>Duração</th><th>Acertos</th><th>%</th><th>Dispositivo/Sessão</th><th>Elegibilidade</th><th>Ações</th></tr></thead>
+              <tbody id="tblAuditoriaDetalhe"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Registro de ações do sistema</h3>
+          <div class="hint">Log cronológico de ações administrativas realizadas nesta sessão</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Data/hora</th><th>Usuário</th><th>Ação</th><th>Detalhe</th></tr></thead>
+              <tbody id="tblAuditoria"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= CAMPANHA ATUAL (Colaborador) ================= -->
+      <section class="section colaborador-only active" id="sec-campanha-atual">
+        <div class="section-head"><div><h2>Campanha Atual</h2><p>Campanhas do PPG abertas para resposta agora.</p></div></div>
+        <div id="campanhaAtualBody"></div>
+      </section>
+
+      <!-- ================= HISTÓRICO (Colaborador) ================= -->
+      <section class="section colaborador-only" id="sec-historico-colab">
+        <div class="section-head"><div><h2>Histórico</h2><p>Campanhas do PPG das quais você já participou.</p></div></div>
+        <div id="historicoColabBody"></div>
+      </section>
+
+      <!-- ================= MEU RESULTADO (Colaborador) ================= -->
+      <section class="section colaborador-only" id="sec-meu-resultado">
+        <div class="section-head"><div><h2>Meu Resultado</h2><p>Resultado da sua participação mais recente no PPG.</p></div></div>
+        <div id="meuResultadoBody"></div>
+      </section>
+
+      <!-- ================= REGULAMENTO (Colaborador) ================= -->
+      <section class="section colaborador-only" id="sec-regulamento">
+        <div class="section-head"><div><h2>Regras e Transparência</h2><p>Entenda exatamente como o PPG funciona, do início ao sorteio.</p></div></div>
+        <div class="mascot-row">
+          <div class="mascot-avatar">
+            <span class="mascot-emoji mascot-emoji-blink">🎯</span>
+          </div>
+          <div class="mascot-speech"><span class="mascot-name">Univaldo</span>Bora entender as regras? É rapidinho, prometo! 😉</div>
+        </div>
+
+        <div id="regulamentoStats"></div>
+
+        <div class="panel">
+          <div class="reg-block">
+            <h4>1. Como participar</h4>
+            <p>Durante o período de cada campanha, acesse "Campanha Atual" e responda ao questionário — uma pergunta por vez, no seu ritmo. Cada colaborador pode enviar <b>apenas uma resposta por campanha</b>, vinculada à sua matrícula. Depois de enviada, a resposta não pode ser alterada.</p>
+          </div>
+          <div class="reg-block">
+            <h4>2. Como a elegibilidade ao sorteio é calculada</h4>
+            <p>Depois que a campanha encerra, o sistema aplica três filtros automáticos, nesta ordem:</p>
+            <ul>
+              <li><b>100% de acertos.</b> Só quem acerta todas as perguntas entra na lista de elegíveis. Não há "quase" — é tudo ou nada.</li>
+              <li><b>Função permitida.</b> Colaboradores em funções de Coordenação, Gerência, Encarregado ou Assessoria não concorrem — o objetivo do PPG é incentivar o conhecimento em todos os níveis operacionais e administrativos, não recompensar quem já ocupa posição de liderança.</li>
+              <li><b>Sem prêmio recente.</b> Quem já foi sorteado em qualquer campanha do PPG nos últimos <b>2 anos</b> não concorre novamente nesse período — assim mais gente tem chance de ser premiada ao longo do tempo.</li>
+            </ul>
+            <p class="hint">Exemplo: se você acertou 100%, não é Coordenador/Gerente e não ganhou nos últimos 2 anos, você está automaticamente na lista de elegíveis — não precisa se inscrever em nada.</p>
+          </div>
+          <div class="reg-block">
+            <h4>3. Como o sorteio garante imparcialidade</h4>
+            <ul>
+              <li>O sorteio é feito por <b>geração aleatória de números</b> dentro do próprio sistema — o mesmo número fica registrado para conferência.</li>
+              <li>O sistema tenta uma <b>distribuição justa</b>: sempre que possível, evita concentrar todos os ganhadores no mesmo setor ou na mesma filial.</li>
+              <li>Quando essa distribuição não é totalmente possível (por exemplo, poucos setores diferentes entre os elegíveis daquela rodada), o sistema registra a justificativa no histórico, para fins de auditoria.</li>
+              <li>A equipe da Qualidade pode validar ou, em caso de alguma restrição não identificada automaticamente, substituir um ganhador — essa ação também fica registrada.</li>
+            </ul>
+          </div>
+          <div class="reg-block">
+            <h4>4. O que é mantido em sigilo</h4>
+            <p>O <b>gabarito</b> (as respostas corretas de cada pergunta) é de acesso exclusivo da equipe da Qualidade — nem antes, nem depois da campanha ele é divulgado. Ao final do questionário você vê apenas sua pontuação final, sem indicação de quais perguntas específicas acertou ou errou.</p>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h4 style="font-size:14px; color:var(--secondary); margin-bottom:12px;">Perguntas frequentes</h4>
+          <details class="faq-item">
+            <summary>Posso responder mais de uma vez se errar?</summary>
+            <p>Não. Cada matrícula tem direito a uma única resposta por campanha, mesmo que você não acerte 100%.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Se eu empatar em 100% com outras pessoas, todo mundo concorre?</summary>
+            <p>Sim — todos que acertarem 100% (e passarem pelos outros dois filtros) entram na mesma lista de elegíveis, com a mesma chance no sorteio aleatório.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Meu gestor pode ver minhas respostas erradas?</summary>
+            <p>Não. Apenas a sua pontuação final é registrada. O detalhamento pergunta a pergunta não fica visível nem para gestores, apenas o percentual final.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Como sei se fui sorteado(a)?</summary>
+            <p>Os ganhadores são divulgados oficialmente pela equipe da Qualidade após o sorteio. Você também pode acompanhar em "Histórico" se participou e qual foi seu resultado.</p>
+          </details>
+        </div>
+      </section>
+
+      <!-- ================= CONFIGURAÇÕES (ambos os perfis) ================= -->
+      <section class="section" id="sec-config">
+        <div class="section-head"><div><h2>Configurações</h2><p id="configSubtitle">Preferências pessoais e parâmetros do sistema.</p></div></div>
+        <div class="panel"><h3>Aparência</h3><div class="hint">Disponível para todos os perfis</div>
+          <div style="display:flex; align-items:center; gap:12px;"><label class="switch"><input type="checkbox" id="themeToggle"><span class="switch-track"></span></label><span style="font-size:13px;">Tema escuro</span></div>
+        </div>
+        <div class="panel">
+          <h3>🔒 Minha senha</h3>
+          <div class="hint">Disponível para todos os perfis</div>
+          <button class="btn btn-outline btn-sm" id="btnTrocarMinhaSenha" style="margin-top:10px;">Trocar minha senha</button>
+        </div>
+        <div class="panel qualidade-only">
+          <h3>🔑 Pedidos de redefinição de senha</h3>
+          <div class="hint">Vem da planilha em tempo real — resolva liberando uma senha temporária para a pessoa.</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Data/hora</th><th>Matrícula</th><th>Nome</th><th>Status</th><th>Ação</th></tr></thead>
+              <tbody id="tblPedidosSenha"></tbody>
+            </table>
+          </div>
+          <button class="btn btn-outline btn-sm" id="btnAtualizarPedidosSenha" style="margin-top:12px;">🔄 Atualizar lista</button>
+        </div>
+        <div class="panel">
+          <h3>Dados e armazenamento</h3>
+          <div class="hint">Este protótipo salva os dados automaticamente neste navegador — não é compartilhado entre computadores ou pessoas diferentes</div>
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+            <span style="width:9px;height:9px;border-radius:50%; background:var(--success); display:inline-block;"></span>
+            <span style="font-size:13px; color:var(--ink-soft);">Salvamento automático ativo — os dados continuam aqui mesmo recarregando a página</span>
+          </div>
+          <button class="btn btn-outline btn-sm" id="btnResetDemoData">🗑️ Zerar e recomeçar com os dados de demonstração</button>
+        </div>
+        <div class="two-col qualidade-only">
+          <div class="panel"><h3>Regras de elegibilidade</h3><div class="hint">Gerenciadas pela equipe da Qualidade</div>
+            <div class="form-grid">
+              <div class="field full"><label>Funções impedidas de participar do sorteio</label><input type="text" value="Coordenadores, Encarregados de Setor, Gerências e Assessoria (15 funções)" disabled></div>
+              <div class="field full"><label>Período de carência após premiação</label><input type="text" value="2 anos" disabled></div>
+              <div class="field full"><label>Distribuição justa entre setores e filiais</label><select><option>Ativada — priorizar diversidade</option><option>Desativada</option></select></div>
+            </div>
+          </div>
+          <div class="panel"><h3>Segurança e integrações</h3><div class="hint">Parâmetros técnicos do sistema</div>
+            <div class="form-grid">
+              <div class="field full"><label>Autenticação</label><input type="text" value="Matrícula + senha, com criptografia de dados sensíveis (produção)" disabled></div>
+              <div class="field full"><label>Armazenamento neste protótipo</label><input type="text" value="LocalStorage do navegador — sem servidor/banco de dados externo" disabled></div>
+              <div class="field full"><label>Integração futura com RH</label><input type="text" value="Atualização automática de matrícula, filial, setor e função" disabled></div>
+              <div class="field full"><label>Duplicidade de respostas</label><select><option>Bloquear — 1 resposta por matrícula</option></select></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= RESPONDER QUESTIONÁRIO ================= -->
+      <section class="section" id="sec-responder">
+        <div class="section-head">
+          <div><h2 id="responderTitle">Questionário</h2><p id="responderSubtitle"></p></div>
+          <button class="btn btn-outline btn-sm" id="btnVoltarCampanhas">← Voltar</button>
+        </div>
+        <div id="responderBody"></div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="empresa.config.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
