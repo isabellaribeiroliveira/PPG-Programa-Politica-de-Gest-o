@@ -595,7 +595,7 @@ const deepLinkCampaignId = urlParams.get('campanha');
 /* ======================= LOGIN ======================= */
 /* A autenticação de verdade agora mora na planilha (via Google Apps Script).
    Não existe mais senha nenhuma escrita aqui no código. */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbydTiVCX1xatYuavb41W-vqJH0oNCnl_hWi3ZavA4ZGGbTsgfBQc8h9e17Lc9S-838qtg/exec";
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbx7muTAi8Ywx_9nALTu8BV6saTvEnlRRgopWdpTNyUFbfAMT-wvfTzG1tisG6bevhuBVQ/exec";
 
 async function backendCall(action, payload){
   try{
@@ -658,7 +658,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
   try{
     currentUser = mapColaboradorParaUser(resp.colaborador);
     if(resp.precisaTrocarSenha){
-      abrirModalTrocaSenha({obrigatoria: true, primeiroAcesso: !!resp.primeiroAcesso});
+      abrirModalTrocaSenha({obrigatoria: true, primeiroAcesso: !!resp.primeiroAcesso, senhaAtual: senha});
       return; // só entra de fato no app depois de trocar a senha
     }
     entrarNoApp();
@@ -713,7 +713,7 @@ function abrirModalTrocaSenha(opts){
     const confirmar = document.getElementById('tsConfirmar').value;
     if(novaSenha !== confirmar){ erroEl.textContent = "As senhas não coincidem."; erroEl.style.display = "block"; return; }
     // No primeiro acesso obrigatório, a "senha atual" ainda é a própria matrícula.
-    const senhaAtual = obrigatoria ? (document.getElementById('loginMatricula')?.value.trim() || currentUser.matricula) : document.getElementById('tsSenhaAtual').value;
+    const senhaAtual = obrigatoria ? (opts.senhaAtual != null ? opts.senhaAtual : currentUser.matricula) : document.getElementById('tsSenhaAtual').value;
     const btn = this.querySelector('button[type="submit"]');
     btn.disabled = true; btn.textContent = "Salvando...";
     const resp = await backendCall('changePassword', {matricula: currentUser.matricula, senhaAtual, novaSenha});
