@@ -915,3 +915,7 @@
     color:var(--secondary); font-size:12px; font-weight:700; cursor:pointer; text-decoration:underline;
   }
   .login-forgot-link:hover{ color:var(--primary); }
+
+  /* ---------- Correção: modais abertos a partir da tela de login (troca de
+     senha, esqueci a senha) precisam ficar ACIMA da própria tela de login. ---------- */
+  #trocaSenhaBackdrop, #esqueciSenhaBackdrop{ z-index: 200; }
