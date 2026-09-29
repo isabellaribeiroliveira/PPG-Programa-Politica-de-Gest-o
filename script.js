@@ -466,6 +466,17 @@ function campaignAccessStatus(c){
   if(now > end) return 'encerrada';
   return 'aberta';
 }
+/* Calcula o status que a campanha DEVERIA ter, com base nas datas.
+   "Finalizada" é definitivo (só muda quando o sorteio é registrado) — a
+   data nunca reverte isso. Fora esse caso, o status sempre reflete a
+   realidade: programada → em andamento → encerrada, sozinho. */
+function calcularStatusPorData(c){
+  if(c.status === 'finalizada') return 'finalizada';
+  const acesso = campaignAccessStatus(c);
+  if(acesso === 'nao_iniciada') return 'programada';
+  if(acesso === 'aberta') return 'andamento';
+  return 'encerrada';
+}
 
 /* ======================= NAV ======================= */
 const titles = {
@@ -954,6 +965,20 @@ async function sincronizarDadosDoServidor(silencioso){
       backendCall('getHistorico')
     ]);
     if(respCamp.ok && Array.isArray(respCamp.campanhas)) campaigns = respCamp.campanhas;
+
+    // Corrige sozinho o status pela data (programada → andamento → encerrada).
+    // "Finalizada" nunca é sobrescrito aqui — só o registro oficial do sorteio muda isso.
+    campaigns.forEach(c=>{
+      const statusCorreto = calcularStatusPorData(c);
+      if(statusCorreto !== c.status){
+        const statusAntigo = c.status;
+        c.status = statusCorreto;
+        if(currentRole === 'qualidade'){
+          backendCall('salvarCampanha', {campanha: c, usuario: 'Sistema (atualização automática por data)'})
+            .then(r=>{ if(r.ok) console.log(`Status de "${c.nome}" atualizado sozinho: ${statusAntigo} → ${statusCorreto}`); });
+        }
+      }
+    });
     if(respBanco.ok && Array.isArray(respBanco.perguntas)) questionBank = respBanco.perguntas;
     if(respRespostas.ok && Array.isArray(respRespostas.respostas)){
       participants = respRespostas.respostas.map(r=>({...r, data: r.dataFim ? new Date(r.dataFim) : new Date(), dataInicio: r.dataInicio ? new Date(r.dataInicio) : null, dataFim: r.dataFim ? new Date(r.dataFim) : null}));
