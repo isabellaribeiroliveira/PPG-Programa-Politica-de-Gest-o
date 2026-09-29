@@ -22,8 +22,8 @@
    ===================================================================== */
 
 window.EMPRESA_CONFIG = {
-  nome: "Empresa Modelo Ltda (dados fictícios)",
-  filiais: ["Matriz", "Filial Norte", "Filial Sul", "Filial Leste", "Filial Oeste"],
+  nome: "Univale Transportes Ltda (dados fictícios)",
+  filiais: ["Matriz", "Vale Mineração - Santa Bárbara", "Vale Mineração - Mariana", "Mineração Usiminas - Musa", "Bahia"],
   cargosImpedidos: [
     "Assessor da Diretoria",
     "Coordenador de Logística",
@@ -42,8 +42,8 @@ window.EMPRESA_CONFIG = {
     "Gerente de Suprimentos"
 ],
   setores: [
-    {nome:"Recursos Humanos", funcoes:["Analista de RH", "Assistente de RH", "Auxiliar de RH", "Gerente de RH"]},
-    {nome:"Qualidade", funcoes:["Analista da Qualidade", "Assistente da Qualidade", "Supervisor da Qualidade"]},
+    {nome:"Recursos Humanos", funcoes:["Analista de RH", "Assistente de RH", "Auxiliar de RH", "Gerente de RH", "Encarregado de RH"]},
+    {nome:"Qualidade", funcoes:["Analista da Qualidade", "Auxiliar da Qualidade", "Gerente da Qualidade"]},
     {nome:"Tecnologia da Informação", funcoes:["Analista de TI", "Técnico de Informática", "Encarregado de TI"]},
     {nome:"Financeiro", funcoes:["Analista Financeiro", "Assistente Financeiro", "Gerente Financeiro"]},
     {nome:"Contabilidade", funcoes:["Analista Contábil", "Auxiliar Contábil", "Gerente Contábil"]},
