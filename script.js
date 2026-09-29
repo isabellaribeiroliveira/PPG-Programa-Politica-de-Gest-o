@@ -560,28 +560,6 @@ const deepLinkCampaignId = urlParams.get('campanha');
     }
   });
 
-  // Abas Qualidade / Colaborador — orientam visualmente qual credencial usar
-  const tabs = document.querySelectorAll('.login-tab');
-  const matriculaInput = document.getElementById('loginMatricula');
-  const subtitle = document.getElementById('loginSubtitle');
-  tabs.forEach(tab=>{
-    tab.addEventListener('click', ()=>{
-      tabs.forEach(t=>t.classList.remove('active'));
-      tab.classList.add('active');
-      const role = tab.dataset.role;
-      document.querySelectorAll('.login-demo-col[data-role]').forEach(col=>{
-        col.classList.toggle('dim', col.dataset.role !== role);
-      });
-      if(role === 'qualidade'){
-        matriculaInput.placeholder = "Ex: 1000";
-        subtitle.textContent = "Acesso da equipe de Qualidade — matrícula e senha corporativas.";
-      } else {
-        matriculaInput.placeholder = "Ex: 100110";
-        subtitle.textContent = "Acesso do Colaborador — mesma matrícula e senha do sistema interno.";
-      }
-    });
-  });
-
   // Painel retrátil de credenciais de teste (escondido por padrão)
   const demoToggle = document.getElementById('loginDemoToggle');
   const demoPanel = document.getElementById('loginDemoPanel');
@@ -600,14 +578,14 @@ const deepLinkCampaignId = urlParams.get('campanha');
 /* ======================= LOGIN ======================= */
 /* A autenticação de verdade agora mora na planilha (via Google Apps Script).
    Não existe mais senha nenhuma escrita aqui no código. */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxC-Hgr8hRY1Zia3UWpoddl7qrGQ0iOS-alQPOnvr9ST7r5NZFQ2KenHs_0_XStxPFVfQ/exec";
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwfKlz_TuxeCNl2F21M4_ebtnHy2lMn-ppggOXU5kjZwDoNQaoTv1E0DLYSvBcyQK_x9Q/exec";
 
 async function backendCall(action, payload){
   try{
     const res = await fetch(BACKEND_URL, {
       method: "POST",
       headers: {"Content-Type": "text/plain;charset=utf-8"}, // evita pre-flight de CORS no Apps Script
-      body: JSON.stringify({action, ...(payload||{})})
+      body: JSON.stringify({action, solicitante: (typeof currentUser !== 'undefined' && currentUser) ? currentUser.matricula : null, ...(payload||{})})
     });
     const textoCru = await res.text();
     if(!res.ok){
@@ -633,7 +611,8 @@ function normalizarTextoCliente(s){
 const PAPEIS_QUALIDADE = ["qualidade", "admin", "administrador", "gestao", "gestor", "coordenacao", "coordenador"];
 function mapColaboradorParaUser(colab){
   const papelNorm = normalizarTextoCliente(colab.papel);
-  const role = PAPEIS_QUALIDADE.some(p => papelNorm.includes(p)) ? "qualidade" : "colaborador";
+  const setorNorm = normalizarTextoCliente(colab.setor);
+  const role = (PAPEIS_QUALIDADE.some(p => papelNorm.includes(p)) || setorNorm.includes("qualidade")) ? "qualidade" : "colaborador";
   return {
     matricula: String(colab.matricula), nome: colab.nome, role,
     setor: colab.setor, filial: colab.filial, funcao: colab.funcao, cargo: colab.cargo || colab.funcao,
@@ -1603,7 +1582,7 @@ window.openQuiz = async function(campaignId){
   if(!existing){
     // checagem fresca no servidor — cobre o caso raro de ter respondido em
     // outro dispositivo nos últimos segundos, antes do próximo ciclo de sincronização
-    body.innerHTML = `<div class="duo-done"><span class="mascot-figure mascot-figure-emoji">${MASCOT_EMOJI}</span><h2>Carregando...</h2></div>`;
+    body.innerHTML = `<div class="duo-done"><span class="mascot-figure mascot-figure-emoji">${MASCOT_SVG}</span><h2>Carregando...</h2></div>`;
     const check = await backendCall('jaRespondeu', {campaignId, matricula: currentUser.matricula});
     if(check.ok && check.jaRespondeu){
       body.innerHTML = `<div class="duo-done"><span class="mascot-figure mascot-figure-emoji">🔒</span><h2>Você já respondeu esta campanha</h2><p>O registro já existe — feito neste ou em outro dispositivo.</p></div>`;
@@ -1728,7 +1707,7 @@ async function finalizeQuiz(){
   };
 
   const container = document.getElementById('responderBody');
-  container.innerHTML = `<div class="duo-done"><span class="mascot-figure mascot-figure-emoji">${MASCOT_EMOJI}</span><h2>Enviando sua resposta...</h2><p>Só um instante, isso é registrado direto no servidor.</p></div>`;
+  container.innerHTML = `<div class="duo-done"><span class="mascot-figure mascot-figure-emoji">${MASCOT_SVG}</span><h2>Enviando sua resposta...</h2><p>Só um instante, isso é registrado direto no servidor.</p></div>`;
 
   const resp = await backendCall('submeterResposta', {resposta: novoParticipante});
 
@@ -1765,13 +1744,17 @@ async function finalizeQuiz(){
 /* Univaldo, o mascote oficial da Univale Transportes — representado por emoji,
    sempre com as animações (respirar, balançar, "piscar") aplicadas via CSS. */
 const MASCOT_EMOJI = "🎯";
+/* Versão em SVG (Twemoji oficial) do mascote — nítida em qualquer aparelho,
+   sem depender da fonte de emoji do sistema operacional (que varia e pode
+   ficar com baixa qualidade em alguns dispositivos). */
+const MASCOT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" width="100%" height="100%"><circle fill="#DD2E44" cx="18" cy="18" r="18"/><circle fill="#FFF" cx="18" cy="18" r="13.5"/><circle fill="#DD2E44" cx="18" cy="18" r="10"/><circle fill="#FFF" cx="18" cy="18" r="6"/><circle fill="#DD2E44" cx="18" cy="18" r="3"/><path opacity=".2" d="M18.24 18.282l13.144 11.754s-2.647 3.376-7.89 5.109L17.579 18.42l.661-.138z"/><path fill="#FFAC33" d="M18.294 19c-.255 0-.509-.097-.704-.292-.389-.389-.389-1.018 0-1.407l.563-.563c.389-.389 1.018-.389 1.408 0 .388.389.388 1.018 0 1.407l-.564.563c-.194.195-.448.292-.703.292z"/><path fill="#55ACEE" d="M24.016 6.981c-.403 2.079 0 4.691 0 4.691l7.054-7.388c.291-1.454-.528-3.932-1.718-4.238-1.19-.306-4.079.803-5.336 6.935zm5.003 5.003c-2.079.403-4.691 0-4.691 0l7.388-7.054c1.454-.291 3.932.528 4.238 1.718.306 1.19-.803 4.079-6.935 5.336z"/><path fill="#3A87C2" d="M32.798 4.485L21.176 17.587c-.362.362-1.673.882-2.51.046-.836-.836-.419-2.08-.057-2.443L31.815 3.501s.676-.635 1.159-.152-.176 1.136-.176 1.136z"/></svg>`;
 const MASCOT_NOME = "Univaldo";
 function mascotBubble(texto, opts){
   const pro = opts && opts.pro;
-  const emoji = (opts && opts.emoji) || MASCOT_EMOJI;
+  const conteudo = (opts && opts.emoji) ? opts.emoji : MASCOT_SVG;
   return `<div class="mascot-row ${pro ? 'mascot-pro' : ''}">
     <div class="mascot-avatar">
-      <span class="mascot-emoji mascot-emoji-blink">${emoji}</span>
+      <span class="mascot-emoji mascot-emoji-blink">${conteudo}</span>
     </div>
     <div class="mascot-speech"><span class="mascot-name">${MASCOT_NOME}</span>${texto}</div>
   </div>`;
@@ -1821,7 +1804,7 @@ function renderQuizDoneInto(container, c, participant){
        Nada de nota, acertos ou confete — isso só é revelado após o encerramento. */
     container.innerHTML = `
       <div class="duo-done">
-        <span class="mascot-figure mascot-figure-emoji">${MASCOT_EMOJI}</span>
+        <span class="mascot-figure mascot-figure-emoji">${MASCOT_SVG}</span>
         <h2>Resposta registrada!</h2>
         <p>Sua participação em <b>${c.nome}</b> foi registrada com sucesso.</p>
         <p class="hint">Por transparência com todos os participantes, o resultado só é liberado depois que a rodada encerrar, em <b>${fmtDateTime(new Date(c.fim))}</b>. Volte aqui depois desse prazo para ver seu desempenho.</p>
@@ -1873,7 +1856,7 @@ function colaboradorStreakStrip(){
   return `<div class="streak-strip">
     <div class="streak-chip fire"><div class="si"><i data-lucide="flame"></i></div><div><b>${total}</b><span>Campanhas respondidas</span></div></div>
     <div class="streak-chip star"><div class="si">⭐</div><div><b>${media}%</b><span>Média de acertos</span></div></div>
-    <div class="streak-chip trophy"><div class="si"><i data-lucide="trophy"></i></div><div><b>${premios}</b><span>Vezes premiado(a)</span></div></div>
+    <div class="streak-chip trophy"><div class="si">🏆</div><div><b>${premios}</b><span>Vezes premiado(a)</span></div></div>
   </div>`;
 }
 function renderCampanhaAtual(){
@@ -1900,7 +1883,7 @@ function renderCampanhaAtual(){
       </div>
       <div class="meta" style="margin:14px 0;">
         <span><i data-lucide="calendar"></i> Responda até ${c.fim.replace('T',' ')}</span>
-        <span><i data-lucide="gift"></i> Prêmio: ${c.premio || 'a definir'}</span>
+        <span>🎁 Prêmio: ${c.premio || 'a definir'}</span>
       </div>
       ${answered
         ? `<button class="btn btn-ghost" onclick="openQuiz('${c.id}')">Ver meu resultado</button>`
@@ -2230,7 +2213,7 @@ document.querySelectorAll('.report-btn').forEach(btn=>{
 function renderTimeline(){
   document.getElementById('timeline').innerHTML = campaigns.filter(c=>c.status==="finalizada" || c.status==="encerrada").map(c=>{
     const {eligible} = evaluateEligibility(c.id);
-    const winnersHtml = c.ganhadores ? `<div class="tl-winners">${c.ganhadores.map(w=>`<span class="chip"><i data-lucide="trophy" style="width:12px;height:12px;vertical-align:-2px;"></i> ${w.nome} · ${w.setor}</span>`).join('')}</div>` : `<div class="tl-winners"><span class="chip">Sorteio pendente de execução</span></div>`;
+    const winnersHtml = c.ganhadores ? `<div class="tl-winners">${c.ganhadores.map(w=>`<span class="chip">🏆 ${w.nome} · ${w.setor}</span>`).join('')}</div>` : `<div class="tl-winners"><span class="chip">Sorteio pendente de execução</span></div>`;
     const metaHtml = c.ganhadores ? `
       <div class="tl-meta"><span><i data-lucide="users"></i> ${campaignParticipants(c.id).length} participantes</span><span><i data-lucide="check-circle-2"></i> ${eligible.length} elegíveis avaliados</span><span><i data-lucide="dices"></i> nº aleatório: ${c.randomSeed || "—"}</span><span><i data-lucide="user"></i> responsável: ${c.responsavel || "—"}</span></div>
       <div class="hint" style="margin-top:6px;">${c.justificativa || ""}</div>` : "";
@@ -2308,7 +2291,7 @@ document.getElementById('btnGerarDivulgacao').addEventListener('click', ()=>{
   wrap.innerHTML = `
     <div id="divBannerArt" style="background:linear-gradient(135deg, var(--primary), var(--secondary)); border-radius:20px; padding:36px; color:#fff; text-align:center; max-width:520px; margin:0 auto;">
       <div style="font-size:13px; letter-spacing:2px; opacity:.85; text-transform:uppercase;">Programa Política de Gestão</div>
-      <div style="font-size:64px; margin:14px auto; animation:mascotBob 3s ease-in-out infinite;">${MASCOT_EMOJI}</div>
+      <div style="width:64px; height:64px; margin:14px auto; animation:mascotBob 3s ease-in-out infinite;">${MASCOT_SVG}</div>
       <h2 style="margin:6px 0; font-family:'Manrope',sans-serif;">${c.nome}</h2>
       <p style="opacity:.95; margin-bottom:18px;">Participe respondendo o questionário e concorra aos prêmios!</p>
       <div style="background:#fff; display:inline-block; padding:10px; border-radius:12px;"><img src="${qrUrl}" alt="QR Code" onerror="this.parentElement.innerHTML='<span style=\\'font-size:11px;color:#333;\\'>QR indisponível offline</span>'"></div>
@@ -2363,6 +2346,17 @@ renderSorteioSetup();
 renderTimeline();
 renderBanco();
 if(window.lucide) lucide.createIcons();
+
+/* Ícones Lucide sempre em dia: sempre que qualquer tela muda (tabelas,
+   listas, cards renderizados de novo), este observador redesenha os ícones
+   sozinho. Assim nenhuma tela nova precisa lembrar de chamar isso na mão. */
+if(window.lucide){
+  const _iconObserver = new MutationObserver(()=>{
+    clearTimeout(window._iconObserverTimeout);
+    window._iconObserverTimeout = setTimeout(()=>{ if(window.lucide) lucide.createIcons(); }, 60);
+  });
+  _iconObserver.observe(document.body, {childList:true, subtree:true});
+}
 
 try{
   if(_hadSavedState && currentUser && currentUser.matricula){

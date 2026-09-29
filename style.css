@@ -434,7 +434,7 @@
     box-shadow:0 6px 14px rgba(2,163,157,0.35); font-size:28px;
     animation:mascotBob 3s ease-in-out infinite;
   }
-  .mascot-avatar .mascot-emoji{ line-height:1; }
+  .mascot-avatar .mascot-emoji{ display:inline-flex; width:60%; height:60%; line-height:1; }
 
   /* Piscar de verdade, simulado num emoji só: um "squash" vertical rápido e periódico */
   .mascot-emoji-blink{ display:inline-block; transform-origin:center; animation:mascotBlinkSquash 5.5s ease-in-out infinite; }
@@ -523,12 +523,13 @@
     animation:mascotBob 3s ease-in-out infinite;
   }
   .mascot-figure-emoji{
-    display:block; margin:0 auto; width:auto; font-size:96px; line-height:1;
+    display:flex; align-items:center; justify-content:center; margin:0 auto;
+    width:96px; height:96px; font-size:76px; line-height:1;
     filter:drop-shadow(0 10px 16px rgba(2,163,157,0.3));
   }
-  .login-mascot-row .mascot-figure-emoji{font-size:90px; margin-bottom:6px;}
-  .duo-done .mascot-figure-emoji{font-size:76px; margin-bottom:6px;}
-  .fun-empty .mascot-figure-emoji{font-size:80px; margin-bottom:6px;}
+  .login-mascot-row .mascot-figure-emoji{width:90px; height:90px; font-size:72px; margin-bottom:6px;}
+  .duo-done .mascot-figure-emoji{width:76px; height:76px; font-size:60px; margin-bottom:6px;}
+  .fun-empty .mascot-figure-emoji{width:80px; height:80px; font-size:64px; margin-bottom:6px;}
 
   /* ---------- Empty states com mais graça ---------- */
   .fun-empty{text-align:center; padding:40px 20px;}
@@ -800,8 +801,9 @@
   }
   @keyframes sacFabIn{ from{ opacity:0; transform:scale(.4) translateY(20px); } to{ opacity:1; transform:scale(1) translateY(0); } }
   @keyframes sacFloat{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-6px); } }
-  .sac-fab img, .sac-fab-emoji{ width:100%; height:100%; object-fit:cover; border-radius:50%; object-position:center 20%; }
-  .sac-fab-emoji{ display:flex; align-items:center; justify-content:center; font-size:26px; }
+  .sac-fab img{ width:100%; height:100%; object-fit:cover; border-radius:50%; object-position:center 20%; }
+  .sac-fab-emoji{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
+  .sac-fab-emoji svg{ width:62%; height:62%; }
   .sac-fab-badge{
     position:absolute; top:-2px; right:-2px; width:20px; height:20px; border-radius:50%;
     background:var(--warning); color:#3A2A00; font-size:12px; font-weight:800; font-family:'Manrope';
@@ -819,8 +821,9 @@
   .sac-popup.open{ display:block; }
   .sac-popup.show{ opacity:1; transform:translateY(0) scale(1); }
   .sac-popup-head{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
-  .sac-popup-head img, .sac-popup-emoji{ width:38px; height:38px; border-radius:50%; object-fit:cover; object-position:center 20%; flex-shrink:0; }
-  .sac-popup-emoji{ display:flex; align-items:center; justify-content:center; font-size:20px; background:rgba(2,163,157,0.14); }
+  .sac-popup-head img{ width:38px; height:38px; border-radius:50%; object-fit:cover; object-position:center 20%; flex-shrink:0; }
+  .sac-popup-emoji{ width:38px; height:38px; display:flex; align-items:center; justify-content:center; background:rgba(2,163,157,0.14); border-radius:50%; flex-shrink:0; }
+  .sac-popup-emoji svg{ width:62%; height:62%; }
   .sac-popup-title{ flex:1; display:flex; flex-direction:column; }
   .sac-popup-title b{ font-size:13px; color:var(--ink); font-family:'Manrope'; }
   .sac-popup-title span{ font-size:10px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.03em; }
