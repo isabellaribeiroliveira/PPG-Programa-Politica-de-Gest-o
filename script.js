@@ -966,19 +966,12 @@ async function sincronizarDadosDoServidor(silencioso){
     ]);
     if(respCamp.ok && Array.isArray(respCamp.campanhas)) campaigns = respCamp.campanhas;
 
-    // Corrige sozinho o status pela data (programada → andamento → encerrada).
+    // Corrige o status pela data (programada → andamento → encerrada), só
+    // para exibição — cada dispositivo calcula isso sozinho a partir das
+    // datas, sem escrever de volta no servidor a cada sincronização (evita
+    // conflito quando várias pessoas estão usando ao mesmo tempo).
     // "Finalizada" nunca é sobrescrito aqui — só o registro oficial do sorteio muda isso.
-    campaigns.forEach(c=>{
-      const statusCorreto = calcularStatusPorData(c);
-      if(statusCorreto !== c.status){
-        const statusAntigo = c.status;
-        c.status = statusCorreto;
-        if(currentRole === 'qualidade'){
-          backendCall('salvarCampanha', {campanha: c, usuario: 'Sistema (atualização automática por data)'})
-            .then(r=>{ if(r.ok) console.log(`Status de "${c.nome}" atualizado sozinho: ${statusAntigo} → ${statusCorreto}`); });
-        }
-      }
-    });
+    campaigns.forEach(c=>{ c.status = calcularStatusPorData(c); });
     if(respBanco.ok && Array.isArray(respBanco.perguntas)) questionBank = respBanco.perguntas;
     if(respRespostas.ok && Array.isArray(respRespostas.respostas)){
       participants = respRespostas.respostas.map(r=>({...r, data: r.dataFim ? new Date(r.dataFim) : new Date(), dataInicio: r.dataInicio ? new Date(r.dataInicio) : null, dataFim: r.dataFim ? new Date(r.dataFim) : null}));
