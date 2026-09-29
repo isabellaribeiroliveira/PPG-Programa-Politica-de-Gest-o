@@ -23,6 +23,20 @@ const NOMES = []; // não é mais usado — participantes agora vêm do quadro r
 function randomFrom(arr){return arr[Math.floor(Math.random()*arr.length)];}
 function pad(n){return n.toString().padStart(2,'0');}
 function fmtDateTime(d){return pad(d.getDate())+"/"+pad(d.getMonth()+1)+"/"+d.getFullYear()+" "+pad(d.getHours())+":"+pad(d.getMinutes());}
+/* Formata início/fim de campanha com segurança — a planilha às vezes devolve
+   uma data "de verdade" (Date, ou um texto ISO completo com segundos/fuso)
+   em vez do texto simples original. Isso não pode quebrar a tela inteira de
+   campanhas por causa de uma linha só, nem mostrar algo feio tipo ".000Z". */
+function fmtPeriodoValor(valor){
+  if(!valor) return '—';
+  if(valor instanceof Date) return fmtDateTime(valor);
+  const s = String(valor);
+  if(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(s)){
+    const d = new Date(s);
+    if(!isNaN(d.getTime())) return fmtDateTime(d);
+  }
+  return s.replace('T',' ');
+}
 function opt(text, correct){ return {text, correct: !!correct}; }
 
 /* Geração de participantes fictícios para o modo de teste — mas usando
@@ -578,7 +592,7 @@ const deepLinkCampaignId = urlParams.get('campanha');
 /* ======================= LOGIN ======================= */
 /* A autenticação de verdade agora mora na planilha (via Google Apps Script).
    Não existe mais senha nenhuma escrita aqui no código. */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycby_jHTsQQvA9PwOrYwwcf7Z0494lwg1sWHy0v5ol2Z0te2642ICoBBpJuv0WnjFANWGxg/exec";
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwfKlz_TuxeCNl2F21M4_ebtnHy2lMn-ppggOXU5kjZwDoNQaoTv1E0DLYSvBcyQK_x9Q/exec";
 
 async function backendCall(action, payload){
   try{
@@ -1085,7 +1099,7 @@ function renderDashboard(){
 
   document.getElementById('tblUltimasCampanhas').innerHTML = campaigns.map(c=>{
     const n = campaignParticipants(c.id).length;
-    return `<tr><td>${c.nome}</td><td>${c.inicio.replace('T',' ')} – ${c.fim.replace('T',' ')}</td><td>${n}</td><td>${statusBadge(c.status)}</td></tr>`;
+    return `<tr><td>${c.nome}</td><td>${fmtPeriodoValor(c.inicio)} – ${fmtPeriodoValor(c.fim)}</td><td>${n}</td><td>${statusBadge(c.status)}</td></tr>`;
   }).join('');
 }
 function renderHBarChart(elId, winners, field, universe){
@@ -1129,7 +1143,7 @@ function renderCampaignGrid(){
       <div style="display:flex; justify-content:space-between; align-items:flex-start;"><h4>${c.nome}</h4>${statusBadge(c.status)}</div>
       <div class="desc">${c.descricao}</div>
       <div class="meta">
-        <span><i data-lucide="calendar"></i> ${c.inicio.replace('T',' ')} → ${c.fim.replace('T',' ')}</span>
+        <span><i data-lucide="calendar"></i> ${fmtPeriodoValor(c.inicio)} → ${fmtPeriodoValor(c.fim)}</span>
         <span><i data-lucide="clipboard-list"></i> ${c.questoes ? c.questoes.length : '—'} perguntas · <i data-lucide="trophy"></i> ${c.qtdGanhadores} ganhadores</span>
         <span><i data-lucide="users"></i> ${n} participantes · <i data-lucide="check-circle-2"></i> ${eligible.length} elegíveis</span>
       </div>
@@ -1611,7 +1625,7 @@ function startQuizFlow(c){
       `<div class="lock-banner">
       <div style="font-size:26px;">⏳</div>
       <div>${access==='nao_iniciada' ? 'Esta campanha ainda não está aberta para respostas.' : 'O prazo para responder esta campanha já foi encerrado.'}</div>
-      <div class="hint">Período: ${c.inicio.replace('T',' ')} até ${c.fim.replace('T',' ')}</div>
+      <div class="hint">Período: ${fmtPeriodoValor(c.inicio)} até ${fmtPeriodoValor(c.fim)}</div>
     </div>`;
     return;
   }
@@ -1882,7 +1896,7 @@ function renderCampanhaAtual(){
         ${statusBadge(c.status)}
       </div>
       <div class="meta" style="margin:14px 0;">
-        <span><i data-lucide="calendar"></i> Responda até ${c.fim.replace('T',' ')}</span>
+        <span><i data-lucide="calendar"></i> Responda até ${fmtPeriodoValor(c.fim)}</span>
         <span>🎁 Prêmio: ${c.premio || 'a definir'}</span>
       </div>
       ${answered
@@ -2166,7 +2180,7 @@ function buildReportData(reportType, campaignId){
     return {title:`Registro de auditoria do sorteio — ${c.nome}`, headers:["Campanha","Critérios aplicados","Nº aleatório","Responsável","Justificativa"], rows};
   }
   if(reportType === 'historico'){
-    const rows = campaigns.filter(x=>x.ganhadores || x.status==='encerrada').map(x=>[x.nome, x.inicio.replace('T',' '), x.fim.replace('T',' '), campaignParticipants(x.id).length, x.ganhadores?x.ganhadores.length:0]);
+    const rows = campaigns.filter(x=>x.ganhadores || x.status==='encerrada').map(x=>[x.nome, fmtPeriodoValor(x.inicio), fmtPeriodoValor(x.fim), campaignParticipants(x.id).length, x.ganhadores?x.ganhadores.length:0]);
     return {title:"Histórico completo de campanhas", headers:["Campanha","Início","Encerramento","Participantes","Ganhadores"], rows};
   }
   if(reportType === 'comparativo'){
@@ -2184,7 +2198,7 @@ function buildReportData(reportType, campaignId){
     const rows = ordered.map(x=>{
       const parts = campaignParticipants(x.id);
       const media = parts.length ? Math.round(parts.reduce((a,p)=>a+p.pct,0)/parts.length) : 0;
-      return [x.inicio.replace('T',' '), x.nome, parts.length, media+"%"];
+      return [fmtPeriodoValor(x.inicio), x.nome, parts.length, media+"%"];
     });
     const chartSvg = buildBarChartSVG(ordered.map(x=>x.nome.split('–')[0].trim()), ordered.map(x=>{
       const parts = campaignParticipants(x.id);
@@ -2217,7 +2231,7 @@ function renderTimeline(){
     const metaHtml = c.ganhadores ? `
       <div class="tl-meta"><span><i data-lucide="users"></i> ${campaignParticipants(c.id).length} participantes</span><span><i data-lucide="check-circle-2"></i> ${eligible.length} elegíveis avaliados</span><span><i data-lucide="dices"></i> nº aleatório: ${c.randomSeed || "—"}</span><span><i data-lucide="user"></i> responsável: ${c.responsavel || "—"}</span></div>
       <div class="hint" style="margin-top:6px;">${c.justificativa || ""}</div>` : "";
-    return `<div class="tl-item"><div class="tl-dot"></div><div class="tl-body"><h4>${c.nome}</h4><p>${c.inicio.replace('T',' ')} → ${c.fim.replace('T',' ')} · ${statusBadge(c.status)}</p>${winnersHtml}${metaHtml}</div></div>`;
+    return `<div class="tl-item"><div class="tl-dot"></div><div class="tl-body"><h4>${c.nome}</h4><p>${fmtPeriodoValor(c.inicio)} → ${fmtPeriodoValor(c.fim)} · ${statusBadge(c.status)}</p>${winnersHtml}${metaHtml}</div></div>`;
   }).join('') || `<p style="color:var(--ink-soft); font-size:13px;">Nenhuma campanha encerrada ainda.</p>`;
 }
 
@@ -2295,7 +2309,7 @@ document.getElementById('btnGerarDivulgacao').addEventListener('click', ()=>{
       <h2 style="margin:6px 0; font-family:'Manrope',sans-serif;">${c.nome}</h2>
       <p style="opacity:.95; margin-bottom:18px;">Participe respondendo o questionário e concorra aos prêmios!</p>
       <div style="background:#fff; display:inline-block; padding:10px; border-radius:12px;"><img src="${qrUrl}" alt="QR Code" onerror="this.parentElement.innerHTML='<span style=\\'font-size:11px;color:#333;\\'>QR indisponível offline</span>'"></div>
-      <p style="font-size:11px; margin-top:12px; opacity:.85;">Período: ${c.inicio.replace('T',' ')} até ${c.fim.replace('T',' ')}</p>
+      <p style="font-size:11px; margin-top:12px; opacity:.85;">Período: ${fmtPeriodoValor(c.inicio)} até ${fmtPeriodoValor(c.fim)}</p>
     </div>
     <div style="text-align:center; margin-top:16px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
       <button class="btn btn-primary btn-sm" id="btnBaixarDivulgacao">⬇️ Baixar como imagem (PNG)</button>
