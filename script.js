@@ -475,12 +475,17 @@ document.querySelectorAll('.menu-group-header').forEach(btn=>{
     btn.closest('.menu-group').classList.toggle('expanded');
   });
 });
+let currentSectionId = "inicio";
 function goToSection(target){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   const sec = document.getElementById('sec-'+target);
   if(sec) sec.classList.add('active');
   document.getElementById('pageTitle').textContent = titles[target] || target;
   closeSidebarMobile();
+  currentSectionId = target;
+  renderSectionContent(target);
+}
+function renderSectionContent(target){
   if(target==="inicio") renderDashboard();
   if(target==="campanhas") renderCampaignGrid();
   if(target==="historico") renderTimeline();
@@ -595,7 +600,7 @@ const deepLinkCampaignId = urlParams.get('campanha');
 /* ======================= LOGIN ======================= */
 /* A autenticação de verdade agora mora na planilha (via Google Apps Script).
    Não existe mais senha nenhuma escrita aqui no código. */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycby7q0RDKi-wdfv3yqWldY2F2zRXyqYQg1mlV7KY7uztMdEXyObpBJS4jELAGUQrVPZN5A/exec";
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbx7muTAi8Ywx_9nALTu8BV6saTvEnlRRgopWdpTNyUFbfAMT-wvfTzG1tisG6bevhuBVQ/exec";
 
 async function backendCall(action, payload){
   try{
@@ -676,6 +681,11 @@ function entrarNoApp(){
   applyRole(currentUser.role);
   saveState();
   showToast(`Bem-vindo(a), ${currentUser.nome}.`, "success");
+  sincronizarDadosDoServidor(true);
+  if(!window._syncIntervalIniciado){
+    window._syncIntervalIniciado = true;
+    setInterval(()=> sincronizarDadosDoServidor(true), 20 * 1000); // a cada 20s, em segundo plano
+  }
 }
 
 /* ======================= TROCA DE SENHA (obrigatória no 1º acesso, ou voluntária) ======================= */
@@ -933,6 +943,46 @@ async function sincronizarColaboradores(){
 }
 sincronizarColaboradores();
 setInterval(sincronizarColaboradores, 5 * 60 * 1000); // a cada 5 minutos, em segundo plano
+
+/* ======================= SINCRONIZAÇÃO AO VIVO: campanhas, perguntas, respostas ======================= */
+/* A planilha é a única fonte de verdade — campanhas, banco de perguntas e
+   respostas nunca ficam "presas" num navegador. Toda tela relevante busca
+   os dados mais recentes nesta função, tanto ao entrar quanto em ciclos
+   automáticos em segundo plano. */
+let sincronizando = false;
+async function sincronizarDadosDoServidor(silencioso){
+  if(sincronizando) return; // evita chamadas simultâneas empilhadas
+  sincronizando = true;
+  try{
+    const [respCamp, respBanco, respRespostas, respHist] = await Promise.all([
+      backendCall('getCampanhas'),
+      backendCall('getBancoPerguntas'),
+      backendCall('getRespostas'),
+      backendCall('getHistorico')
+    ]);
+    if(respCamp.ok && Array.isArray(respCamp.campanhas)) campaigns = respCamp.campanhas;
+    if(respBanco.ok && Array.isArray(respBanco.perguntas)) questionBank = respBanco.perguntas;
+    if(respRespostas.ok && Array.isArray(respRespostas.respostas)){
+      participants = respRespostas.respostas.map(r=>({...r, data: r.dataFim ? new Date(r.dataFim) : new Date(), dataInicio: r.dataInicio ? new Date(r.dataInicio) : null, dataFim: r.dataFim ? new Date(r.dataFim) : null}));
+    }
+    const historicoImportado = (respHist.ok && Array.isArray(respHist.historico)) ? respHist.historico : [];
+    const ganhosImportados = historicoImportado
+      .filter(h => String(h.ganhador).toLowerCase() === 'sim')
+      .map(h => ({matricula: String(h.matricula), data: new Date(h.periodoFim || h.importadoEm || Date.now())}));
+    const ganhosAoVivo = [];
+    campaigns.forEach(c=>{
+      if(c.ganhadores && c.ganhadores.length) c.ganhadores.forEach(g => ganhosAoVivo.push({matricula: String(g.matricula), data: new Date(c.fim)}));
+    });
+    wonHistory = [...ganhosImportados, ...ganhosAoVivo];
+
+    renderSectionContent(currentSectionId); // atualiza a tela que estiver aberta com os dados frescos
+    if(!silencioso) console.log("Dados sincronizados com o servidor.");
+  }catch(e){
+    console.warn("Não foi possível sincronizar com o servidor agora:", e);
+  }finally{
+    sincronizando = false;
+  }
+}
 document.getElementById('btnLogout').addEventListener('click', ()=>{
   currentUser = null;
   saveState();
@@ -1315,7 +1365,7 @@ if(btnInserirDoBanco){
 }
 
 /* ======================= NOVA CAMPANHA — SUBMIT (criar ou editar) ======================= */
-document.getElementById('formCampanha').addEventListener('submit', function(e){
+document.getElementById('formCampanha').addEventListener('submit', async function(e){
   e.preventDefault();
   const f = new FormData(this);
   const questoes = collectQuestionsFromForm();
@@ -1331,19 +1381,28 @@ document.getElementById('formCampanha').addEventListener('submit', function(e){
     status: f.get('status') || "programada",
     questoes: questoes.length ? questoes : [{texto:"Pergunta de exemplo", type:"unica", options:[opt("Sim",true),opt("Não")]}]
   };
+  const btnSubmit = document.getElementById('btnSubmitCampanha');
+  const textoOriginal = btnSubmit.textContent;
+  btnSubmit.disabled = true; btnSubmit.textContent = "Salvando...";
 
   if(editingCampaignId){
     const idx = campaigns.findIndex(c=>c.id===editingCampaignId);
-    if(idx > -1) campaigns[idx] = {...campaigns[idx], ...payload};
+    const campanhaCompleta = {...(idx>-1 ? campaigns[idx] : {}), ...payload, id: editingCampaignId};
+    const resp = await backendCall('salvarCampanha', {campanha: campanhaCompleta, usuario: currentUser.nome});
+    btnSubmit.disabled = false; btnSubmit.textContent = textoOriginal;
+    if(!resp.ok){ showToast(resp.erro || "Não foi possível salvar a campanha.", "warning"); return; }
+    if(idx > -1) campaigns[idx] = campanhaCompleta;
     showToast("Campanha atualizada com sucesso!","success");
     logAction("Campanha editada", payload.nome);
     editingCampaignId = null;
-    document.getElementById('btnSubmitCampanha').textContent = "Cadastrar campanha";
+    btnSubmit.textContent = "Cadastrar campanha";
     document.getElementById('btnCancelEdit').style.display = "none";
     document.getElementById('novaTitle').textContent = "Nova Campanha";
   } else {
-    const id = "c" + (campaigns.length + 1) + "_" + Date.now().toString().slice(-4);
-    campaigns.unshift({id, ganhadores:null, ...payload});
+    const resp = await backendCall('salvarCampanha', {campanha: {ganhadores:null, ...payload}, usuario: currentUser.nome});
+    btnSubmit.disabled = false; btnSubmit.textContent = textoOriginal;
+    if(!resp.ok){ showToast(resp.erro || "Não foi possível salvar a campanha.", "warning"); return; }
+    campaigns.unshift({id: resp.id, ganhadores:null, ...payload});
     showToast("Campanha e questionário cadastrados com sucesso!","success");
     logAction("Nova campanha cadastrada", payload.nome);
   }
@@ -1429,7 +1488,7 @@ function collectBQOptions(){
 const bqForm = document.getElementById('bqForm');
 if(bqForm){
   bqRenderOptions('unica', null);
-  bqForm.addEventListener('submit', function(e){
+  bqForm.addEventListener('submit', async function(e){
     e.preventDefault();
     const options = collectBQOptions();
     const payload = {
@@ -1441,15 +1500,25 @@ if(bqForm){
       options: options.length ? options : [opt("Sim",true),opt("Não")],
       status: document.getElementById('bqStatus').value
     };
+    const btn = this.querySelector('button[type="submit"]');
+    const textoOriginal = btn ? btn.textContent : null;
+    if(btn){ btn.disabled = true; btn.textContent = "Salvando..."; }
+
     if(editingBQCodigo){
       const idx = questionBank.findIndex(q=>q.codigo===editingBQCodigo);
-      if(idx>-1) questionBank[idx] = {...questionBank[idx], ...payload};
+      const perguntaCompleta = {...(idx>-1 ? questionBank[idx] : {}), ...payload, codigo: editingBQCodigo};
+      const resp = await backendCall('salvarPergunta', {pergunta: perguntaCompleta});
+      if(btn){ btn.disabled = false; btn.textContent = textoOriginal; }
+      if(!resp.ok){ showToast(resp.erro || "Não foi possível salvar a pergunta.", "warning"); return; }
+      if(idx>-1) questionBank[idx] = perguntaCompleta;
       logAction("Edição de pergunta", `${editingBQCodigo} — ${payload.texto.slice(0,40)}`);
       showToast("Pergunta atualizada.","success");
     } else {
-      const codigo = "BQ-" + String(questionBank.length+1).padStart(3,'0');
-      questionBank.push({codigo, autor: currentUser.nome, dataCriacao:new Date(), ultimaUtilizacao:null, qtdUtilizacoes:0, ...payload});
-      logAction("Nova pergunta cadastrada", `${codigo} — ${payload.texto.slice(0,40)}`);
+      const resp = await backendCall('salvarPergunta', {pergunta: {autor: currentUser.nome, dataCriacao:new Date(), ultimaUtilizacao:null, qtdUtilizacoes:0, ...payload}});
+      if(btn){ btn.disabled = false; btn.textContent = textoOriginal; }
+      if(!resp.ok){ showToast(resp.erro || "Não foi possível salvar a pergunta.", "warning"); return; }
+      questionBank.push({codigo: resp.codigo, autor: currentUser.nome, dataCriacao:new Date(), ultimaUtilizacao:null, qtdUtilizacoes:0, ...payload});
+      logAction("Nova pergunta cadastrada", `${resp.codigo} — ${payload.texto.slice(0,40)}`);
       showToast("Pergunta cadastrada no banco.","success");
     }
     editingBQCodigo = null;
@@ -1511,7 +1580,9 @@ window.editBQ = function(codigo){
   bqRenderOptions(q.type, q.options);
   document.getElementById('bqForm').scrollIntoView({behavior:'smooth', block:'start'});
 };
-window.deleteBQ = function(codigo){
+window.deleteBQ = async function(codigo){
+  const resp = await backendCall('excluirPergunta', {codigo});
+  if(!resp.ok){ showToast(resp.erro || "Não foi possível excluir a pergunta.", "warning"); return; }
   questionBank = questionBank.filter(q=>q.codigo!==codigo);
   logAction("Exclusão de pergunta", codigo);
   renderBanco();
@@ -1519,16 +1590,29 @@ window.deleteBQ = function(codigo){
 };
 
 /* ======================= RESPONDER QUESTIONÁRIO — ESTILO DUOLINGO ======================= */
-window.openQuiz = function(campaignId){
+window.openQuiz = async function(campaignId){
   const c = campaigns.find(x=>x.id===campaignId);
-  const existing = participants.find(p=>p.campaignId===campaignId && p.matricula===currentUser.matricula);
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.getElementById('sec-responder').classList.add('active');
   document.getElementById('pageTitle').textContent = "Questionário";
   document.getElementById('responderTitle').textContent = c.nome;
+  document.getElementById('responderSubtitle').textContent = "";
+  const body = document.getElementById('responderBody');
+
+  let existing = participants.find(p=>p.campaignId===campaignId && p.matricula===currentUser.matricula);
+  if(!existing){
+    // checagem fresca no servidor — cobre o caso raro de ter respondido em
+    // outro dispositivo nos últimos segundos, antes do próximo ciclo de sincronização
+    body.innerHTML = `<div class="duo-done"><span class="mascot-figure mascot-figure-emoji">${MASCOT_EMOJI}</span><h2>Carregando...</h2></div>`;
+    const check = await backendCall('jaRespondeu', {campaignId, matricula: currentUser.matricula});
+    if(check.ok && check.jaRespondeu){
+      body.innerHTML = `<div class="duo-done"><span class="mascot-figure mascot-figure-emoji">🔒</span><h2>Você já respondeu esta campanha</h2><p>O registro já existe — feito neste ou em outro dispositivo.</p></div>`;
+      return;
+    }
+  }
   document.getElementById('responderSubtitle').textContent = existing ? "" : c.descricao;
   if(existing){
-    renderQuizDoneInto(document.getElementById('responderBody'), c, existing);
+    renderQuizDoneInto(body, c, existing);
   } else {
     startQuizFlow(c);
   }
@@ -1628,7 +1712,7 @@ function isCorrect(q, ans){
   return !!(q.options[ans] && q.options[ans].correct);
 }
 
-function finalizeQuiz(){
+async function finalizeQuiz(){
   const {campaign, answers, dataInicio, sessaoId} = quizState;
   const respostasCorretas = campaign.questoes.map((q,i)=> isCorrect(q, answers[i]));
   const correctCount = respostasCorretas.filter(Boolean).length;
@@ -1642,11 +1726,38 @@ function finalizeQuiz(){
     respostasSelecionadas: answers, acertosQtd: correctCount, totalQuestoes: campaign.questoes.length,
     codigoResposta: gerarCodigoResposta(dataFim), sessaoId: sessaoId || gerarSessaoId(), dispositivo: dispositivoReal()
   };
+
+  const container = document.getElementById('responderBody');
+  container.innerHTML = `<div class="duo-done"><span class="mascot-figure mascot-figure-emoji">${MASCOT_EMOJI}</span><h2>Enviando sua resposta...</h2><p>Só um instante, isso é registrado direto no servidor.</p></div>`;
+
+  const resp = await backendCall('submeterResposta', {resposta: novoParticipante});
+
+  if(!resp.ok){
+    if(resp.jaRespondida){
+      container.innerHTML = `
+        <div class="duo-done">
+          <span class="mascot-figure mascot-figure-emoji">🔒</span>
+          <h2>Você já respondeu esta campanha</h2>
+          <p>Encontramos um registro seu para <b>${campaign.nome}</b> — feito neste ou em outro dispositivo. Cada matrícula só pode responder uma vez, para manter tudo justo.</p>
+        </div>`;
+    } else {
+      container.innerHTML = `
+        <div class="duo-done">
+          <span class="mascot-figure mascot-figure-emoji">⚠️</span>
+          <h2>Não foi possível enviar sua resposta</h2>
+          <p>${resp.erro || 'Verifique sua internet e tente novamente.'}</p>
+          <button class="btn btn-primary" onclick="openQuiz('${campaign.id}')" style="margin-top:12px;">Tentar novamente</button>
+        </div>`;
+    }
+    quizState = null;
+    return;
+  }
+
   participants.push(novoParticipante);
   logAction("Resposta registrada", `${novoParticipante.codigoResposta} — ${campaign.nome} — ${novoParticipante.nome}`);
   fillCampaignSelects();
   renderDashboard(); renderParticipantsTable(); renderEligibleTable(); renderSorteioSetup();
-  renderQuizDoneInto(document.getElementById('responderBody'), campaign, novoParticipante);
+  renderQuizDoneInto(container, campaign, novoParticipante);
   saveState();
   quizState = null;
 }
@@ -1960,14 +2071,23 @@ document.getElementById('btnRelatorioOficial').addEventListener('click', ()=>{
   openPrintReport(`Relatório oficial do sorteio — ${c.nome}`, headers, rows, `Número aleatório utilizado: ${seed} · Gerado em ${fmtDateTime(new Date())}`);
   logAction("Relatório oficial gerado", c.nome);
 });
-document.getElementById('btnRegistrarHistorico').addEventListener('click', ()=>{
+document.getElementById('btnRegistrarHistorico').addEventListener('click', async ()=>{
   if(!window._lastSorteio) return;
   if(!window._lastSorteio.validado){ showToast("Valide o resultado (botão 'Validar resultado') antes de registrar oficialmente.","warning"); return; }
   const {campaignId, winners, seed, fair, distinctSetores, eligibleCount} = window._lastSorteio;
   const c = campaigns.find(x=>x.id===campaignId);
-  c.ganhadores = winners.map(w=>({nome:w.nome, matricula:w.matricula, setor:w.setor, filial:w.filial, funcao:w.funcao}));
-  c.status = "finalizada"; c.randomSeed = seed; c.responsavel = "Mariana Queiroz";
-  c.justificativa = fair ? `Distribuição justa alcançada entre ${distinctSetores} setor(es) distintos.` : `Distribuição parcial: apenas ${distinctSetores} setor(es) representado(s) entre os ${eligibleCount} elegíveis.`;
+  const campanhaAtualizada = {
+    ...c,
+    ganhadores: winners.map(w=>({nome:w.nome, matricula:w.matricula, setor:w.setor, filial:w.filial, funcao:w.funcao})),
+    status: "finalizada", randomSeed: seed, responsavel: currentUser.nome,
+    justificativa: fair ? `Distribuição justa alcançada entre ${distinctSetores} setor(es) distintos.` : `Distribuição parcial: apenas ${distinctSetores} setor(es) representado(s) entre os ${eligibleCount} elegíveis.`
+  };
+  const btn = document.getElementById('btnRegistrarHistorico');
+  btn.disabled = true; btn.textContent = "Registrando...";
+  const resp = await backendCall('salvarCampanha', {campanha: campanhaAtualizada, usuario: currentUser.nome});
+  btn.disabled = false; btn.textContent = "Registrar no histórico";
+  if(!resp.ok){ showToast(resp.erro || "Não foi possível registrar o sorteio.", "warning"); return; }
+  Object.assign(c, campanhaAtualizada);
   winners.forEach(w=> wonHistory.push({matricula:w.matricula, data:new Date()}));
   historyLog.unshift({campaignId, data:new Date(), texto:`Sorteio realizado para a campanha ${c.nome}.`});
   logAction("Sorteio registrado no histórico", c.nome);
@@ -2250,6 +2370,11 @@ try{
     document.getElementById('appRoot').style.display = "flex";
     applyRole(currentUser.role);
     showToast(`Sessão restaurada — bem-vindo(a) de volta, ${currentUser.nome}.`, "");
+    sincronizarDadosDoServidor(true);
+    if(!window._syncIntervalIniciado){
+      window._syncIntervalIniciado = true;
+      setInterval(()=> sincronizarDadosDoServidor(true), 20 * 1000);
+    }
   } else if(_hadSavedState){
     if(currentUser){ currentUser = null; saveState(); } // sessão salva não corresponde a nenhum usuário válido — exige novo login
     showToast("Dados salvos anteriormente neste navegador foram restaurados.", "");
