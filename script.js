@@ -731,7 +731,7 @@ const deepLinkCampaignId = urlParams.get('campanha');
 /* ======================= LOGIN ======================= */
 /* A autenticação de verdade agora mora na planilha (via Google Apps Script).
    Não existe mais senha nenhuma escrita aqui no código. */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbyoyNsLOjk1VFJgORWfvBv_QgJRwqNxNiXUEztZnfoJ87qgOBwyh3o7qpvvP60_N3Y3Rg/exec";
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbx7muTAi8Ywx_9nALTu8BV6saTvEnlRRgopWdpTNyUFbfAMT-wvfTzG1tisG6bevhuBVQ/exec";
 
 async function backendCall(action, payload){
   try{
@@ -740,10 +740,21 @@ async function backendCall(action, payload){
       headers: {"Content-Type": "text/plain;charset=utf-8"}, // evita pre-flight de CORS no Apps Script
       body: JSON.stringify({action, ...(payload||{})})
     });
-    return await res.json();
+    const textoCru = await res.text();
+    if(!res.ok){
+      console.error(`Backend respondeu HTTP ${res.status} para a ação "${action}". Corpo da resposta:`, textoCru);
+      return {ok:false, erro:`O servidor respondeu com erro ${res.status}. Veja o Console (F12) para detalhes.`};
+    }
+    try{
+      return JSON.parse(textoCru);
+    }catch(parseErr){
+      console.error(`A resposta da ação "${action}" não veio em JSON. Isso geralmente acontece quando a implantação do Apps Script não está com acesso "Qualquer pessoa", ou quando houve um erro dentro do próprio script. Resposta recebida:`, textoCru);
+      return {ok:false, erro:"O servidor respondeu algo inesperado (não era JSON). Veja o Console (F12) — provavelmente a implantação do Apps Script precisa ser revisada."};
+    }
   }catch(e){
-    console.error("Erro de conexão com o backend:", e);
-    return {ok:false, erro:"Não foi possível conectar ao servidor. Verifique sua internet e tente de novo."};
+    // "Failed to fetch" / TypeError aqui quase sempre é bloqueio de CORS ou URL incorreta/implantação não publicada.
+    console.error(`Erro de conexão com o backend na ação "${action}":`, e);
+    return {ok:false, erro:"Não foi possível conectar ao servidor. Verifique sua internet e tente de novo. (Detalhe técnico no Console, F12)"};
   }
 }
 
