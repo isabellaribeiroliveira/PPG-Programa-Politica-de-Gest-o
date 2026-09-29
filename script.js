@@ -600,7 +600,7 @@ const deepLinkCampaignId = urlParams.get('campanha');
 /* ======================= LOGIN ======================= */
 /* A autenticação de verdade agora mora na planilha (via Google Apps Script).
    Não existe mais senha nenhuma escrita aqui no código. */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbx7muTAi8Ywx_9nALTu8BV6saTvEnlRRgopWdpTNyUFbfAMT-wvfTzG1tisG6bevhuBVQ/exec";
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxC-Hgr8hRY1Zia3UWpoddl7qrGQ0iOS-alQPOnvr9ST7r5NZFQ2KenHs_0_XStxPFVfQ/exec";
 
 async function backendCall(action, payload){
   try{
