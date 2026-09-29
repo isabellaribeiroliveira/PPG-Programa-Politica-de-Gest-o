@@ -1,428 +1,219 @@
-/* =====================================================================
-   PPG — Programa Política de Gestão
-   v4.0 — dados organizacionais coerentes (via empresa.config.js),
-   questionário estilo Duolingo, perfis totalmente separados, menu
-   expansível/recolhível, Banco de Perguntas, Auditoria e drill-down.
-   ===================================================================== */
-
-/* ======================= DADOS DERIVADOS DA CONFIGURAÇÃO DA EMPRESA =======================
-   Tudo aqui vem de window.EMPRESA_CONFIG (empresa.config.js). Nenhuma lista de
-   setor/função/filial é mantida solta neste arquivo — isso evita combinações
-   incoerentes como "setor ELÉTRICA + função GERENTE DE CSC". */
-const EMPRESA = window.EMPRESA_CONFIG;
-
-
-const SETORES = EMPRESA.setores.map(s => s.nome);
-const UNIDADES = EMPRESA.filiais;
-const FUNCOES = [...new Set(EMPRESA.setores.flatMap(s => s.funcoes))];
-const CARGOS_IMPEDIDOS = EMPRESA.cargosImpedidos;
+/* ======================= MOCK DATA ======================= */
+const SETORES = ["ADM. DE TRANSPORTES - MINERAÇÃO","ADM. FRETAMENTO","ADM. FRETAMENTO - BEMISA","ADM. FRETAMENTO - CENIBRA","ADM. FRETAMENTO - TECHINT","ADM. FRETAMENTO - USIMINAS","ADM. MANUTENÇÃO/SUPRIMENTOS","ADMINISTRAÇÃO DE PESSOAL","ADMINISTRAÇÃO DE TRANSPORTES","ADMINISTRAÇÃO DE TRANSPORTES/FRETAMENTO MUSA","APRENDIZAGEM","ARRECADAÇÃO","ASSESSORIA JURÍDICA","ASSESSORIA OPERACIONAL","ASSISTÊNCIA  ADMINISTRATIVA","BORRACHARIA","CENTRO DE SERVIÇOS COMPARTILHADOS","COBRADORES","COMERCIAL","CONSERVAÇÃO","CONTABILIDADE","CONTROLE RECEITAS","CUSTOS","ELÉTRICA","FINANCEIRO","FISCALIZAÇÃO DE TRANSPORTES","GARAGISTAS / FRENTISTAS","GERENCIA","INFORMÁTICA","INSTRUÇÃO DE TRANSPORTES","JARDINAGEM","LANTERNAGEM","LAVANDERIA","MECÂNICA GERAL","MONITORAMENTO","MOTORISTAS - COMPARTILHADOS","MOTORISTAS - COMPLEXO MARIANA","MOTORISTAS - COMPLEXO MINAS CENTRAIS","MOTORISTAS - FRETAMENTO - BYD","MOTORISTAS - FRETAMENTO - ENGEPACK","MOTORISTAS - FRETAMENTO - KORDSA","MOTORISTAS - FRETAMENTO - OXITENO","MOTORISTAS - FRETAMENTO - POOL I","MOTORISTAS - FRETAMENTO - TURISMO","MOTORISTAS - FRETAMENTO MUSA","MOTORISTAS - LINHAS INTERMUNICIPAIS - CAPITAL","MOTORISTAS (FRETAMENTO APERAM)","MOTORISTAS (FRETAMENTO BEMISA PEDRA BRANCA)","MOTORISTAS (FRETAMENTO BEMISA)","MOTORISTAS (FRETAMENTO CENIBRA)","MOTORISTAS (FRETAMENTO CIPALAM)","MOTORISTAS (FRETAMENTO TECHINT)","MOTORISTAS (FRETAMENTO USIMEC - OPEX)","MOTORISTAS (FRETAMENTO USIMINAS)","MOTORISTAS (LINHAS)","PORTARIA","PROGRAMAÇÃO DE TRANSPORTES","QUALIDADE","QUALIDADE E RH","RECEPÇÃO DE MANUTENCAO","RECURSOS HUMANOS","SERVIÇOS GERAIS","SERVIÇOS GERAIS - BEMISA","SERVIÇOS GERAIS - CENIBRA","SERVIÇOS GERAIS - USIMINAS","SESMT","SUPERVISÃO DE MANUTENÇÃO","SUPRIMENTOS","TURISMO"];
+const UNIDADES = ["Matriz – Coronel Fabriciano","Complexo Minas Centrais - Filial Santa Bárbara","Complexo Mariana - Filial Mariana","Bahia - Filial","Mineração Usiminas - Filial Itaúna"];
+const FUNCOES = ["ADVOGADO","AJUDANTE DE PEDREIRO","ANALISTA AMBIENTAL","ANALISTA COMERCIAL","ANALISTA CONTABIL","ANALISTA DA QUALIDADE","ANALISTA DE CUSTOS","ANALISTA DE MEDIÇÃO","ANALISTA DE PESSOAL","ANALISTA DE TELEMETRIA","ANALISTA DE TI","ASSIST. ADMINISTRATIVO","ASSISTENTE SOCIAL","AUX. ADMINISTRATIVO","AUX. CONTABIL","AUX. DE JARDINAGEM","AUX. DE PESSOAL","AUX. DE PESSOAL","AUX. ELETRICISTA","AUX. MECANICO","AUX. SERV. GERAIS","BORRACHEIRO","CAPOTEIRO","COBRADOR","COORD. DE MANUTENCAO","COORD. DE TRANSPORTES","ELETRICISTA","ENC. DE SETOR - ADMINISTRATIVO","ENC. DE SETOR - MANUTENCAO","ENC. DE SETOR - OPERACIONAL","ENCARREGADO DE TI","ENG. SEGURANÇA DO TRABALHO","ESPECIALISTA EM MANUTENÇÃO","FISCAL","GARAGISTA","GERENTE COMERCIAL","GERENTE CONTÁBIL","GERENTE DE CSC","GERENTE DE FILIAL","GERENTE DE MANUTENÇÃO","GERENTE DE OPERAÇÃO","GERENTE DE RH/QUALIDADE","GERENTE DE SUPRIMENTOS","GERENTE FINANCEIRO","GERENTE JURÍDICO","LANTERNEIRO","LAVADOR","LAVADOR CHASSIS","LUBRIFICADOR","MECANICO","MEDICO DO TRABALHO","MOLEIRO","MOTO BOY","MOTORISTA DE MICROONIBUS","MOTORISTA DE ONIBUS - SÊNIOR","MOTORISTA DE VAN","MOTORISTA INSTRUTOR","PEDREIRO","PINTOR DE VEICULOS","POLIDOR","PORTEIRO","SUPERVISOR","TÉC. DE INFORMÁTICA","TÉC. ENFERMAGEM TRABALHO","TÉC. SEG. TRABALHO","VIGIA"];
+const CARGOS_IMPEDIDOS = ["COORD. DE MANUTENCAO","COORD. DE TRANSPORTES","ENC. DE SETOR - ADMINISTRATIVO","ENC. DE SETOR - MANUTENCAO","ENC. DE SETOR - OPERACIONAL","ENCARREGADO DE TI","ENG. SEGURANÇA DO TRABALHO","ESPECIALISTA EM MANUTENÇÃO","GERENTE COMERCIAL","GERENTE CONTÁBIL","GERENTE DE CSC","GERENTE DE FILIAL","GERENTE DE MANUTENÇÃO","GERENTE DE OPERAÇÃO","GERENTE DE RH/QUALIDADE","GERENTE DE SUPRIMENTOS","GERENTE FINANCEIRO","GERENTE JURÍDICO"];
+// Cargos permitidos = todas as funções da empresa que NÃO estão na lista de impedidos
 const CARGOS_PERMITIDOS = FUNCOES.filter(f => !CARGOS_IMPEDIDOS.includes(f));
-
-const NOMES = []; // não é mais usado — participantes agora vêm do quadro real (EMPRESA.colaboradores)
+const NOMES = ["Ana Souza","Bruno Lima","Carla Mendes","Diego Alves","Elaine Costa","Fábio Rocha","Gisele Ramos","Henrique Dias",
+"Isabela Nunes","João Pedro","Karina Silva","Lucas Farias","Marina Torres","Nelson Braga","Olívia Prado","Paulo Cesar",
+"Renata Vieira","Sérgio Matos","Tatiane Cruz","Vinícius Melo","Camila Duarte","Rafael Nogueira","Beatriz Amaral","Thiago Peixoto"];
 
 function randomFrom(arr){return arr[Math.floor(Math.random()*arr.length)];}
 function pad(n){return n.toString().padStart(2,'0');}
 function fmtDateTime(d){return pad(d.getDate())+"/"+pad(d.getMonth()+1)+"/"+d.getFullYear()+" "+pad(d.getHours())+":"+pad(d.getMinutes());}
+
 function opt(text, correct){ return {text, correct: !!correct}; }
-
-/* Geração de participantes fictícios para o modo de teste — mas usando
-   SEMPRE colaboradores reais do quadro ativo (planilha da empresa), nunca
-   nomes/combinações inventadas. Cada campanha sorteia um grupo de
-   colaboradores reais (sem repetir matrícula dentro da mesma campanha). */
-/* Código único de resposta — auditável, formato PPG-AAAA-MM-NNNNNN */
-let responseSeqCounter = 0;
-function gerarCodigoResposta(d){
-  responseSeqCounter++;
-  const ano = d.getFullYear();
-  const mes = String(d.getMonth()+1).padStart(2,'0');
-  const seq = String(responseSeqCounter).padStart(6,'0');
-  return `PPG-${ano}-${mes}-${seq}`;
-}
-function gerarSessaoId(){ return 'S-' + Math.random().toString(36).slice(2,10).toUpperCase(); }
-
-/* Dispositivo/sessão — para dados de demonstração, sorteia um rótulo plausível;
-   para respostas reais, lê o navegador de verdade (não expõe dados sensíveis, só o tipo de dispositivo e navegador). */
-const DISPOSITIVOS_DEMO = ["Desktop · Chrome","Desktop · Edge","Notebook · Firefox","Celular · Chrome Mobile","Celular · Safari Mobile","Tablet · Safari"];
-function dispositivoFicticio(seedIndex){ return DISPOSITIVOS_DEMO[seedIndex % DISPOSITIVOS_DEMO.length]; }
-function dispositivoReal(){
-  try{
-    const ua = navigator.userAgent || "";
-    const tipo = /Mobi|Android/i.test(ua) ? "Celular" : (/iPad|Tablet/i.test(ua) ? "Tablet" : "Desktop");
-    let nav = "Navegador";
-    if(/Edg\//.test(ua)) nav = "Edge";
-    else if(/Chrome\//.test(ua)) nav = "Chrome";
-    else if(/Firefox\//.test(ua)) nav = "Firefox";
-    else if(/Safari\//.test(ua)) nav = "Safari";
-    return `${tipo} · ${nav}`;
-  }catch(e){ return "Não identificado"; }
-}
-function duracaoLabel(ini, fim){
-  if(!ini || !fim) return "—";
-  const segs = Math.max(0, Math.round((new Date(fim) - new Date(ini))/1000));
-  return formatSegundos(segs);
-}
-function formatSegundos(segs){
-  const m = Math.floor(segs/60), s = segs%60;
-  return m > 0 ? `${m}min ${s}s` : `${s}s`;
-}
 
 function buildParticipants(campaignId, count, pct100Count){
   const list = [];
-  const sampled = EMPRESA.sortearColaboradores(count);
-  const totalQuestoes = (campaigns.find(c=>c.id===campaignId) || {}).questoes?.length || 4;
-  sampled.forEach((colab, i)=>{
+  const usedNames = [...NOMES];
+  for(let i=0;i<count;i++){
+    const idx = Math.floor(Math.random()*usedNames.length);
+    const nome = usedNames.splice(idx,1)[0] || (NOMES[i % NOMES.length] + " " + i);
     const acertos = i < pct100Count ? 100 : [90,80,70,60][Math.floor(Math.random()*4)];
-    const dataFim = new Date(2026, 5, 10 + Math.floor(i/4), 8 + (i%9), (i*7)%60);
-    const dataInicio = new Date(dataFim.getTime() - (3 + Math.floor(Math.random()*9)) * 60000);
-    list.push({
-      campaignId, nome: colab.nome, matricula: colab.matricula, cpf: EMPRESA.cpfFicticio(colab.matricula),
-      setor: colab.setor, filial: colab.filial, funcao: colab.funcao, cargo: colab.funcao,
-      data: dataFim, dataInicio, dataFim, pct: acertos, respostasCorretas: null,
-      acertosQtd: Math.round(acertos/100*totalQuestoes), totalQuestoes,
-      codigoResposta: gerarCodigoResposta(dataFim), sessaoId: gerarSessaoId(),
-      dispositivo: dispositivoFicticio(i)
-    });
-  });
+    const d = new Date(2026, 5, 10 + Math.floor(i/4), 8 + (i%9), (i*7)%60);
+    const cargo = (i % 7 === 0) ? randomFrom(CARGOS_IMPEDIDOS) : randomFrom(CARGOS_PERMITIDOS);
+    list.push({campaignId, nome, matricula:"MAT"+(10230+i*3), setor:randomFrom(SETORES), filial:randomFrom(UNIDADES), funcao:randomFrom(FUNCOES), cargo, data:d, pct:acertos, respostasCorretas:null});
+  }
   return list;
 }
 
-function isoLocal(d){
-  const p = n => String(n).padStart(2,'0');
-  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
-}
-const _hoje = new Date();
-const _inicioC1 = new Date(_hoje.getTime() - 20*24*60*60*1000);
-const _fimC1 = new Date(_hoje.getTime() + 20*24*60*60*1000);
-
-let campaigns = [];
-
-let participants = [];
-
-let wonHistory = [];
-
-/* ======================= BANCO DE PERGUNTAS ======================= */
-let questionBank = [
-  {codigo:"BQ-001", categoria:"Segurança", tema:"Segurança da Informação", procedimento:"POL-SEG-01",
-   texto:"Qual é a prática recomendada ao identificar um e-mail suspeito?", type:"unica",
-   options:[opt("Clicar no link para verificar a origem"),opt("Reportar ao canal de segurança e não interagir com o e-mail",true),opt("Responder pedindo mais informações ao remetente"),opt("Encaminhar para colegas avaliarem")],
-   autor:"Mariana Queiroz", dataCriacao:new Date(2026,4,20), ultimaUtilizacao:new Date(2026,5,15), qtdUtilizacoes:1, status:"ativa"},
-  {codigo:"BQ-002", categoria:"Qualidade", tema:"ISO 9001", procedimento:"POL-QUA-04",
-   texto:"O que é uma não conformidade?", type:"unica",
-   options:[opt("Um elogio do cliente"),opt("Um desvio em relação a um requisito estabelecido",true),opt("Uma sugestão de melhoria qualquer"),opt("Um novo processo criado")],
-   autor:"Mariana Queiroz", dataCriacao:new Date(2025,9,10), ultimaUtilizacao:new Date(2025,10,5), qtdUtilizacoes:2, status:"ativa"},
-  {codigo:"BQ-003", categoria:"Ética", tema:"Compliance", procedimento:"COD-ETI-01",
-   texto:"O que é conflito de interesses?", type:"unica",
-   options:[opt("Quando interesses pessoais podem influenciar decisões profissionais",true),opt("Uma discordância entre colegas de equipe"),opt("Um erro de sistema"),opt("Uma reunião com clientes")],
-   autor:"Mariana Queiroz", dataCriacao:new Date(2025,6,2), ultimaUtilizacao:new Date(2025,7,10), qtdUtilizacoes:1, status:"ativa"},
-  {codigo:"BQ-004", categoria:"Segurança", tema:"Proteção de Dados", procedimento:"POL-SEG-02",
-   texto:"O uso de pen drives pessoais em computadores corporativos é permitido sem autorização?", type:"vf",
-   options:[opt("Verdadeiro"),opt("Falso",true)],
-   autor:"Mariana Queiroz", dataCriacao:new Date(2024,2,1), ultimaUtilizacao:new Date(2024,2,20), qtdUtilizacoes:1, status:"ativa"}
-];
-function bqUsageStatus(q){
-  if(!q.ultimaUtilizacao) return {label:"Nunca utilizada", cls:"nunca"};
-  const twoYearsMs = 2*365*24*60*60*1000;
-  const diff = new Date() - new Date(q.ultimaUtilizacao);
-  if(diff < twoYearsMs){
-    const months = Math.max(1, Math.round(diff/(30*24*60*60*1000)));
-    return {label:`Usada há ${months} mês(es) — considere outra`, cls:"recente"};
+let campaigns = [
+  {
+    id:"c1", nome:"PPG 2026.1 – Segurança da Informação",
+    descricao:"Avaliação sobre práticas de segurança da informação e proteção de dados corporativos.",
+    objetivo:"Reforçar a cultura de segurança da informação entre todos os colaboradores.",
+    inicio:"2026-06-01T08:00", fim:"2026-07-30T18:00",
+    qtdGanhadores:4, premio:"Vale-compras R$ 200,00", criterios:"Nenhum critério adicional definido.",
+    status:"andamento", ganhadores:null,
+    questoes:[
+      {texto:"Qual é a prática recomendada ao identificar um e-mail suspeito?", type:"unica", options:[opt("Clicar no link para verificar a origem"),opt("Reportar ao canal de segurança e não interagir com o e-mail",true),opt("Responder pedindo mais informações ao remetente"),opt("Encaminhar para colegas avaliarem")]},
+      {texto:"O que caracteriza uma senha forte?", type:"unica", options:[opt("Data de nascimento e nome do usuário"),opt("Sequência numérica simples, como 123456"),opt("Combinação de letras, números e símbolos, sem dados pessoais",true),opt("A mesma senha usada em vários sistemas")]},
+      {texto:"Dados de clientes podem ser compartilhados sem autorização?", type:"vf", options:[opt("Verdadeiro"),opt("Falso",true)]},
+      {texto:"Qual canal deve ser usado para reportar incidentes de segurança?", type:"unica", options:[opt("Grupo de WhatsApp da equipe"),opt("Canal oficial de segurança da informação",true),opt("Rede social corporativa"),opt("E-mail pessoal do gestor")]}
+    ]
+  },
+  {
+    id:"c2", nome:"PPG 2025.4 – Qualidade e Processos",
+    descricao:"Questionário sobre procedimentos de qualidade, ISO 9001 e melhoria contínua.",
+    objetivo:"Consolidar o entendimento sobre os processos certificados pela ISO 9001.",
+    inicio:"2025-11-01T08:00", fim:"2025-11-20T18:00",
+    qtdGanhadores:4, premio:"Vale-compras R$ 200,00", criterios:"Priorizar setores ainda não contemplados em 2025.",
+    status:"encerrada", ganhadores:null,
+    questoes:[
+      {texto:"O que é uma não conformidade?", type:"unica", options:[opt("Um elogio do cliente"),opt("Um desvio em relação a um requisito estabelecido",true),opt("Uma sugestão de melhoria qualquer"),opt("Um novo processo criado")]},
+      {texto:"Qual a periodicidade da auditoria interna?", type:"unica", options:[opt("Definida no programa de auditoria da empresa",true),opt("Nunca é definida"),opt("Somente quando há reclamação"),opt("A cada 5 anos, sem exceções")]},
+      {texto:"Quais das opções abaixo fazem parte do ciclo PDCA?", type:"multiplas_respostas", options:[opt("Planejar",true),opt("Executar",true),opt("Ignorar os resultados"),opt("Verificar e agir",true)]},
+      {texto:"Quem é responsável por abrir uma RNC (Registro de Não Conformidade)?", type:"unica", options:[opt("Somente a diretoria"),opt("Qualquer colaborador que identificar o desvio",true),opt("Somente auditores externos"),opt("Ninguém, é automático")]}
+    ]
+  },
+  {
+    id:"c3", nome:"PPG 2025.3 – Ética e Compliance",
+    descricao:"Reforço das diretrizes do código de ética e canal de denúncias.",
+    objetivo:"Assegurar o conhecimento do código de ética por todos os colaboradores.",
+    inicio:"2025-08-01T08:00", fim:"2025-08-20T18:00",
+    qtdGanhadores:4, premio:"Vale-compras R$ 150,00", criterios:"Nenhum critério adicional definido.",
+    status:"finalizada",
+    ganhadores:[
+      {nome:"Isabela Nunes", matricula:"MAT10251", setor:"INFORMÁTICA", filial:"Matriz – Coronel Fabriciano", funcao:"ANALISTA DE TI"},
+      {nome:"Paulo Cesar", matricula:"MAT10281", setor:"FINANCEIRO", filial:"Complexo Minas Centrais - Filial Santa Bárbara", funcao:"ASSIST. ADMINISTRATIVO"},
+      {nome:"Karina Silva", matricula:"MAT10263", setor:"RECURSOS HUMANOS", filial:"Complexo Mariana - Filial Mariana", funcao:"AUX. DE PESSOAL"},
+      {nome:"Diego Alves", matricula:"MAT10236", setor:"SUPRIMENTOS", filial:"Matriz – Coronel Fabriciano", funcao:"AUX. ADMINISTRATIVO"}
+    ],
+    randomSeed:"748291063", justificativa:"Distribuição justa alcançada: 4 setores e 3 Unidades distintas representadas entre os ganhadores.", responsavel:"Mariana Queiroz",
+    questoes:[
+      {texto:"Qual o canal oficial para registrar uma denúncia?", type:"unica", options:[opt("Comentário em rede social"),opt("Canal de denúncias da Ética e Compliance",true),opt("Conversa informal com colegas"),opt("E-mail pessoal do diretor")]},
+      {texto:"O que é conflito de interesses?", type:"unica", options:[opt("Quando interesses pessoais podem influenciar decisões profissionais",true),opt("Uma discordância entre colegas de equipe"),opt("Um erro de sistema"),opt("Uma reunião com clientes")]},
+      {texto:"Presentes de fornecedores devem ser sempre recusados, independentemente do valor?", type:"vf", options:[opt("Verdadeiro"),opt("Falso — a política define limites de valor e situações permitidas",true)]},
+      {texto:"Quem pode acionar o código de ética da empresa?", type:"unica", options:[opt("Somente gestores"),opt("Qualquer colaborador",true),opt("Somente o setor de Compliance"),opt("Somente fornecedores")]}
+    ]
   }
-  return {label:"Livre para reutilização", cls:"livre"};
-}
+];
 
-/* ======================= AUDITORIA (log de ações) ======================= */
-let actionLog = [];
-let ruleChangeLog = []; // histórico de alterações/exceções às regras de elegibilidade, por campanha
-function logAction(acao, detalhe){
-  actionLog.unshift({acao, detalhe: detalhe||"", usuario: currentUser ? currentUser.nome : "Sistema", data:new Date()});
-  const sec = document.getElementById('sec-auditoria');
-  if(sec && sec.classList.contains('active')) renderAuditoria();
-  saveState();
-}
-function renderAuditoria(){
-  const tbody = document.getElementById('tblAuditoria');
-  if(!tbody) return;
-  tbody.innerHTML = actionLog.map(a=>`<tr><td>${fmtDateTime(a.data)}</td><td>${a.usuario}</td><td>${a.acao}</td><td>${a.detalhe}</td></tr>`).join('') ||
-    `<tr><td colspan="4" style="text-align:center; color:var(--ink-soft); padding:20px;">Nenhuma ação registrada ainda nesta sessão.</td></tr>`;
-}
+let participants = [
+  ...buildParticipants("c1", 34, 6),
+  ...buildParticipants("c2", 28, 5),
+  ...buildParticipants("c3", 22, 4),
+];
 
-/* ======================= AUDITORIA DETALHADA (rastreabilidade por participação) ======================= */
-function audFillFilterSelects(){
-  const camp = document.getElementById('audFiltroCampanha');
-  if(!camp) return;
-  const prevCamp = camp.value;
-  camp.innerHTML = '<option value="">Todas</option>' + campaigns.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
-  camp.value = prevCamp;
-  const setor = document.getElementById('audFiltroSetor');
-  if(setor.options.length <= 1) setor.innerHTML = '<option value="">Todos</option>' + [...SETORES].sort().map(s=>`<option value="${s}">${s}</option>`).join('');
-  const filial = document.getElementById('audFiltroFilial');
-  if(filial.options.length <= 1) filial.innerHTML = '<option value="">Todas</option>' + UNIDADES.map(f=>`<option value="${f}">${f}</option>`).join('');
-  const funcao = document.getElementById('audFiltroFuncao');
-  if(funcao.options.length <= 1) funcao.innerHTML = '<option value="">Todas</option>' + [...FUNCOES].sort().map(f=>`<option value="${f}">${f}</option>`).join('');
-}
-function audGetFilteredParticipants(){
-  const campId = document.getElementById('audFiltroCampanha').value;
-  const setor = document.getElementById('audFiltroSetor').value;
-  const filial = document.getElementById('audFiltroFilial').value;
-  const funcao = document.getElementById('audFiltroFuncao').value;
-  const dataDe = document.getElementById('audFiltroDataDe').value;
-  const dataAte = document.getElementById('audFiltroDataAte').value;
-  const status = document.getElementById('audFiltroStatus').value;
-  const busca = document.getElementById('audFiltroBusca').value.trim().toLowerCase();
-  return participants.filter(p=>{
-    if(campId && p.campaignId !== campId) return false;
-    if(setor && p.setor !== setor) return false;
-    if(filial && p.filial !== filial) return false;
-    if(funcao && p.funcao !== funcao) return false;
-    const d = p.dataFim || p.data;
-    if(dataDe && d < new Date(dataDe+'T00:00:00')) return false;
-    if(dataAte && d > new Date(dataAte+'T23:59:59')) return false;
-    if(busca){
-      const hay = `${p.nome} ${p.matricula} ${p.codigoResposta||''}`.toLowerCase();
-      if(!hay.includes(busca)) return false;
-    }
-    if(status){
-      const {eligible, excluded} = evaluateEligibility(p.campaignId);
-      const isElig = eligible.some(e=>e.matricula===p.matricula);
-      const isExcl = excluded.some(e=>e.matricula===p.matricula);
-      if(status==='elegivel' && !isElig) return false;
-      if(status==='excluido' && !isExcl) return false;
-      const ex = excluded.find(e=>e.matricula===p.matricula);
-      if(status==='naoelegivel' && !(ex && ex.motivos.some(m=>m.includes('100%')))) return false;
-      if(status==='cargoimpedido' && !(ex && ex.motivos.some(m=>m.includes('cargo de liderança')))) return false;
-      if(status==='premiadorecente' && !(ex && ex.motivos.some(m=>m.includes('premiado')))) return false;
-    }
-    return true;
-  });
-}
-function audEligLabel(p){
-  const {eligible, excluded} = evaluateEligibility(p.campaignId);
-  const ex = excluded.find(e=>e.matricula===p.matricula);
-  if(ex) return `<span class="badge excluido" title="${ex.motivo}">${ex.motivo}</span>`;
-  return `<span class="badge finalizada">Elegível</span>`;
-}
-function renderAuditoriaBarChart(elId, dataObj){
-  const el = document.getElementById(elId);
-  if(!el) return;
-  const entries = Object.entries(dataObj).filter(([k,v])=>v>0);
-  if(!entries.length){ el.innerHTML = '<p class="hint">Sem dados para os filtros atuais.</p>'; return; }
-  const max = Math.max(...entries.map(([,v])=>v));
-  el.innerHTML = entries.map(([k,v])=>`
-    <div class="hbar-row"><div class="hbar-label">${k}</div><div class="hbar-track"><div class="hbar-fill" style="width:0%" data-w="${(v/max*100)}"></div></div><div class="hbar-value">${v}</div></div>`).join('');
-  requestAnimationFrame(()=> el.querySelectorAll('.hbar-fill').forEach(f=> f.style.width = f.dataset.w + "%"));
-}
-function renderAuditoriaDetalhe(){
-  const tbody = document.getElementById('tblAuditoriaDetalhe');
-  if(!tbody) return;
-  audFillFilterSelects();
-  const list = audGetFilteredParticipants().sort((a,b)=> (b.dataFim||b.data) - (a.dataFim||a.data));
-  tbody.innerHTML = list.map(p=>{
-    const c = campaigns.find(x=>x.id===p.campaignId);
-    return `<tr>
-      <td>${p.nome}</td><td>${p.matricula}</td><td style="font-family:monospace; font-size:11px;">${p.cpf||'—'}</td><td>${p.funcao||p.cargo}</td><td>${p.setor}</td><td>${p.filial}</td>
-      <td>${c?c.nome:p.campaignId}</td><td style="font-family:monospace; font-size:11px;">${p.codigoResposta||'—'}</td>
-      <td>${p.dataInicio?fmtDateTime(p.dataInicio):'—'}</td><td>${p.dataFim?fmtDateTime(p.dataFim):fmtDateTime(p.data)}</td>
-      <td>${duracaoLabel(p.dataInicio, p.dataFim||p.data)}</td>
-      <td>${p.acertosQtd!=null && p.totalQuestoes ? `${p.acertosQtd}/${p.totalQuestoes}` : '—'}</td>
-      <td><span class="${p.pct===100?'pct100':'pctless'}">${p.pct}%</span></td>
-      <td style="font-size:11px;">${p.dispositivo||'—'}<br><span style="font-family:monospace; color:var(--ink-soft); font-size:10px;">${p.sessaoId||''}</span></td>
-      <td>${audEligLabel(p)}</td>
-      <td style="display:flex; gap:6px; flex-wrap:wrap;">
-        <button class="btn btn-outline btn-sm" onclick="audVerDetalhe('${p.campaignId}','${p.matricula}')">Respostas</button>
-        <button class="btn btn-outline btn-sm" onclick="audVerPerfil('${p.matricula}')">Perfil</button>
-      </td>
-    </tr>`;
-  }).join('') || `<tr><td colspan="16" style="text-align:center; color:var(--ink-soft); padding:20px;">Nenhum registro encontrado com os filtros atuais.</td></tr>`;
-
-  const totalPart = list.length;
-  const total100 = list.filter(p=>p.pct===100).length;
-  const media = list.length ? Math.round(list.reduce((a,p)=>a+p.pct,0)/list.length) : 0;
-  const comDuracao = list.filter(p=>p.dataInicio && (p.dataFim||p.data));
-  const duracaoMediaSeg = comDuracao.length ? Math.round(comDuracao.reduce((a,p)=> a + (new Date(p.dataFim||p.data) - new Date(p.dataInicio))/1000, 0) / comDuracao.length) : 0;
-  let totalEleg = 0, totalExcl = 0;
-  const campanhasNoFiltro = [...new Set(list.map(p=>p.campaignId))];
-  campanhasNoFiltro.forEach(cid=>{ const {eligible, excluded} = evaluateEligibility(cid); totalEleg += eligible.length; totalExcl += excluded.length; });
-  document.getElementById('audResumo').innerHTML = `
-    <div class="stat"><b>${totalPart}</b><span>Participações no filtro</span></div>
-    <div class="stat"><b>${total100}</b><span>Com 100% de acertos</span></div>
-    <div class="stat"><b>${media}%</b><span>Média de acertos</span></div>
-    <div class="stat"><b>${formatSegundos(duracaoMediaSeg)}</b><span>Tempo médio de resposta</span></div>
-    <div class="stat"><b>${totalEleg}</b><span>Elegíveis (campanhas no filtro)</span></div>
-    <div class="stat"><b>${totalExcl}</b><span>Excluídos (campanhas no filtro)</span></div>`;
-
-  const bySetor = {}, byFilial = {};
-  list.forEach(p=>{ bySetor[p.setor]=(bySetor[p.setor]||0)+1; byFilial[p.filial]=(byFilial[p.filial]||0)+1; });
-  renderAuditoriaBarChart('audChartSetor', bySetor);
-  renderAuditoriaBarChart('audChartFilial', byFilial);
-
-  const ordered = [...campaigns].sort((a,b)=> new Date(a.inicio) - new Date(b.inicio));
-  const evoData = {};
-  ordered.forEach(c=> evoData[c.nome.split('–')[0].trim()] = campaignParticipants(c.id).length);
-  renderAuditoriaBarChart('audChartEvolucao', evoData);
-}
-window.audVerDetalhe = function(campaignId, matricula){
-  const p = participants.find(pp=>pp.campaignId===campaignId && pp.matricula===matricula);
-  const c = campaigns.find(x=>x.id===campaignId);
-  if(!p || !c) return;
-  const rows = c.questoes.map((q,i)=>{
-    const ans = p.respostasSelecionadas ? p.respostasSelecionadas[i] : undefined;
-    const selTexts = Array.isArray(ans) ? ans.map(a=> (q.options[a]||{}).text).join(', ') : (ans!==undefined && ans!==null && q.options[ans] ? q.options[ans].text : 'Não disponível (registro histórico)');
-    const correctTexts = q.options.filter(o=>o.correct).map(o=>o.text).join(', ');
-    const ok = p.respostasCorretas ? p.respostasCorretas[i] : null;
-    return `<tr><td>${q.texto}</td><td>${selTexts||'—'}</td><td>${correctTexts}</td><td>${ok===null?'—':(ok?'<span class="pct100">✓ Correta</span>':'<span style="color:var(--error);">✕ Incorreta</span>')}</td></tr>`;
-  }).join('');
-  const backdrop = document.createElement('div');
-  backdrop.className = 'share-backdrop';
-  backdrop.id = 'audDetalheBackdrop';
-  backdrop.innerHTML = `
-    <div class="share-card" style="max-width:640px; text-align:left;">
-      <h3 style="margin-bottom:4px;">${p.nome} — ${p.codigoResposta||''}</h3>
-      <p class="hint" style="margin-bottom:14px;">${c.nome} · ${p.matricula} · ${p.setor} · ${p.filial}</p>
-      <div class="table-wrap" style="max-height:360px; overflow-y:auto;">
-        <table><thead><tr><th>Pergunta</th><th>Resposta selecionada</th><th>Alternativa correta</th><th>Resultado</th></tr></thead>
-        <tbody>${rows}</tbody></table>
-      </div>
-      <div class="share-actions" style="margin-top:16px;"><button class="btn btn-outline" id="audCloseDetalhe">Fechar</button></div>
-    </div>`;
-  document.body.appendChild(backdrop);
-  backdrop.addEventListener('click', (e)=>{ if(e.target===backdrop) backdrop.remove(); });
-  document.getElementById('audCloseDetalhe').addEventListener('click', ()=> backdrop.remove());
-};
-window.audVerPerfil = function(matricula){
-  const historico = participants.filter(p=>p.matricula===matricula).sort((a,b)=> (b.dataFim||b.data) - (a.dataFim||a.data));
-  if(!historico.length) return;
-  const ref = historico[0];
-  const premios = wonHistory.filter(w=>w.matricula===matricula).sort((a,b)=>b.data-a.data);
-  const rows = historico.map(p=>{
-    const c = campaigns.find(x=>x.id===p.campaignId);
-    const ganhou = c && c.ganhadores && c.ganhadores.some(g=>g.matricula===matricula);
-    return `<tr>
-      <td>${c?c.nome:p.campaignId}</td><td style="font-family:monospace; font-size:11px;">${p.codigoResposta||'—'}</td>
-      <td>${fmtDateTime(p.dataFim||p.data)}</td><td>${duracaoLabel(p.dataInicio, p.dataFim||p.data)}</td>
-      <td><span class="${p.pct===100?'pct100':'pctless'}">${p.pct}%</span></td>
-      <td>${audEligLabel(p)}</td>
-      <td>${ganhou ? '<span class="badge finalizada"><i data-lucide="trophy" style="width:12px;height:12px;vertical-align:-2px;"></i> Ganhador</span>' : '—'}</td>
-    </tr>`;
-  }).join('');
-  const premiosHtml = premios.length
-    ? premios.map(w=>`<li>${fmtDateTime(w.data)}</li>`).join('')
-    : '<li>Nenhum prêmio recebido até o momento.</li>';
-  const backdrop = document.createElement('div');
-  backdrop.className = 'share-backdrop';
-  backdrop.id = 'audPerfilBackdrop';
-  backdrop.innerHTML = `
-    <div class="share-card" style="max-width:720px; text-align:left;">
-      <h3 style="margin-bottom:2px;">${ref.nome}</h3>
-      <p class="hint" style="margin-bottom:2px;">${matricula} · CPF ${ref.cpf||'—'} · ${ref.funcao||ref.cargo} · ${ref.setor} · ${ref.filial}</p>
-      <p class="hint" style="margin-bottom:14px;">${historico.length} participação(ões) registrada(s) no total, em ${new Set(historico.map(p=>p.campaignId)).size} campanha(s) distinta(s).</p>
-      <div class="table-wrap" style="max-height:280px; overflow-y:auto;">
-        <table><thead><tr><th>Campanha</th><th>Código</th><th>Data</th><th>Duração</th><th>%</th><th>Elegibilidade</th><th>Sorteio</th></tr></thead>
-        <tbody>${rows}</tbody></table>
-      </div>
-      <h4 style="margin:16px 0 6px; font-size:13px;">Histórico de premiações</h4>
-      <ul style="margin:0; padding-left:18px; font-size:12.5px; color:var(--ink-soft); display:flex; flex-direction:column; gap:4px;">${premiosHtml}</ul>
-      <div class="share-actions" style="margin-top:16px;"><button class="btn btn-outline" id="audClosePerfil">Fechar</button></div>
-    </div>`;
-  document.body.appendChild(backdrop);
-  backdrop.addEventListener('click', (e)=>{ if(e.target===backdrop) backdrop.remove(); });
-  document.getElementById('audClosePerfil').addEventListener('click', ()=> backdrop.remove());
-};
-document.getElementById('audAplicarFiltros')?.addEventListener('click', renderAuditoriaDetalhe);
-document.getElementById('audLimparFiltros')?.addEventListener('click', ()=>{
-  ['audFiltroCampanha','audFiltroSetor','audFiltroFilial','audFiltroFuncao','audFiltroStatus'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-  ['audFiltroDataDe','audFiltroDataAte','audFiltroBusca'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-  renderAuditoriaDetalhe();
-});
-document.getElementById('audExportXlsx')?.addEventListener('click', ()=>{
-  const list = audGetFilteredParticipants();
-  if(!list.length){ showToast("Não há dados para exportar com os filtros atuais.","warning"); return; }
-  const headers = ["Nome","Matrícula","CPF","Função","Setor","Filial","Campanha","Código","Início","Fim","Duração","Acertos","% Acertos","Dispositivo","Sessão","Elegibilidade"];
-  const rows = list.map(p=>{
-    const c = campaigns.find(x=>x.id===p.campaignId);
-    const {eligible, excluded} = evaluateEligibility(p.campaignId);
-    const ex = excluded.find(e=>e.matricula===p.matricula);
-    const elegStr = ex ? `Excluído — ${ex.motivo}` : 'Elegível';
-    return [p.nome,p.matricula,p.cpf||'',p.funcao||p.cargo,p.setor,p.filial,c?c.nome:p.campaignId,p.codigoResposta||'',
-      p.dataInicio?fmtDateTime(p.dataInicio):'', p.dataFim?fmtDateTime(p.dataFim):fmtDateTime(p.data),
-      duracaoLabel(p.dataInicio, p.dataFim||p.data), p.acertosQtd!=null?`${p.acertosQtd}/${p.totalQuestoes}`:'', p.pct+'%',
-      p.dispositivo||'', p.sessaoId||'', elegStr];
-  });
-  downloadCSV('auditoria_participacoes.csv', headers, rows);
-  logAction("Relatório exportado", `Auditoria detalhada (Excel) — ${list.length} registro(s)`);
-  showToast("Arquivo .csv baixado (compatível com Excel).","success");
-});
-document.getElementById('audExportPdf')?.addEventListener('click', ()=>{
-  const list = audGetFilteredParticipants();
-  if(!list.length){ showToast("Não há dados para exportar com os filtros atuais.","warning"); return; }
-  const headers = ["Nome","Matrícula","Setor","Filial","Campanha","Código","Duração","% Acertos","Dispositivo","Elegibilidade"];
-  const rows = list.map(p=>{
-    const c = campaigns.find(x=>x.id===p.campaignId);
-    const {eligible, excluded} = evaluateEligibility(p.campaignId);
-    const ex = excluded.find(e=>e.matricula===p.matricula);
-    const elegStr = ex ? `Excluído — ${ex.motivo}` : 'Elegível';
-    return [p.nome,p.matricula,p.setor,p.filial,c?c.nome:p.campaignId,p.codigoResposta||'',duracaoLabel(p.dataInicio,p.dataFim||p.data),p.pct+'%',p.dispositivo||'',elegStr];
-  });
-  openPrintReport("Auditoria de participações", headers, rows, `Total filtrado: ${list.length} registro(s)`);
-  logAction("Relatório exportado", `Auditoria detalhada (PDF) — ${list.length} registro(s)`);
-});
+let wonHistory = [
+  {matricula:"MAT10251", data:new Date(2025,7,21)},
+  {matricula:"MAT10281", data:new Date(2025,7,21)},
+  {matricula:"MAT10263", data:new Date(2025,7,21)},
+  {matricula:"MAT10236", data:new Date(2025,7,21)},
+  {matricula:participants.find(p=>p.campaignId==="c1")?.matricula, data:new Date(2025,2,10)}
+];
 
 let currentUser = null;
 let currentRole = "qualidade";
 let historyLog = [];
 let editingCampaignId = null;
-let quizState = null;
-let editingBQCodigo = null;
+let respondingCampaignId = null;
 
-/* ======================= PERSISTÊNCIA (localStorage) =======================
-   O app é só HTML/CSS/JS, sem servidor — então "banco de dados" aqui significa
-   salvar automaticamente no navegador de quem está usando. Os dados sobrevivem
-   a um recarregamento de página (F5) ou a fechar e reabrir a aba, permitindo
-   acompanhar o processo ao longo do tempo. Isso é local a cada navegador/
-   computador — não é compartilhado entre pessoas diferentes (para isso seria
-   necessário um backend real). */
-const STORAGE_KEY = "ppg_app_state_v1";
-const STATE_VERSION = 3; // aumente este número sempre que a "forma" dos dados salvos mudar de forma incompatível
 
-function dateReviver(key, value){
-  if(typeof value === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)) return new Date(value);
-  return value;
+/* ======================= SINCRONIZAÇÃO EM TEMPO REAL =======================
+ * A tela de Rodadas consulta o Google Apps Script periodicamente.
+ * Substitua somente PPG_API_URL pela URL da implantação do seu Apps Script.
+ */
+const PPG_API_URL = "COLE_AQUI_A_URL_DA_IMPLANTACAO_DO_APPS_SCRIPT";
+const PPG_SYNC_INTERVAL_MS = 10000;
+let ppgSyncTimer = null;
+let ppgSyncBusy = false;
+let ppgLastSync = null;
+
+function ppgApiUrlConfigured(){
+  return PPG_API_URL && !PPG_API_URL.includes("COLE_AQUI");
 }
-function saveState(){
-  try{
-    const state = {
-      version: STATE_VERSION,
-      campaigns, participants, wonHistory, questionBank, actionLog, ruleChangeLog,
-      responseSeqCounter, currentUser, currentRole,
-      themePreference: window.themePreference || 'auto',
-      savedAt: new Date()
-    };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }catch(e){ console.warn("Não foi possível salvar os dados localmente:", e); }
+
+async function ppgGet(action, params = {}){
+  if(!ppgApiUrlConfigured()) throw new Error("URL do Apps Script ainda não configurada.");
+  const qs = new URLSearchParams({action, ...params});
+  const response = await fetch(`${PPG_API_URL}?${qs.toString()}`, {
+    method: "GET",
+    cache: "no-store"
+  });
+  if(!response.ok) throw new Error(`HTTP ${response.status}`);
+  return await response.json();
 }
-function loadState(){
+
+function calcularStatusTempoReal(c){
+  const agora = new Date();
+  const inicio = new Date(c.inicio);
+  const fim = new Date(c.fim);
+  if(!isNaN(inicio.getTime()) && agora < inicio) return "programada";
+  if(!isNaN(fim.getTime()) && agora > fim){
+    return c.status === "finalizada" ? "finalizada" : "encerrada";
+  }
+  return "andamento";
+}
+
+function atualizarIndicadorTempoReal(erro = false){
+  let el = document.getElementById("ppgLiveIndicator");
+  if(!el){
+    el = document.createElement("div");
+    el.id = "ppgLiveIndicator";
+    el.style.cssText = "position:fixed;right:18px;bottom:16px;z-index:9999;padding:7px 12px;border-radius:20px;background:rgba(255,255,255,.95);border:1px solid #DDE8E6;box-shadow:0 4px 14px rgba(0,0,0,.08);font:700 11px Arial,sans-serif;color:#087F6C;";
+    document.body.appendChild(el);
+  }
+  if(erro){
+    el.style.color = "#B42318";
+    el.textContent = "● Sincronização indisponível";
+    return;
+  }
+  el.style.color = "#087F6C";
+  const hora = ppgLastSync ? ppgLastSync.toLocaleTimeString("pt-BR") : "--:--:--";
+  el.textContent = `● Atualizado ${hora}`;
+}
+
+function redesenharTelasPPG(){
+  try{ fillCampaignSelects(); }catch(e){}
+  try{ renderDashboard(); }catch(e){}
+  try{ renderCampaignGrid(); }catch(e){}
+  try{ renderParticipantsTable(); }catch(e){}
+  try{ renderEligibleTable(); }catch(e){}
+  try{ renderSorteioSetup(); }catch(e){}
+  try{ renderTimeline(); }catch(e){}
+}
+
+async function sincronizarPPGEmTempoReal(){
+  if(ppgSyncBusy || !ppgApiUrlConfigured()) return;
+  ppgSyncBusy = true;
   try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(!raw) return false;
-    const state = JSON.parse(raw, dateReviver);
-    if(state.version !== STATE_VERSION){
-      console.warn("Dados salvos de uma versão anterior do app — ignorando e começando do zero.");
-      localStorage.removeItem(STORAGE_KEY);
-      return false;
+    const camp = await ppgGet("getCampanhas");
+    if(!camp || !camp.ok) throw new Error(camp?.erro || "Falha ao carregar campanhas.");
+
+    campaigns = (camp.campanhas || []).map(c => ({
+      ...c,
+      status: calcularStatusTempoReal(c),
+      questoes: Array.isArray(c.questoes) ? c.questoes : [],
+      ganhadores: c.ganhadores || null,
+      qtdRespostas: Number(c.qtdRespostas || 0)
+    }));
+
+    const resp = await ppgGet("getRespostas");
+    if(resp && resp.ok && Array.isArray(resp.respostas)){
+      participants = resp.respostas.map(r => ({
+        ...r,
+        campaignId: String(r.campaignId || ""),
+        matricula: String(r.matricula || ""),
+        pct: Number(r.pct || 0),
+        acertosQtd: Number(r.acertosQtd || 0),
+        totalQuestoes: Number(r.totalQuestoes || 0),
+        data: r.data || r.dataInicio || r.dataHora || new Date(),
+        respostasCorretas: Array.isArray(r.respostasCorretas) ? r.respostasCorretas : [],
+        respostasSelecionadas: Array.isArray(r.respostasSelecionadas) ? r.respostasSelecionadas : []
+      }));
     }
-    if(state.campaigns) campaigns = state.campaigns;
-    if(state.participants) participants = state.participants;
-    if(state.wonHistory) wonHistory = state.wonHistory;
-    if(state.questionBank) questionBank = state.questionBank;
-    if(state.actionLog) actionLog = state.actionLog;
-    if(state.ruleChangeLog) ruleChangeLog = state.ruleChangeLog;
-    if(typeof state.responseSeqCounter === 'number') responseSeqCounter = state.responseSeqCounter;
-    currentUser = state.currentUser || null;
-    currentRole = state.currentRole || "qualidade";
-    window.themePreference = state.themePreference || 'auto';
-    return true;
-  }catch(e){ console.warn("Não foi possível carregar os dados salvos:", e); return false; }
+
+    ppgLastSync = new Date();
+    atualizarIndicadorTempoReal(false);
+    redesenharTelasPPG();
+  }catch(err){
+    console.warn("PPG: falha na sincronização em tempo real", err);
+    atualizarIndicadorTempoReal(true);
+  }finally{
+    ppgSyncBusy = false;
+  }
 }
-function clearSavedState(){ try{ localStorage.removeItem(STORAGE_KEY); }catch(e){} }
+
+function iniciarPPGTempoReal(){
+  if(ppgSyncTimer) clearInterval(ppgSyncTimer);
+  atualizarIndicadorTempoReal(false);
+  sincronizarPPGEmTempoReal();
+  ppgSyncTimer = setInterval(sincronizarPPGEmTempoReal, PPG_SYNC_INTERVAL_MS);
+}
+
 
 /* ======================= ELEGIBILIDADE ======================= */
 function isWithinTwoYears(matricula, refDate){
@@ -430,15 +221,12 @@ function isWithinTwoYears(matricula, refDate){
   return wonHistory.some(w => w.matricula === matricula && (refDate - w.data) < twoYearsMs);
 }
 function evaluateEligibility(campaignId){
-  const all = campaignParticipants(campaignId);
+  const all = campaignParticipants(campaignId).filter(p=>p.pct===100);
   const eligible = [], excluded = [];
   const now = new Date();
   all.forEach(p=>{
-    const motivos = [];
-    if(p.pct !== 100) motivos.push(`Não atingiu 100% de acertos no questionário (fez ${p.pct}%)`);
-    if(CARGOS_IMPEDIDOS.includes(p.cargo)) motivos.push(`Ocupa cargo de liderança impedido de participar (${p.cargo})`);
-    if(isWithinTwoYears(p.matricula, now)) motivos.push("Já foi premiado(a) em uma campanha do PPG nos últimos 2 anos");
-    if(motivos.length) excluded.push({...p, motivo: motivos.join(" · "), motivos});
+    if(CARGOS_IMPEDIDOS.includes(p.cargo)) excluded.push({...p, motivo:`Cargo impedido (${p.cargo})`});
+    else if(isWithinTwoYears(p.matricula, now)) excluded.push({...p, motivo:"Premiado(a) em campanha do PPG nos últimos 2 anos"});
     else eligible.push(p);
   });
   return {eligible, excluded};
@@ -454,54 +242,24 @@ function campaignAccessStatus(c){
 }
 
 /* ======================= NAV ======================= */
-const titles = {
-  inicio:"Início", campanhas:"Rodadas", nova:"Nova Campanha", participantes:"Resultados",
-  elegiveis:"Elegíveis", sorteio:"Sorteio", relatorios:"Relatórios", historico:"Histórico",
-  banco:"Banco de Perguntas", auditoria:"Auditoria", config:"Configurações", responder:"Questionário",
-  "regras-excecoes":"Regras & Exceções", "divulgacao":"Divulgação", "fale-conosco":"Fale com a Qualidade", "importar-historico":"Importar Histórico",
-  "campanha-atual":"Campanha Atual", "historico-colab":"Histórico", "meu-resultado":"Meu Resultado", regulamento:"Regulamento"
-};
+const titles = {inicio:"Início", campanhas:"Campanhas PPG", nova:"Nova Campanha", participantes:"Participantes", elegiveis:"Elegíveis", sorteio:"Sorteio", relatorios:"Relatórios", historico:"Histórico", config:"Configurações", responder:"Questionário"};
 
 document.querySelectorAll('.menu-item').forEach(btn=>{
   btn.addEventListener('click', ()=>{
-    const target = btn.dataset.target;
+    if(btn.classList.contains('locked')) return;
+    goToSection(btn.dataset.target);
     document.querySelectorAll('.menu-item').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
-    goToSection(target);
   });
 });
-document.querySelectorAll('.menu-group-header').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    btn.closest('.menu-group').classList.toggle('expanded');
-  });
-});
-let currentSectionId = "inicio";
 function goToSection(target){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  const sec = document.getElementById('sec-'+target);
-  if(sec) sec.classList.add('active');
-  document.getElementById('pageTitle').textContent = titles[target] || target;
+  document.getElementById('sec-'+target).classList.add('active');
+  document.getElementById('pageTitle').textContent = titles[target];
   closeSidebarMobile();
-  currentSectionId = target;
-  renderSectionContent(target);
-}
-function renderSectionContent(target){
   if(target==="inicio") renderDashboard();
   if(target==="campanhas") renderCampaignGrid();
   if(target==="historico") renderTimeline();
-  if(target==="participantes") renderParticipantsTable();
-  if(target==="elegiveis") renderEligibleTable();
-  if(target==="banco") renderBanco();
-  if(target==="auditoria"){ renderAuditoria(); renderAuditoriaDetalhe(); }
-  if(target==="regras-excecoes") renderRegrasExcecoes();
-  if(target==="divulgacao") renderDivulgacao();
-  if(target==="fale-conosco" && currentRole==="qualidade") renderDuvidas();
-  if(target==="importar-historico") renderHistoricoImportado();
-  if(target==="config" && currentRole==="qualidade") renderPedidosSenha();
-  if(target==="campanha-atual") renderCampanhaAtual();
-  if(target==="historico-colab") renderHistoricoColaborador();
-  if(target==="meu-resultado") renderMeuResultado();
-  if(target==="regulamento") renderRegulamentoStats();
 }
 
 document.getElementById('hamburger').addEventListener('click', ()=>{
@@ -511,511 +269,53 @@ document.getElementById('hamburger').addEventListener('click', ()=>{
 document.getElementById('overlay').addEventListener('click', closeSidebarMobile);
 function closeSidebarMobile(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('open'); }
 
-const btnResetDemoData = document.getElementById('btnResetDemoData');
-if(btnResetDemoData){
-  btnResetDemoData.addEventListener('click', ()=>{
-    if(confirm("Isso vai apagar os dados salvos neste navegador (sessão, tema, cache local) e recarregar a página. Os dados da planilha não são afetados. Continuar?")){
-      clearSavedState();
-      window.location.reload();
-    }
-  });
-}
-
-/* Menu lateral recolhível (ícone-somente) */
-const btnCollapseSidebar = document.getElementById('btnCollapseSidebar');
-if(btnCollapseSidebar){
-  btnCollapseSidebar.addEventListener('click', ()=>{
-    document.getElementById('sidebar').classList.toggle('collapsed');
-  });
-}
-// Em telas de tablet, começa recolhido automaticamente (mais espaço de conteúdo)
-if(window.innerWidth <= 1180 && window.innerWidth > 880){
-  document.getElementById('sidebar').classList.add('collapsed');
-}
-
-/* Link/QR de divulgação: ?campanha=ID leva direto ao questionário após o login */
-const urlParams = new URLSearchParams(window.location.search);
-const deepLinkCampaignId = urlParams.get('campanha');
-
-/* ======================= TELA DE LOGIN — SAC, abas e credenciais retráteis ======================= */
-(function initLoginExtras(){
-  const sacFab = document.getElementById('sacFab');
-  const sacPopup = document.getElementById('sacPopup');
-  const sacClose = document.getElementById('sacClose');
-  function openSac(){
-    sacPopup.classList.add('open');
-    requestAnimationFrame(()=> sacPopup.classList.add('show'));
-  }
-  function closeSac(){
-    sacPopup.classList.remove('show');
-    setTimeout(()=> sacPopup.classList.remove('open'), 250);
-  }
-  if(sacFab) sacFab.addEventListener('click', ()=>{
-    sacPopup.classList.contains('open') ? closeSac() : openSac();
-  });
-  if(sacClose) sacClose.addEventListener('click', closeSac);
-  document.addEventListener('click', (e)=>{
-    if(sacPopup && sacPopup.classList.contains('open') && !sacPopup.contains(e.target) && e.target !== sacFab && !sacFab.contains(e.target)){
-      closeSac();
-    }
-  });
-
-  // Painel retrátil de credenciais de teste (escondido por padrão)
-  const demoToggle = document.getElementById('loginDemoToggle');
-  const demoPanel = document.getElementById('loginDemoPanel');
-  if(demoToggle) demoToggle.addEventListener('click', ()=>{
-    demoToggle.classList.toggle('open');
-    demoPanel.classList.toggle('open');
-  });
-
-  // Botão "conheça o programa" rola suavemente até a landing
-  const scrollHint = document.getElementById('loginScrollHint');
-  if(scrollHint) scrollHint.addEventListener('click', ()=>{
-    document.getElementById('loginLanding').scrollIntoView({behavior:'smooth', block:'start'});
-  });
-})();
-
 /* ======================= LOGIN ======================= */
-/* A autenticação de verdade agora mora na planilha (via Google Apps Script).
-   Não existe mais senha nenhuma escrita aqui no código. */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbyLI_IQNQ4LDB4mhQjRJdiAOdWqtyj8JL7BVkY2cYLUznrJS6UdL1csuAFdoMM5fc-L7Q/exec";
-
-async function backendCall(action, payload){
-  try{
-    const res = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: {"Content-Type": "text/plain;charset=utf-8"}, // evita pre-flight de CORS no Apps Script
-      body: JSON.stringify({action, solicitante: (typeof currentUser !== 'undefined' && currentUser) ? currentUser.matricula : null, ...(payload||{})})
-    });
-    const textoCru = await res.text();
-    if(!res.ok){
-      console.error(`Backend respondeu HTTP ${res.status} para a ação "${action}". Corpo da resposta:`, textoCru);
-      return {ok:false, erro:`O servidor respondeu com erro ${res.status}. Veja o Console (F12) para detalhes.`};
-    }
-    try{
-      return JSON.parse(textoCru);
-    }catch(parseErr){
-      console.error(`A resposta da ação "${action}" não veio em JSON. Isso geralmente acontece quando a implantação do Apps Script não está com acesso "Qualquer pessoa", ou quando houve um erro dentro do próprio script. Resposta recebida:`, textoCru);
-      return {ok:false, erro:"O servidor respondeu algo inesperado (não era JSON). Veja o Console (F12) — provavelmente a implantação do Apps Script precisa ser revisada."};
-    }
-  }catch(e){
-    // "Failed to fetch" / TypeError aqui quase sempre é bloqueio de CORS ou URL incorreta/implantação não publicada.
-    console.error(`Erro de conexão com o backend na ação "${action}":`, e);
-    return {ok:false, erro:"Não foi possível conectar ao servidor. Verifique sua internet e tente de novo. (Detalhe técnico no Console, F12)"};
-  }
-}
-
-function normalizarTextoCliente(s){
-  return String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
-}
-const PAPEIS_QUALIDADE = ["qualidade", "admin", "administrador", "gestao", "gestor", "coordenacao", "coordenador"];
-function mapColaboradorParaUser(colab){
-  const papelNorm = normalizarTextoCliente(colab.papel);
-  const setorNorm = normalizarTextoCliente(colab.setor);
-  const role = (PAPEIS_QUALIDADE.some(p => papelNorm.includes(p)) || setorNorm.includes("qualidade")) ? "qualidade" : "colaborador";
-  return {
-    matricula: String(colab.matricula), nome: colab.nome, role,
-    setor: colab.setor, filial: colab.filial, funcao: colab.funcao, cargo: colab.cargo || colab.funcao,
-    email: colab.email || ""
-  };
-}
-
-document.getElementById('loginForm').addEventListener('submit', async function(e){
+// Cada usuário de demonstração tem sua própria senha (nada de senha única compartilhada).
+const USERS = {
+  "1000": { senha:"qualidade2026", nome:"Mariana Queiroz", role:"qualidade" },
+  "2000": { senha:"colab2026", nome:"Carlos Bento", role:"colaborador",
+            setor:"QUALIDADE", filial:"Matriz – Coronel Fabriciano", funcao:"ANALISTA DA QUALIDADE", cargo:"ANALISTA DA QUALIDADE" }
+};
+document.getElementById('loginForm').addEventListener('submit', function(e){
   e.preventDefault();
   const mat = document.getElementById('loginMatricula').value.trim();
   const senha = document.getElementById('loginSenha').value;
   const errEl = document.getElementById('loginError');
-  const btnEntrar = this.querySelector('button[type="submit"]');
+  const user = USERS[mat];
+  if(user && senha === user.senha){
+    currentUser = {matricula: mat, nome:user.nome, role:user.role, setor:user.setor, filial:user.filial, funcao:user.funcao, cargo:user.cargo};
+  } else { errEl.style.display = "block"; return; }
   errEl.style.display = "none";
-  btnEntrar.disabled = true; btnEntrar.textContent = "Entrando...";
-
-  const resp = await backendCall('login', {matricula: mat, senha});
-
-  btnEntrar.disabled = false; btnEntrar.textContent = "Entrar";
-
-  if(!resp.ok){
-    errEl.textContent = resp.erro || "Matrícula ou senha inválida.";
-    errEl.style.display = "block";
-    return;
-  }
-
-  try{
-    currentUser = mapColaboradorParaUser(resp.colaborador);
-    if(resp.precisaTrocarSenha){
-      abrirModalTrocaSenha({obrigatoria: true, primeiroAcesso: !!resp.primeiroAcesso, senhaAtual: senha});
-      return; // só entra de fato no app depois de trocar a senha
-    }
-    entrarNoApp();
-  }catch(err){
-    console.error("Erro ao entrar:", err);
-    currentUser = null;
-    errEl.textContent = "Ocorreu um erro inesperado ao entrar. Tente novamente.";
-    errEl.style.display = "block";
-  }
-});
-
-function entrarNoApp(){
   document.getElementById('loginScreen').style.display = "none";
   document.getElementById('appRoot').style.display = "flex";
   applyRole(currentUser.role);
-  saveState();
   showToast(`Bem-vindo(a), ${currentUser.nome}.`, "success");
-  sincronizarDadosDoServidor(true);
-  if(!window._syncIntervalIniciado){
-    window._syncIntervalIniciado = true;
-    setInterval(()=> sincronizarDadosDoServidor(true), 20 * 1000); // a cada 20s, em segundo plano
-  }
-}
-
-/* ======================= TROCA DE SENHA (obrigatória no 1º acesso, ou voluntária) ======================= */
-function abrirModalTrocaSenha(opts){
-  opts = opts || {};
-  const obrigatoria = !!opts.obrigatoria;
-  const backdrop = document.createElement('div');
-  backdrop.className = 'share-backdrop';
-  backdrop.id = 'trocaSenhaBackdrop';
-  backdrop.innerHTML = `
-    <div class="share-card" style="max-width:380px; text-align:left;">
-      <h3>${opts.primeiroAcesso ? '👋 Bem-vindo(a)! Crie sua senha' : '🔒 Trocar senha'}</h3>
-      <p class="hint" style="margin-bottom:16px;">${opts.primeiroAcesso
-        ? 'Este é seu primeiro acesso. Por segurança, defina uma senha só sua antes de continuar.'
-        : 'Defina uma nova senha de acesso.'}</p>
-      <form id="formTrocaSenha">
-        ${obrigatoria ? '' : '<div class="field" style="margin-bottom:10px;"><label>Senha atual</label><input type="password" id="tsSenhaAtual" required></div>'}
-        <div class="field" style="margin-bottom:10px;"><label>Nova senha</label><input type="password" id="tsNovaSenha" minlength="4" required></div>
-        <div class="field" style="margin-bottom:10px;"><label>Confirmar nova senha</label><input type="password" id="tsConfirmar" minlength="4" required></div>
-        <div class="login-error" id="tsErro">As senhas não coincidem.</div>
-        <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px;">Salvar nova senha</button>
-      </form>
-      ${obrigatoria ? '' : '<div class="share-actions" style="margin-top:12px;"><button class="btn btn-outline" id="tsCancelar">Cancelar</button></div>'}
-    </div>`;
-  document.body.appendChild(backdrop);
-  if(!obrigatoria){
-    backdrop.addEventListener('click', (e)=>{ if(e.target===backdrop) backdrop.remove(); });
-    document.getElementById('tsCancelar').addEventListener('click', ()=> backdrop.remove());
-  }
-  document.getElementById('formTrocaSenha').addEventListener('submit', async function(e){
-    e.preventDefault();
-    const erroEl = document.getElementById('tsErro');
-    erroEl.style.display = "none";
-    const novaSenha = document.getElementById('tsNovaSenha').value;
-    const confirmar = document.getElementById('tsConfirmar').value;
-    if(novaSenha !== confirmar){ erroEl.textContent = "As senhas não coincidem."; erroEl.style.display = "block"; return; }
-    // No primeiro acesso obrigatório, a "senha atual" ainda é a própria matrícula.
-    const senhaAtual = obrigatoria ? (opts.senhaAtual != null ? opts.senhaAtual : currentUser.matricula) : document.getElementById('tsSenhaAtual').value;
-    const btn = this.querySelector('button[type="submit"]');
-    btn.disabled = true; btn.textContent = "Salvando...";
-    const resp = await backendCall('changePassword', {matricula: currentUser.matricula, senhaAtual, novaSenha});
-    btn.disabled = false; btn.textContent = "Salvar nova senha";
-    if(!resp.ok){ erroEl.textContent = resp.erro || "Não foi possível trocar a senha."; erroEl.style.display = "block"; return; }
-    backdrop.remove();
-    showToast("Senha atualizada com sucesso!", "success");
-    if(obrigatoria) entrarNoApp();
-  });
-}
-
-/* ======================= ESQUECI MINHA SENHA ======================= */
-document.getElementById('btnEsqueciSenha').addEventListener('click', ()=>{
-  const backdrop = document.createElement('div');
-  backdrop.className = 'share-backdrop';
-  backdrop.id = 'esqueciSenhaBackdrop';
-  backdrop.innerHTML = `
-    <div class="share-card" style="max-width:380px; text-align:left;">
-      <h3>Esqueci minha senha</h3>
-      <p class="hint" style="margin-bottom:16px;">Informe sua matrícula. A equipe de Qualidade vai receber um aviso por e-mail e liberar uma senha temporária para você.</p>
-      <form id="formEsqueciSenha">
-        <div class="field" style="margin-bottom:10px;"><label>Matrícula</label><input type="text" id="esqMatricula" required></div>
-        <div class="login-error" id="esqErro"></div>
-        <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px;">Solicitar redefinição</button>
-      </form>
-      <div class="share-actions" style="margin-top:12px;"><button class="btn btn-outline" id="esqCancelar">Fechar</button></div>
-    </div>`;
-  document.body.appendChild(backdrop);
-  backdrop.addEventListener('click', (e)=>{ if(e.target===backdrop) backdrop.remove(); });
-  document.getElementById('esqCancelar').addEventListener('click', ()=> backdrop.remove());
-  document.getElementById('formEsqueciSenha').addEventListener('submit', async function(e){
-    e.preventDefault();
-    const erroEl = document.getElementById('esqErro');
-    erroEl.style.display = "none";
-    const matricula = document.getElementById('esqMatricula').value.trim();
-    const btn = this.querySelector('button[type="submit"]');
-    btn.disabled = true; btn.textContent = "Enviando...";
-    const resp = await backendCall('requestReset', {matricula});
-    btn.disabled = false; btn.textContent = "Solicitar redefinição";
-    if(!resp.ok){ erroEl.textContent = resp.erro || "Não foi possível registrar o pedido."; erroEl.style.display = "block"; return; }
-    backdrop.remove();
-    showToast("Pedido enviado! A Qualidade foi avisada por e-mail e vai liberar uma senha temporária.", "success");
-  });
 });
-
-/* ======================= IMPORTAR HISTÓRICO DE CAMPANHAS PASSADAS ======================= */
-let historicoParseado = null;
-
-document.getElementById('btnBaixarModeloHistorico')?.addEventListener('click', ()=>{
-  const headers = ["campanha","periodoInicio","periodoFim","matricula","nome","setor","filial","funcao","percentualAcertos","ganhador","premio"];
-  const rows = [["PPG 2023.2 – Ética","2023-08-01","2023-08-20","100234","Ana Souza","TI","Matriz","Analista","100","Sim","Vale-compras R$ 150,00"]];
-  downloadCSV('modelo_historico_ppg.csv', headers, rows);
-});
-
-document.getElementById('historicoImportFile')?.addEventListener('change', function(e){
-  const file = e.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = function(evt){
-    try{
-      const data = new Uint8Array(evt.target.result);
-      const wb = XLSX.read(data, {type:'array'});
-      const sheet = wb.Sheets[wb.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(sheet, {defval:""});
-      historicoParseado = rows.map(r=>({
-        campanha: String(r.campanha || r.Campanha || '').trim(),
-        periodoInicio: String(r.periodoInicio || r['Período Início'] || r.inicio || '').trim(),
-        periodoFim: String(r.periodoFim || r['Período Fim'] || r.fim || '').trim(),
-        matricula: String(r.matricula || r.Matricula || r['Matrícula'] || '').trim(),
-        nome: String(r.nome || r.Nome || '').trim(),
-        setor: String(r.setor || r.Setor || '').trim(),
-        filial: String(r.filial || r.Filial || '').trim(),
-        funcao: String(r.funcao || r.Funcao || r['Função'] || '').trim(),
-        percentualAcertos: Number(r.percentualAcertos || r['% Acertos'] || r.pct || 0),
-        ganhador: /sim|true|1/i.test(String(r.ganhador || r.Ganhador || '')),
-        premio: String(r.premio || r.Premio || r['Prêmio'] || '').trim()
-      })).filter(r=>r.campanha && r.matricula);
-
-      if(!historicoParseado.length){ showToast("Não encontrei linhas válidas nesse arquivo. Confira se as colunas 'campanha' e 'matricula' estão preenchidas.","warning"); return; }
-
-      const campanhasUnicas = new Set(historicoParseado.map(r=>r.campanha));
-      const ganhadoresCount = historicoParseado.filter(r=>r.ganhador).length;
-      document.getElementById('historicoResumoPreview').innerHTML = `
-        <div class="stat"><b>${campanhasUnicas.size}</b><span>Campanha(s) encontrada(s)</span></div>
-        <div class="stat"><b>${historicoParseado.length}</b><span>Participações no arquivo</span></div>
-        <div class="stat"><b>${ganhadoresCount}</b><span>Marcado(s) como ganhador</span></div>`;
-
-      document.getElementById('tblHistoricoPreview').innerHTML = historicoParseado.slice(0,200).map(r=>`
-        <tr><td>${r.campanha}</td><td>${r.matricula}</td><td>${r.nome}</td><td>${r.setor}</td><td>${r.percentualAcertos}%</td><td>${r.ganhador?'🏆 Sim':'—'}</td></tr>
-      `).join('');
-      document.getElementById('historicoPreviewWrap').style.display = "block";
-      if(window.lucide) lucide.createIcons();
-    }catch(err){
-      showToast("Não foi possível ler o arquivo. Verifique se é .xlsx ou .csv com as colunas esperadas.","warning");
-    }
-    e.target.value = "";
-  };
-  reader.readAsArrayBuffer(file);
-});
-
-document.getElementById('btnCancelarImportHistorico')?.addEventListener('click', ()=>{
-  historicoParseado = null;
-  document.getElementById('historicoPreviewWrap').style.display = "none";
-});
-
-document.getElementById('btnConfirmarImportHistorico')?.addEventListener('click', async ()=>{
-  if(!historicoParseado || !historicoParseado.length) return;
-  const btn = document.getElementById('btnConfirmarImportHistorico');
-  btn.disabled = true; btn.textContent = "Importando...";
-  const resp = await backendCall('importarHistorico', {linhas: historicoParseado, importadoPor: currentUser.nome});
-  btn.disabled = false; btn.innerHTML = '<i data-lucide="check"></i> Confirmar importação';
-  if(window.lucide) lucide.createIcons();
-  if(!resp.ok){ showToast(resp.erro || "Não foi possível importar.", "warning"); return; }
-  showToast(`${resp.importadas} linha(s) importada(s) com sucesso! Já fica visível para toda a equipe.`, "success");
-  logAction("Histórico importado", `${resp.importadas} linha(s) via arquivo`);
-  document.getElementById('historicoPreviewWrap').style.display = "none";
-  historicoParseado = null;
-  renderHistoricoImportado();
-});
-
-async function renderHistoricoImportado(){
-  const tbody = document.getElementById('tblHistoricoImportado');
-  if(!tbody) return;
-  tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--ink-soft); padding:16px;">Carregando…</td></tr>`;
-  const resp = await backendCall('getHistorico');
-  if(!resp.ok){
-    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--error); padding:16px;">${resp.erro || 'Não foi possível carregar.'}</td></tr>`;
-    return;
-  }
-  const linhas = resp.historico || [];
-  const porCampanha = {};
-  linhas.forEach(l=>{
-    if(!porCampanha[l.campanha]) porCampanha[l.campanha] = {periodo:`${l.periodoInicio} – ${l.periodoFim}`, total:0, ganhadores:0};
-    porCampanha[l.campanha].total++;
-    if(String(l.ganhador).toLowerCase() === 'sim') porCampanha[l.campanha].ganhadores++;
-  });
-  tbody.innerHTML = Object.entries(porCampanha).map(([nome, info])=>`
-    <tr><td>${nome}</td><td>${info.periodo}</td><td>${info.total}</td><td>${info.ganhadores}</td></tr>
-  `).join('') || `<tr><td colspan="4" style="text-align:center; color:var(--ink-soft); padding:16px;">Nenhum histórico importado ainda.</td></tr>`;
-}
-document.getElementById('btnAtualizarHistoricoImportado')?.addEventListener('click', renderHistoricoImportado);
-
-/* ======================= FALE COM A QUALIDADE ======================= */
-document.getElementById('formFaleConosco')?.addEventListener('submit', async function(e){
-  e.preventDefault();
-  const erroEl = document.getElementById('fcErro');
-  erroEl.style.display = "none";
-  const assunto = document.getElementById('fcAssunto').value.trim();
-  const mensagem = document.getElementById('fcMensagem').value.trim();
-  const btn = this.querySelector('button[type="submit"]');
-  btn.disabled = true; btn.textContent = "Enviando...";
-  const resp = await backendCall('enviarDuvida', {matricula: currentUser.matricula, assunto, mensagem});
-  btn.disabled = false; btn.innerHTML = '<i data-lucide="send"></i> Enviar para a Qualidade';
-  if(window.lucide) lucide.createIcons();
-  if(!resp.ok){ erroEl.textContent = resp.erro || "Não foi possível enviar sua mensagem."; erroEl.style.display = "block"; return; }
-  this.reset();
-  showToast("Mensagem enviada! A equipe de Qualidade foi avisada por e-mail.", "success");
-});
-async function renderDuvidas(){
-  const tbody = document.getElementById('tblDuvidas');
-  if(!tbody) return;
-  tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--ink-soft); padding:16px;">Carregando…</td></tr>`;
-  const resp = await backendCall('listarDuvidas');
-  if(!resp.ok){
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--error); padding:16px;">${resp.erro || 'Não foi possível carregar as mensagens.'}</td></tr>`;
-    return;
-  }
-  const duvidas = (resp.duvidas || []).sort((a,b)=> new Date(b.dataHora) - new Date(a.dataHora));
-  tbody.innerHTML = duvidas.map(d=>`
-    <tr><td>${fmtDateTime(new Date(d.dataHora))}</td><td>${d.matricula}</td><td>${d.nome}</td><td>${d.assunto}</td><td>${d.mensagem}</td></tr>
-  `).join('') || `<tr><td colspan="5" style="text-align:center; color:var(--ink-soft); padding:16px;">Nenhuma mensagem recebida ainda.</td></tr>`;
-}
-document.getElementById('btnAtualizarDuvidas')?.addEventListener('click', renderDuvidas);
-
-/* ======================= QUALIDADE: RESOLVER PEDIDOS DE SENHA ======================= */
-async function renderPedidosSenha(){
-  const tbody = document.getElementById('tblPedidosSenha');
-  if(!tbody) return;
-  tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--ink-soft); padding:16px;">Carregando…</td></tr>`;
-  const resp = await backendCall('listPasswordRequests');
-  if(!resp.ok){
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--error); padding:16px;">${resp.erro || 'Não foi possível carregar os pedidos.'}</td></tr>`;
-    return;
-  }
-  const pedidos = (resp.pedidos || []).sort((a,b)=> new Date(b.dataHora) - new Date(a.dataHora));
-  tbody.innerHTML = pedidos.map(p=>`
-    <tr>
-      <td>${fmtDateTime(new Date(p.dataHora))}</td><td>${p.matricula}</td><td>${p.nome}</td>
-      <td><span class="badge ${p.status==='pendente'?'programada':'finalizada'}">${p.status}</span></td>
-      <td>${p.status==='pendente'
-        ? `<button class="btn btn-outline btn-sm" onclick="resolverPedidoSenha('${p.matricula}')">Definir senha temporária</button>`
-        : `—`}</td>
-    </tr>`).join('') || `<tr><td colspan="5" style="text-align:center; color:var(--ink-soft); padding:16px;">Nenhum pedido registrado.</td></tr>`;
-}
-window.resolverPedidoSenha = function(matricula){
-  const senhaTemp = prompt(`Defina a senha temporária para a matrícula ${matricula}:\n(a pessoa vai precisar trocá-la no próximo acesso)`);
-  if(!senhaTemp) return;
-  backendCall('resolveReset', {matricula, novaSenhaTemp: senhaTemp, atendidoPor: currentUser.nome}).then(resp=>{
-    if(resp.ok){ showToast("Senha temporária definida com sucesso.", "success"); renderPedidosSenha(); }
-    else showToast(resp.erro || "Não foi possível concluir.", "warning");
-  });
-};
-document.getElementById('btnAtualizarPedidosSenha')?.addEventListener('click', renderPedidosSenha);
-document.getElementById('btnTrocarMinhaSenha')?.addEventListener('click', ()=> abrirModalTrocaSenha({obrigatoria:false}));
-
-/* ======================= SINCRONIZAÇÃO DO QUADRO DE COLABORADORES ======================= */
-/* Busca o quadro real na planilha (em segundo plano, sem pedir nada a ninguém)
-   e mantém a amostragem de participantes/sorteio coerente com dados reais. */
-async function sincronizarColaboradores(){
-  const resp = await backendCall('getColaboradores');
-  if(resp.ok && Array.isArray(resp.colaboradores) && resp.colaboradores.length){
-    EMPRESA.colaboradores = resp.colaboradores.map(c=>({
-      matricula: String(c.matricula), nome: c.nome, setor: c.setor, filial: c.filial, funcao: c.funcao
-    }));
-    console.log(`Quadro de colaboradores sincronizado: ${EMPRESA.colaboradores.length} pessoa(s).`);
-  }
-}
-sincronizarColaboradores();
-setInterval(sincronizarColaboradores, 5 * 60 * 1000); // a cada 5 minutos, em segundo plano
-
-/* ======================= SINCRONIZAÇÃO AO VIVO: campanhas, perguntas, respostas ======================= */
-/* A planilha é a única fonte de verdade — campanhas, banco de perguntas e
-   respostas nunca ficam "presas" num navegador. Toda tela relevante busca
-   os dados mais recentes nesta função, tanto ao entrar quanto em ciclos
-   automáticos em segundo plano. */
-let sincronizando = false;
-async function sincronizarDadosDoServidor(silencioso){
-  if(sincronizando) return; // evita chamadas simultâneas empilhadas
-  sincronizando = true;
-  try{
-    const [respCamp, respBanco, respRespostas, respHist] = await Promise.all([
-      backendCall('getCampanhas'),
-      backendCall('getBancoPerguntas'),
-      backendCall('getRespostas'),
-      backendCall('getHistorico')
-    ]);
-    if(respCamp.ok && Array.isArray(respCamp.campanhas)) campaigns = respCamp.campanhas;
-    if(respBanco.ok && Array.isArray(respBanco.perguntas)) questionBank = respBanco.perguntas;
-    if(respRespostas.ok && Array.isArray(respRespostas.respostas)){
-      participants = respRespostas.respostas.map(r=>({...r, data: r.dataFim ? new Date(r.dataFim) : new Date(), dataInicio: r.dataInicio ? new Date(r.dataInicio) : null, dataFim: r.dataFim ? new Date(r.dataFim) : null}));
-    }
-    const historicoImportado = (respHist.ok && Array.isArray(respHist.historico)) ? respHist.historico : [];
-    const ganhosImportados = historicoImportado
-      .filter(h => String(h.ganhador).toLowerCase() === 'sim')
-      .map(h => ({matricula: String(h.matricula), data: new Date(h.periodoFim || h.importadoEm || Date.now())}));
-    const ganhosAoVivo = [];
-    campaigns.forEach(c=>{
-      if(c.ganhadores && c.ganhadores.length) c.ganhadores.forEach(g => ganhosAoVivo.push({matricula: String(g.matricula), data: new Date(c.fim)}));
-    });
-    wonHistory = [...ganhosImportados, ...ganhosAoVivo];
-
-    renderSectionContent(currentSectionId); // atualiza a tela que estiver aberta com os dados frescos
-    if(!silencioso) console.log("Dados sincronizados com o servidor.");
-  }catch(e){
-    console.warn("Não foi possível sincronizar com o servidor agora:", e);
-  }finally{
-    sincronizando = false;
-  }
-}
 document.getElementById('btnLogout').addEventListener('click', ()=>{
   currentUser = null;
-  saveState();
   document.getElementById('appRoot').style.display = "none";
-  document.getElementById('loginScreen').style.display = "";
-  document.getElementById('loginScreen').scrollTo(0, 0);
+  document.getElementById('loginScreen').style.display = "flex";
   document.getElementById('loginForm').reset();
 });
 function applyRole(role){
   currentRole = role;
   const isAdmin = role === "qualidade";
-  document.body.classList.toggle('role-colaborador', !isAdmin);
   document.getElementById('userName').textContent = currentUser.nome;
-  document.getElementById('userRole').textContent = isAdmin ? "Qualidade · Administrador" : `Colaborador · ${currentUser.funcao || ''}`;
-  const initials = currentUser.nome.split(' ').filter(Boolean).slice(0,2).map(n=>n[0]).join('').toUpperCase();
-  document.getElementById('avatarInit').textContent = initials;
+  document.getElementById('userRole').textContent = isAdmin ? "Qualidade · Administrador" : "Colaborador";
+  document.getElementById('avatarInit').textContent = isAdmin ? "MQ" : "CB";
+  document.querySelectorAll('.menu-item.admin-only').forEach(item=> item.classList.toggle('locked', !isAdmin));
+  document.querySelectorAll('.admin-only-panel').forEach(p=> p.style.display = isAdmin ? "" : "none");
+  document.getElementById('dashTitle').textContent = isAdmin ? "Painel da Qualidade" : "Minhas campanhas";
+  document.getElementById('dashSubtitle').textContent = isAdmin ? "Visão geral das campanhas do Programa Política de Gestão." : "Acompanhe as campanhas ativas e seus resultados anteriores.";
+  document.getElementById('campanhasSubtitle').textContent = isAdmin ? "Todas as campanhas cadastradas, programadas, em andamento e encerradas." : "Campanhas ativas e campanhas das quais você já participou.";
   document.getElementById('configSubtitle').textContent = isAdmin ? "Preferências pessoais e parâmetros gerais do sistema." : "Preferências pessoais.";
-  logAction(isAdmin ? "Login (Qualidade)" : "Login (Colaborador)", `${currentUser.nome} autenticado(a) no sistema.`);
-  if(window.lucide) lucide.createIcons();
-  const defaultTarget = isAdmin ? "inicio" : "campanha-atual";
-  document.querySelectorAll('.menu-item').forEach(b=>b.classList.remove('active'));
-  const btn = document.querySelector(`[data-target="${defaultTarget}"]`);
-  if(btn) btn.classList.add('active');
-  if(!isAdmin && deepLinkCampaignId && campaigns.find(c=>c.id===deepLinkCampaignId)){
-    goToSection(defaultTarget);
-    openQuiz(deepLinkCampaignId);
-  } else {
-    goToSection(defaultTarget);
-  }
+  document.querySelector('[data-target="inicio"]').click();
 }
 
 /* ======================= TEMA ======================= */
-function setDarkMode(on){ document.body.classList.toggle('dark', on); }
-window.themePreference = 'auto';
-function aplicarTema(pref){
-  window.themePreference = pref;
-  const escuro = pref === 'auto'
-    ? !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
-    : pref === 'dark';
-  setDarkMode(escuro);
-  document.querySelectorAll('#themeTabs .login-tab').forEach(t => t.classList.toggle('active', t.dataset.theme === pref));
-  saveState();
-}
-document.querySelectorAll('#themeTabs .login-tab').forEach(tab=>{
-  tab.addEventListener('click', ()=> aplicarTema(tab.dataset.theme));
-});
-document.getElementById('themeToggleTop').addEventListener('click', ()=>{
-  aplicarTema(document.body.classList.contains('dark') ? 'light' : 'dark');
-});
-if(window.matchMedia){
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ()=>{
-    if(window.themePreference === 'auto') aplicarTema('auto');
-  });
-}
+function setDarkMode(on){ document.body.classList.toggle('dark', on); document.getElementById('themeToggle').checked = on; }
+document.getElementById('themeToggle').addEventListener('change', (e)=> setDarkMode(e.target.checked));
+document.getElementById('themeToggleTop').addEventListener('click', ()=> setDarkMode(!document.body.classList.contains('dark')));
 
 /* ======================= TOAST ======================= */
 function showToast(msg, type=""){
@@ -1035,29 +335,27 @@ function campaignParticipants(id){ return participants.filter(p=>p.campaignId===
 function fillCampaignSelects(){
   const selects = [document.getElementById('selectCampanhaParticipantes'), document.getElementById('selectCampanhaElegiveis'), document.getElementById('selectCampanhaSorteio'), document.getElementById('selectCampanhaRelatorio')];
   selects.forEach(sel=>{
-    if(!sel) return;
     const prev = sel.value;
     sel.innerHTML = campaigns.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
     if(prev) sel.value = prev;
   });
 }
 
-/* ======================= DASHBOARD (com drill-down) ======================= */
+/* ======================= DASHBOARD ======================= */
 function renderDashboard(){
-  renderQualidadeTip();
   document.getElementById('kpiTotalCampanhas').textContent = campaigns.length;
   document.getElementById('kpiAndamento').textContent = campaigns.filter(c=>c.status==="andamento").length;
   document.getElementById('kpiProgramadas').textContent = campaigns.filter(c=>c.status==="programada").length;
   const latest = campaigns[0];
-  document.getElementById('kpiParticipantes').textContent = latest ? campaignParticipants(latest.id).length : 0;
-  document.getElementById('kpiElegiveis').textContent = latest ? evaluateEligibility(latest.id).eligible.length : 0;
+  document.getElementById('kpiParticipantes').textContent = latest ? Number(latest.qtdRespostas ?? campaignParticipants(latest.id).length) : 0;
+  document.getElementById('kpiElegiveis').textContent = evaluateEligibility(latest.id).eligible.length;
   const ganhadores = campaigns.filter(c=>c.ganhadores).reduce((a,c)=>a+c.ganhadores.length,0);
   document.getElementById('kpiGanhadores').textContent = ganhadores;
 
   const barsEl = document.getElementById('chartParticipacao');
-  const maxCount = Math.max(...campaigns.map(c=>campaignParticipants(c.id).length), 1);
+  const maxCount = Math.max(...campaigns.map(c=>Number(c.qtdRespostas ?? campaignParticipants(c.id).length)), 1);
   barsEl.innerHTML = campaigns.map(c=>{
-    const n = campaignParticipants(c.id).length;
+    const n = Number(c.qtdRespostas ?? campaignParticipants(c.id).length);
     const h = Math.max(8, Math.round((n/maxCount)*130));
     const shortName = c.nome.split('–')[0].trim();
     return `<div class="bar-col"><div class="bar-value">${n}</div><div class="bar-shell"><div class="bar-fill" style="height:0px" data-h="${h}"></div></div><div class="bar-label">${shortName}</div></div>`;
@@ -1065,7 +363,7 @@ function renderDashboard(){
   requestAnimationFrame(()=> document.querySelectorAll('#chartParticipacao .bar-fill').forEach(el=> el.style.height = el.dataset.h + "px"));
 
   const ref = campaigns.find(c=>c.status==="encerrada") || campaigns[0];
-  const refP = ref ? campaignParticipants(ref.id) : [];
+  const refP = campaignParticipants(ref.id);
   const p100 = refP.filter(p=>p.pct===100).length, p90 = refP.filter(p=>p.pct===90).length, p80 = refP.filter(p=>p.pct===80).length;
   const pOther = refP.length - p100 - p90 - p80;
   const total = refP.length || 1;
@@ -1080,11 +378,11 @@ function renderDashboard(){
     <div class="donut-legend">${seg.map(s=>`<div><span class="legend-dot" style="background:${s.c}"></span>${s.label} — ${s.v}</div>`).join('')}</div>`;
 
   const allWinners = campaigns.filter(c=>c.ganhadores).flatMap(c=>c.ganhadores);
-  renderHBarChart('chartSetor', allWinners, 'setor', SETORES.filter(s=> allWinners.some(w=>w.setor===s)).length ? [...new Set(allWinners.map(w=>w.setor))] : SETORES.slice(0,8));
+  renderHBarChart('chartSetor', allWinners, 'setor', SETORES);
   renderHBarChart('chartFilial', allWinners, 'filial', UNIDADES);
 
   document.getElementById('tblUltimasCampanhas').innerHTML = campaigns.map(c=>{
-    const n = campaignParticipants(c.id).length;
+    const n = Number(c.qtdRespostas ?? campaignParticipants(c.id).length);
     return `<tr><td>${c.nome}</td><td>${c.inicio.replace('T',' ')} – ${c.fim.replace('T',' ')}</td><td>${n}</td><td>${statusBadge(c.status)}</td></tr>`;
   }).join('');
 }
@@ -1093,66 +391,59 @@ function renderHBarChart(elId, winners, field, universe){
   winners.forEach(w=>{ counts[w[field]] = (counts[w[field]]||0) + 1; });
   const max = Math.max(...Object.values(counts), 1);
   const el = document.getElementById(elId);
-  el.innerHTML = Object.entries(counts).map(([k,v],idx)=>{
-    const rowId = elId + "_row" + idx;
-    const names = winners.filter(w=>w[field]===k).map(w=>`${w.nome} · ${w.funcao||''}`);
-    return `<div>
-      <div class="hbar-row clickable" onclick="toggleHbarDetail('${rowId}')">
-        <div class="hbar-label">${k}</div>
-        <div class="hbar-track"><div class="hbar-fill" style="width:0%" data-w="${(v/max*100)}"></div></div>
-        <div class="hbar-value">${v}</div>
-      </div>
-      <div class="hbar-detail" id="${rowId}">${names.length ? names.map(n=>`<span>${n}</span>`).join('') : 'Nenhum ganhador ainda neste grupo.'}</div>
-    </div>`;
-  }).join('');
+  el.innerHTML = Object.entries(counts).map(([k,v])=>`
+    <div class="hbar-row"><div class="hbar-label">${k}</div><div class="hbar-track"><div class="hbar-fill" style="width:0%" data-w="${(v/max*100)}"></div></div><div class="hbar-value">${v}</div></div>`).join('');
   requestAnimationFrame(()=> el.querySelectorAll('.hbar-fill').forEach(f=> f.style.width = f.dataset.w + "%"));
 }
-window.toggleHbarDetail = function(id){ document.getElementById(id).classList.toggle('open'); };
 
-/* Drill-down dos KPIs do dashboard */
-window.goToRodadas = function(){ document.querySelector('[data-target="campanhas"]').click(); };
-window.goToResultadosLatest = function(){ if(campaigns[0]) goToParticipants(campaigns[0].id); };
-window.goToElegiveisLatest = function(){
-  if(!campaigns[0]) return;
-  document.querySelector('[data-target="elegiveis"]').click();
-  document.getElementById('selectCampanhaElegiveis').value = campaigns[0].id;
-  renderEligibleTable();
-};
-window.goToHistoricoAdmin = function(){ document.querySelector('[data-target="historico"]').click(); };
-
-/* ======================= CAMPANHAS / RODADAS (Qualidade) ======================= */
+/* ======================= CAMPANHAS ======================= */
 function renderCampaignGrid(){
-  document.getElementById('campaignGrid').innerHTML = campaigns.map(c=>{
-    const n = campaignParticipants(c.id).length;
+  const list = currentRole==='qualidade' ? campaigns : campaigns.filter(c=>{
+    const access = campaignAccessStatus(c);
+    const answered = participants.some(p=>p.campaignId===c.id && p.matricula==='2000');
+    return access==='aberta' || answered;
+  });
+  document.getElementById('campaignGrid').innerHTML = list.map(c=>{
+    const n = Number(c.qtdRespostas ?? campaignParticipants(c.id).length);
     const {eligible} = evaluateEligibility(c.id);
+    const access = campaignAccessStatus(c);
+    const answered = participants.some(p=>p.campaignId===c.id && p.matricula==='2000');
+    let colabActions = "";
+    if(currentRole !== 'qualidade'){
+      if(answered){
+        colabActions = `<button class="btn btn-ghost btn-sm" onclick="openQuiz('${c.id}')">Ver meu resultado</button>`;
+      } else if(access === 'aberta'){
+        colabActions = `<button class="btn btn-primary btn-sm" onclick="openQuiz('${c.id}')">Responder questionário</button>`;
+      } else if(access === 'nao_iniciada'){
+        colabActions = `<button class="btn btn-outline btn-sm" disabled>Ainda não iniciada</button>`;
+      } else {
+        colabActions = `<button class="btn btn-outline btn-sm" disabled>Encerrada — você não participou</button>`;
+      }
+    }
     return `<div class="ccard">
       <div style="display:flex; justify-content:space-between; align-items:flex-start;"><h4>${c.nome}</h4>${statusBadge(c.status)}</div>
       <div class="desc">${c.descricao}</div>
       <div class="meta">
-        <span><i data-lucide="calendar"></i> ${c.inicio.replace('T',' ')} → ${c.fim.replace('T',' ')}</span>
-        <span><i data-lucide="clipboard-list"></i> ${c.questoes ? c.questoes.length : '—'} perguntas · <i data-lucide="trophy"></i> ${c.qtdGanhadores} ganhadores</span>
-        <span><i data-lucide="users"></i> ${n} participantes · <i data-lucide="check-circle-2"></i> ${eligible.length} elegíveis</span>
+        <span>📅 ${c.inicio.replace('T',' ')} → ${c.fim.replace('T',' ')}</span>
+        <span>📝 ${c.questoes ? c.questoes.length : '—'} perguntas · 🏆 ${c.qtdGanhadores} ganhadores</span>
+        ${currentRole==='qualidade' ? `<span>👥 ${n} participantes · ✅ ${eligible.length} elegíveis</span>` : ''}
       </div>
       <div class="actions">
-        <button class="btn btn-ghost btn-sm" onclick="goToParticipants('${c.id}')">Ver participantes</button>
-        <button class="btn btn-outline btn-sm" onclick="loadCampaignForEdit('${c.id}')">Editar</button>
-        <button class="btn btn-outline btn-sm" onclick="openShareModal('${c.id}')"><i data-lucide="share-2"></i> Compartilhar</button>
+        ${currentRole==='qualidade' ? `<button class="btn btn-ghost btn-sm" onclick="goToParticipants('${c.id}')">Ver participantes</button>
+        <button class="btn btn-outline btn-sm" onclick="loadCampaignForEdit('${c.id}')">Editar</button>` : colabActions}
       </div>
     </div>`;
-  }).join('') || `<p style="color:var(--ink-soft); font-size:13px;">Nenhuma campanha cadastrada.</p>`;
+  }).join('') || `<p style="color:var(--ink-soft); font-size:13px;">Nenhuma campanha disponível no momento.</p>`;
 }
 window.goToParticipants = function(id){
-  document.querySelectorAll('.menu-item').forEach(b=>b.classList.remove('active'));
-  const btn = document.querySelector('[data-target="participantes"]'); if(btn) btn.classList.add('active');
-  goToSection('participantes');
+  document.querySelector('[data-target="participantes"]').click();
   document.getElementById('selectCampanhaParticipantes').value = id;
   renderParticipantsTable();
 };
 
-/* ======================= PARTICIPANTES / RESULTADOS ======================= */
+/* ======================= PARTICIPANTES ======================= */
 function renderParticipantsTable(){
-  const sel = document.getElementById('selectCampanhaParticipantes');
-  const id = sel.value;
+  const id = document.getElementById('selectCampanhaParticipantes').value;
   const list = campaignParticipants(id).sort((a,b)=>b.pct-a.pct);
   document.getElementById('tblParticipantes').innerHTML = list.map(p=>`
     <tr><td>${p.nome}</td><td>${p.matricula}</td><td>${p.cargo}</td><td>${p.setor}</td><td>${p.filial}</td><td>${fmtDateTime(p.data)}</td><td><span class="${p.pct===100?'pct100':'pctless'}">${p.pct}%</span></td></tr>`).join('') ||
@@ -1195,48 +486,7 @@ function renderEligibleTable(){
 }
 document.getElementById('selectCampanhaElegiveis').addEventListener('change', renderEligibleTable);
 
-/* ======================= COMPARTILHAMENTO (LINK + QR CODE) ======================= */
-window.openShareModal = function(campaignId){
-  const c = campaigns.find(x=>x.id===campaignId);
-  if(!c) return;
-  const link = `${window.location.origin}${window.location.pathname}?campanha=${campaignId}`;
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(link)}`;
-  const backdrop = document.createElement('div');
-  backdrop.className = "share-backdrop";
-  backdrop.id = "shareBackdrop";
-  backdrop.innerHTML = `
-    <div class="share-card">
-      <h3>Divulgar campanha</h3>
-      <p>${c.nome}</p>
-      <div class="share-qr"><img src="${qrUrl}" alt="QR Code de acesso à campanha" onerror="this.parentElement.innerHTML='<span style=\\'font-size:11px;color:var(--ink-soft);padding:12px;\\'>QR indisponível sem conexão à internet</span>'"></div>
-      <div class="share-link-box">
-        <input type="text" id="shareLinkInput" value="${link}" readonly>
-        <button class="btn btn-primary btn-sm" id="btnCopyShareLink">Copiar</button>
-      </div>
-      <p class="hint" style="margin-bottom:16px;">Compartilhe este link ou o QR Code por e-mail, WhatsApp ou impresso — ao abrir, o colaborador faz login e já cai direto no questionário.</p>
-      <div class="share-actions"><button class="btn btn-outline" id="btnCloseShare">Fechar</button></div>
-    </div>`;
-  document.body.appendChild(backdrop);
-  backdrop.addEventListener('click', (e)=>{ if(e.target === backdrop) closeShareModal(); });
-  document.getElementById('btnCloseShare').addEventListener('click', closeShareModal);
-  document.getElementById('btnCopyShareLink').addEventListener('click', ()=>{
-    const input = document.getElementById('shareLinkInput');
-    input.select();
-    navigator.clipboard && navigator.clipboard.writeText(input.value).then(()=>{
-      showToast("Link copiado para a área de transferência.","success");
-    }).catch(()=>{
-      document.execCommand('copy');
-      showToast("Link copiado.","success");
-    });
-  });
-  logAction("Campanha divulgada", `Link/QR gerado para ${c.nome}`);
-};
-window.closeShareModal = function(){
-  const el = document.getElementById('shareBackdrop');
-  if(el) el.remove();
-};
-
-
+/* ======================= NOVA CAMPANHA — QUESTION BUILDER ======================= */
 let questionCounter = 0;
 function createQuestionCard(qData){
   questionCounter++;
@@ -1317,34 +567,8 @@ function collectQuestionsFromForm(){
   });
 }
 
-/* Reaproveitar pergunta do Banco de Perguntas dentro de Nova Campanha,
-   com alerta de reutilização (controle de repetição — regra 14) */
-function fillBQPicker(){
-  const sel = document.getElementById('bqPickerSelect');
-  if(!sel) return;
-  sel.innerHTML = questionBank.filter(q=>q.status==='ativa').map(q=>`<option value="${q.codigo}">${q.codigo} — ${q.texto.slice(0,55)}</option>`).join('');
-}
-const btnInserirDoBanco = document.getElementById('btnInserirDoBanco');
-if(btnInserirDoBanco){
-  btnInserirDoBanco.addEventListener('click', ()=>{
-    const sel = document.getElementById('bqPickerSelect');
-    const q = questionBank.find(x=>x.codigo===sel.value);
-    if(!q) return;
-    const u = bqUsageStatus(q);
-    if(u.cls === 'recente'){
-      showToast(`Atenção: esta pergunta foi ${u.label.toLowerCase()}. Você pode reutilizá-la mesmo assim, se necessário.`, "warning");
-    } else {
-      showToast("Pergunta inserida no questionário.","success");
-    }
-    createQuestionCard({texto:q.texto, type:q.type, options:q.options});
-    q.qtdUtilizacoes++; q.ultimaUtilizacao = new Date();
-    renderBanco();
-    logAction("Reutilização de pergunta do banco", `${q.codigo} inserida em nova campanha`);
-  });
-}
-
 /* ======================= NOVA CAMPANHA — SUBMIT (criar ou editar) ======================= */
-document.getElementById('formCampanha').addEventListener('submit', async function(e){
+document.getElementById('formCampanha').addEventListener('submit', function(e){
   e.preventDefault();
   const f = new FormData(this);
   const questoes = collectQuestionsFromForm();
@@ -1360,30 +584,19 @@ document.getElementById('formCampanha').addEventListener('submit', async functio
     status: f.get('status') || "programada",
     questoes: questoes.length ? questoes : [{texto:"Pergunta de exemplo", type:"unica", options:[opt("Sim",true),opt("Não")]}]
   };
-  const btnSubmit = document.getElementById('btnSubmitCampanha');
-  const textoOriginal = btnSubmit.textContent;
-  btnSubmit.disabled = true; btnSubmit.textContent = "Salvando...";
 
   if(editingCampaignId){
     const idx = campaigns.findIndex(c=>c.id===editingCampaignId);
-    const campanhaCompleta = {...(idx>-1 ? campaigns[idx] : {}), ...payload, id: editingCampaignId};
-    const resp = await backendCall('salvarCampanha', {campanha: campanhaCompleta, usuario: currentUser.nome});
-    btnSubmit.disabled = false; btnSubmit.textContent = textoOriginal;
-    if(!resp.ok){ showToast(resp.erro || "Não foi possível salvar a campanha.", "warning"); return; }
-    if(idx > -1) campaigns[idx] = campanhaCompleta;
+    if(idx > -1) campaigns[idx] = {...campaigns[idx], ...payload};
     showToast("Campanha atualizada com sucesso!","success");
-    logAction("Campanha editada", payload.nome);
     editingCampaignId = null;
-    btnSubmit.textContent = "Cadastrar campanha";
+    document.getElementById('btnSubmitCampanha').textContent = "Cadastrar campanha";
     document.getElementById('btnCancelEdit').style.display = "none";
     document.getElementById('novaTitle').textContent = "Nova Campanha";
   } else {
-    const resp = await backendCall('salvarCampanha', {campanha: {ganhadores:null, ...payload}, usuario: currentUser.nome});
-    btnSubmit.disabled = false; btnSubmit.textContent = textoOriginal;
-    if(!resp.ok){ showToast(resp.erro || "Não foi possível salvar a campanha.", "warning"); return; }
-    campaigns.unshift({id: resp.id, ganhadores:null, ...payload});
+    const id = "c" + (campaigns.length + 1) + "_" + Date.now().toString().slice(-4);
+    campaigns.unshift({id, ganhadores:null, ...payload});
     showToast("Campanha e questionário cadastrados com sucesso!","success");
-    logAction("Nova campanha cadastrada", payload.nome);
   }
   fillCampaignSelects();
   renderCampaignGrid();
@@ -1420,262 +633,58 @@ document.getElementById('btnCancelEdit').addEventListener('click', ()=>{
   document.getElementById('novaTitle').textContent = "Nova Campanha";
 });
 
-/* ======================= BANCO DE PERGUNTAS (Qualidade) ======================= */
-function renderBanco(){
-  const tbody = document.getElementById('bqTableBody');
-  if(!tbody) return;
-  tbody.innerHTML = questionBank.map(q=>{
-    const u = bqUsageStatus(q);
-    return `<tr>
-      <td>${q.codigo}</td><td>${q.categoria}</td><td>${q.tema}</td><td>${q.procedimento||'—'}</td>
-      <td>${q.qtdUtilizacoes}x</td>
-      <td><span class="bq-badge ${u.cls}">${u.label}</span></td>
-      <td><span class="badge ${q.status==='ativa'?'finalizada':'excluido'}">${q.status==='ativa'?'Ativa':'Inativa'}</span></td>
-      <td style="display:flex; gap:6px;">
-        <button class="btn btn-outline btn-sm" onclick="editBQ('${q.codigo}')">Editar</button>
-        <button class="btn btn-outline btn-sm" onclick="deleteBQ('${q.codigo}')">Excluir</button>
-      </td>
-    </tr>`;
-  }).join('') || `<tr><td colspan="8" style="text-align:center; color:var(--ink-soft); padding:20px;">Nenhuma pergunta cadastrada no banco.</td></tr>`;
-  fillBQPicker();
-}
-function bqRenderOptions(type, options){
-  const wrap = document.getElementById('bqOptionsWrap');
-  if(!wrap) return;
-  options = options || (type==='vf' ? [{text:"Verdadeiro",correct:true},{text:"Falso",correct:false}] : [{text:"",correct:false},{text:"",correct:false},{text:"",correct:false},{text:"",correct:false}]);
-  if(type==='vf'){
-    wrap.innerHTML = `
-      <div class="opt-row"><input type="radio" name="bq-vf" class="bq-correct-vf" value="0" ${options[0] && options[0].correct?'checked':''}><span style="font-size:13px;">Verdadeiro</span></div>
-      <div class="opt-row"><input type="radio" name="bq-vf" class="bq-correct-vf" value="1" ${!(options[0] && options[0].correct)?'checked':''}><span style="font-size:13px;">Falso</span></div>`;
-  } else {
-    const inputType = type==='multiplas_respostas' ? 'checkbox' : 'radio';
-    const nameAttr = inputType==='radio' ? 'name="bq-radio"' : '';
-    wrap.innerHTML = options.map((o,i)=>`<div class="opt-row"><input type="${inputType}" ${nameAttr} class="bq-correct" ${o.correct?'checked':''}><input type="text" class="bq-opt-text" placeholder="Alternativa ${i+1}" value="${(o.text||'').replace(/"/g,'&quot;')}"></div>`).join('');
-  }
-}
-window.renderBQOptionInputs = function(type){ bqRenderOptions(type, null); };
-function collectBQOptions(){
-  const type = document.getElementById('bqTipo').value;
-  if(type==='vf'){
-    const checked = document.querySelector('.bq-correct-vf:checked');
-    const isTrue = checked ? checked.value==="0" : true;
-    return [opt("Verdadeiro", isTrue), opt("Falso", !isTrue)];
-  }
-  const rows = document.querySelectorAll('#bqOptionsWrap .opt-row');
-  return Array.from(rows).map(r=>opt(r.querySelector('.bq-opt-text').value||"", r.querySelector('.bq-correct').checked)).filter(o=>o.text.trim()!=="");
-}
-const bqForm = document.getElementById('bqForm');
-if(bqForm){
-  bqRenderOptions('unica', null);
-  bqForm.addEventListener('submit', async function(e){
-    e.preventDefault();
-    const options = collectBQOptions();
-    const payload = {
-      categoria: document.getElementById('bqCategoria').value || "Geral",
-      tema: document.getElementById('bqTema').value || "",
-      procedimento: document.getElementById('bqProcedimento').value || "",
-      texto: document.getElementById('bqTexto').value || "Pergunta sem enunciado",
-      type: document.getElementById('bqTipo').value,
-      options: options.length ? options : [opt("Sim",true),opt("Não")],
-      status: document.getElementById('bqStatus').value
-    };
-    const btn = this.querySelector('button[type="submit"]');
-    const textoOriginal = btn ? btn.textContent : null;
-    if(btn){ btn.disabled = true; btn.textContent = "Salvando..."; }
-
-    if(editingBQCodigo){
-      const idx = questionBank.findIndex(q=>q.codigo===editingBQCodigo);
-      const perguntaCompleta = {...(idx>-1 ? questionBank[idx] : {}), ...payload, codigo: editingBQCodigo};
-      const resp = await backendCall('salvarPergunta', {pergunta: perguntaCompleta});
-      if(btn){ btn.disabled = false; btn.textContent = textoOriginal; }
-      if(!resp.ok){ showToast(resp.erro || "Não foi possível salvar a pergunta.", "warning"); return; }
-      if(idx>-1) questionBank[idx] = perguntaCompleta;
-      logAction("Edição de pergunta", `${editingBQCodigo} — ${payload.texto.slice(0,40)}`);
-      showToast("Pergunta atualizada.","success");
-    } else {
-      const resp = await backendCall('salvarPergunta', {pergunta: {autor: currentUser.nome, dataCriacao:new Date(), ultimaUtilizacao:null, qtdUtilizacoes:0, ...payload}});
-      if(btn){ btn.disabled = false; btn.textContent = textoOriginal; }
-      if(!resp.ok){ showToast(resp.erro || "Não foi possível salvar a pergunta.", "warning"); return; }
-      questionBank.push({codigo: resp.codigo, autor: currentUser.nome, dataCriacao:new Date(), ultimaUtilizacao:null, qtdUtilizacoes:0, ...payload});
-      logAction("Nova pergunta cadastrada", `${resp.codigo} — ${payload.texto.slice(0,40)}`);
-      showToast("Pergunta cadastrada no banco.","success");
-    }
-    editingBQCodigo = null;
-    this.reset();
-    document.getElementById('bqCodigo').value = "";
-    bqRenderOptions('unica', null);
-    renderBanco();
-  });
-  document.getElementById('btnResetBQ').addEventListener('click', ()=>{
-    editingBQCodigo = null;
-    bqForm.reset();
-    document.getElementById('bqCodigo').value = "";
-    bqRenderOptions('unica', null);
-  });
-  document.getElementById('bqImportFile').addEventListener('change', function(e){
-    const file = e.target.files[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = function(evt){
-      try{
-        const data = new Uint8Array(evt.target.result);
-        const wb = XLSX.read(data, {type:'array'});
-        const sheet = wb.Sheets[wb.SheetNames[0]];
-        const rows = XLSX.utils.sheet_to_json(sheet, {defval:""});
-        let count = 0;
-        rows.forEach(r=>{
-          const opts = [1,2,3,4].map(i=>r['opcao'+i]).filter(v=>v!=="").map((t,i)=>opt(String(t), String(r.correta||"").split(',').map(s=>s.trim()).includes(String(i+1))));
-          questionBank.push({
-            codigo: r.codigo ? String(r.codigo) : ("BQ-"+String(questionBank.length+1).padStart(3,'0')),
-            categoria: r.categoria || "Importada", tema: r.tema || "", procedimento: r.procedimento || "",
-            texto: r.texto || r.pergunta || "Pergunta importada",
-            type: r.tipo || "unica", options: opts.length ? opts : [opt("Sim",true),opt("Não")],
-            autor: currentUser.nome, dataCriacao:new Date(), ultimaUtilizacao:null, qtdUtilizacoes:0, status:"ativa"
-          });
-          count++;
-        });
-        renderBanco();
-        logAction("Importação de perguntas", `${count} pergunta(s) via ${file.name}`);
-        showToast(`${count} pergunta(s) importada(s) com sucesso.`,"success");
-      }catch(err){
-        showToast("Não foi possível importar o arquivo. Verifique se é .xlsx ou .csv com as colunas esperadas.","warning");
-      }
-      e.target.value = "";
-    };
-    reader.readAsArrayBuffer(file);
-  });
-}
-window.editBQ = function(codigo){
-  const q = questionBank.find(x=>x.codigo===codigo);
-  if(!q) return;
-  editingBQCodigo = codigo;
-  document.getElementById('bqCodigo').value = q.codigo;
-  document.getElementById('bqCategoria').value = q.categoria;
-  document.getElementById('bqTema').value = q.tema;
-  document.getElementById('bqProcedimento').value = q.procedimento || "";
-  document.getElementById('bqTexto').value = q.texto;
-  document.getElementById('bqTipo').value = q.type;
-  document.getElementById('bqStatus').value = q.status;
-  bqRenderOptions(q.type, q.options);
-  document.getElementById('bqForm').scrollIntoView({behavior:'smooth', block:'start'});
-};
-window.deleteBQ = async function(codigo){
-  const resp = await backendCall('excluirPergunta', {codigo});
-  if(!resp.ok){ showToast(resp.erro || "Não foi possível excluir a pergunta.", "warning"); return; }
-  questionBank = questionBank.filter(q=>q.codigo!==codigo);
-  logAction("Exclusão de pergunta", codigo);
-  renderBanco();
-  showToast("Pergunta removida do banco.","");
-};
-
-/* ======================= RESPONDER QUESTIONÁRIO — ESTILO DUOLINGO ======================= */
-window.openQuiz = async function(campaignId){
+/* ======================= RESPONDER QUESTIONÁRIO (colaborador) ======================= */
+window.openQuiz = function(campaignId){
+  respondingCampaignId = campaignId;
   const c = campaigns.find(x=>x.id===campaignId);
+  const existing = participants.find(p=>p.campaignId===campaignId && p.matricula==='2000');
+  document.getElementById('responderTitle').textContent = c.nome;
+  document.getElementById('responderSubtitle').textContent = c.descricao;
+  document.getElementById('sec-responder').classList.add('_temp');
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.getElementById('sec-responder').classList.add('active');
   document.getElementById('pageTitle').textContent = "Questionário";
-  document.getElementById('responderTitle').textContent = c.nome;
-  document.getElementById('responderSubtitle').textContent = "";
-  const body = document.getElementById('responderBody');
 
-  let existing = participants.find(p=>p.campaignId===campaignId && p.matricula===currentUser.matricula);
-  if(!existing){
-    // checagem fresca no servidor — cobre o caso raro de ter respondido em
-    // outro dispositivo nos últimos segundos, antes do próximo ciclo de sincronização
-    body.innerHTML = `<div class="duo-done"><span class="mascot-figure mascot-figure-emoji">${MASCOT_SVG}</span><h2>Carregando...</h2></div>`;
-    const check = await backendCall('jaRespondeu', {campaignId, matricula: currentUser.matricula});
-    if(check.ok && check.jaRespondeu){
-      body.innerHTML = `<div class="duo-done"><span class="mascot-figure mascot-figure-emoji">🔒</span><h2>Você já respondeu esta campanha</h2><p>O registro já existe — feito neste ou em outro dispositivo.</p></div>`;
-      return;
-    }
-  }
-  document.getElementById('responderSubtitle').textContent = existing ? "" : c.descricao;
   if(existing){
-    renderQuizDoneInto(body, c, existing);
+    renderQuizResult(c, existing);
   } else {
-    startQuizFlow(c);
+    renderQuizForm(c);
   }
 };
 document.getElementById('btnVoltarCampanhas').addEventListener('click', ()=>{
-  const target = currentRole === 'qualidade' ? 'campanhas' : 'campanha-atual';
   document.querySelectorAll('.menu-item').forEach(b=>b.classList.remove('active'));
-  const btn = document.querySelector(`[data-target="${target}"]`); if(btn) btn.classList.add('active');
-  goToSection(target);
+  document.querySelector('[data-target="campanhas"]').classList.add('active');
+  goToSection('campanhas');
 });
 
-function startQuizFlow(c){
+function renderQuizForm(c){
   const access = campaignAccessStatus(c);
   const body = document.getElementById('responderBody');
   if(access !== 'aberta'){
-    body.innerHTML = mascotBubble(access==='nao_iniciada' ? "Ainda não é hoje! Essa campanha abre em breve." : "Essa campanha já encerrou — mas fica de olho na próxima!") +
-      `<div class="lock-banner">
+    body.innerHTML = `<div class="lock-banner">
       <div style="font-size:26px;">⏳</div>
       <div>${access==='nao_iniciada' ? 'Esta campanha ainda não está aberta para respostas.' : 'O prazo para responder esta campanha já foi encerrado.'}</div>
       <div class="hint">Período: ${c.inicio.replace('T',' ')} até ${c.fim.replace('T',' ')}</div>
     </div>`;
     return;
   }
-  // Limite de participação: 1 resposta por matrícula (regra 12)
-  const already = participants.find(p=>p.campaignId===c.id && p.matricula===currentUser.matricula);
-  if(already){
-    showToast("Sua participação nesta campanha já foi registrada.", "warning");
-    renderQuizDoneInto(body, c, already);
-    return;
-  }
-  quizState = {campaign:c, index:0, answers:new Array(c.questoes.length).fill(null), dataInicio:new Date(), sessaoId:gerarSessaoId()};
-  renderQuizStep();
-}
-
-function renderQuizStep(){
-  const {campaign, index, answers} = quizState;
-  const q = campaign.questoes[index];
-  const total = campaign.questoes.length;
-  const progressPct = Math.round((index / total) * 100);
-  const body = document.getElementById('responderBody');
-  const selected = answers[index];
-  body.innerHTML = `
-    <div class="duo-wrap">
-      <div class="duo-progress"><div class="duo-progress-fill" style="width:${progressPct}%"></div></div>
-      <div class="duo-counter">Pergunta ${index+1} de ${total}</div>
-      <div class="duo-card" id="duoCard">
-        <div class="duo-question">${q.texto}</div>
-        <div class="duo-options">
-          ${q.options.map((o,oi)=>{
-            const isSel = Array.isArray(selected) ? selected.includes(oi) : selected === oi;
-            return `<button type="button" class="duo-option ${isSel?'selected':''}" data-oi="${oi}">${o.text}</button>`;
-          }).join('')}
-        </div>
-      </div>
-      <div class="duo-nav">
-        <button class="btn btn-outline" id="duoBack" ${index===0?'disabled':''}>← Voltar</button>
-        <button class="btn btn-primary" id="duoContinue">${index===total-1?'Finalizar':'Continuar'}</button>
-      </div>
-      <p class="hint" style="text-align:center; margin-top:14px;">Você poderá enviar apenas uma resposta para esta campanha, vinculada à sua matrícula.</p>
-    </div>`;
-
-  body.querySelectorAll('.duo-option').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const oi = Number(btn.dataset.oi);
-      if(q.type === 'multiplas_respostas'){
-        let arr = Array.isArray(answers[index]) ? [...answers[index]] : [];
-        if(arr.includes(oi)) arr = arr.filter(x=>x!==oi); else arr.push(oi);
-        answers[index] = arr;
-      } else {
-        answers[index] = oi;
-      }
-      renderQuizStep();
-    });
-  });
-  document.getElementById('duoBack').addEventListener('click', ()=>{
-    quizState.index = Math.max(0, index-1);
-    renderQuizStep();
-  });
-  const contBtn = document.getElementById('duoContinue');
-  const hasAnswer = Array.isArray(selected) ? selected.length>0 : (selected !== null && selected !== undefined);
-  contBtn.disabled = !hasAnswer;
-  contBtn.addEventListener('click', ()=>{
-    if(index < total-1){ quizState.index++; renderQuizStep(); }
-    else { finalizeQuiz(); }
+  body.innerHTML = `<form class="panel" id="quizForm">
+    ${c.questoes.map((q,i)=>`
+      <div class="quiz-q">
+        <div class="qn">Pergunta ${i+1} de ${c.questoes.length}</div>
+        <div class="qt">${q.texto}</div>
+        ${q.options.map((o,oi)=>`
+          <label class="quiz-opt">
+            <input type="${q.type==='multiplas_respostas'?'checkbox':'radio'}" name="resp_${i}" value="${oi}">
+            <span>${o.text}</span>
+          </label>`).join('')}
+      </div>`).join('')}
+    <button type="submit" class="btn btn-primary btn-block">Enviar respostas</button>
+    <p class="hint" style="text-align:center; margin-top:10px;">Você poderá enviar apenas uma resposta para esta campanha, vinculada à sua matrícula.</p>
+  </form>`;
+  document.getElementById('quizForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    submitQuiz(c);
   });
 }
 
@@ -1691,266 +700,68 @@ function isCorrect(q, ans){
   return !!(q.options[ans] && q.options[ans].correct);
 }
 
-async function finalizeQuiz(){
-  const {campaign, answers, dataInicio, sessaoId} = quizState;
-  const respostasCorretas = campaign.questoes.map((q,i)=> isCorrect(q, answers[i]));
-  const correctCount = respostasCorretas.filter(Boolean).length;
-  const pct = Math.round(correctCount / campaign.questoes.length * 100);
-  const dataFim = new Date();
-  const novoParticipante = {
-    campaignId: campaign.id, nome: currentUser.nome, matricula: currentUser.matricula,
-    cpf: EMPRESA.cpfFicticio(currentUser.matricula),
-    setor: currentUser.setor, filial: currentUser.filial, funcao: currentUser.funcao, cargo: currentUser.cargo,
-    data: dataFim, dataInicio: dataInicio || dataFim, dataFim, pct, respostasCorretas,
-    respostasSelecionadas: answers, acertosQtd: correctCount, totalQuestoes: campaign.questoes.length,
-    codigoResposta: gerarCodigoResposta(dataFim), sessaoId: sessaoId || gerarSessaoId(), dispositivo: dispositivoReal()
-  };
-
-  const container = document.getElementById('responderBody');
-  container.innerHTML = `<div class="duo-done"><span class="mascot-figure mascot-figure-emoji">${MASCOT_SVG}</span><h2>Enviando sua resposta...</h2><p>Só um instante, isso é registrado direto no servidor.</p></div>`;
-
-  const resp = await backendCall('submeterResposta', {resposta: novoParticipante});
-
-  if(!resp.ok){
-    if(resp.jaRespondida){
-      container.innerHTML = `
-        <div class="duo-done">
-          <span class="mascot-figure mascot-figure-emoji">🔒</span>
-          <h2>Você já respondeu esta campanha</h2>
-          <p>Encontramos um registro seu para <b>${campaign.nome}</b> — feito neste ou em outro dispositivo. Cada matrícula só pode responder uma vez, para manter tudo justo.</p>
-        </div>`;
+function submitQuiz(c){
+  const form = document.getElementById('quizForm');
+  const respostasCorretas = [];
+  c.questoes.forEach((q,i)=>{
+    let ans;
+    if(q.type === 'multiplas_respostas'){
+      ans = Array.from(form.querySelectorAll(`input[name="resp_${i}"]:checked`)).map(el=>Number(el.value));
     } else {
-      container.innerHTML = `
-        <div class="duo-done">
-          <span class="mascot-figure mascot-figure-emoji">⚠️</span>
-          <h2>Não foi possível enviar sua resposta</h2>
-          <p>${resp.erro || 'Verifique sua internet e tente novamente.'}</p>
-          <button class="btn btn-primary" onclick="openQuiz('${campaign.id}')" style="margin-top:12px;">Tentar novamente</button>
-        </div>`;
+      const checked = form.querySelector(`input[name="resp_${i}"]:checked`);
+      ans = checked ? Number(checked.value) : null;
     }
-    quizState = null;
-    return;
-  }
-
-  participants.push(novoParticipante);
-  logAction("Resposta registrada", `${novoParticipante.codigoResposta} — ${campaign.nome} — ${novoParticipante.nome}`);
-  fillCampaignSelects();
-  renderDashboard(); renderParticipantsTable(); renderEligibleTable(); renderSorteioSetup();
-  renderQuizDoneInto(container, campaign, novoParticipante);
-  saveState();
-  quizState = null;
-}
-
-/* Univaldo, o mascote oficial da Univale Transportes — representado por emoji,
-   sempre com as animações (respirar, balançar, "piscar") aplicadas via CSS. */
-const MASCOT_EMOJI = "🎯";
-/* Versão em SVG (Twemoji oficial) do mascote — nítida em qualquer aparelho,
-   sem depender da fonte de emoji do sistema operacional (que varia e pode
-   ficar com baixa qualidade em alguns dispositivos). */
-const MASCOT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" width="100%" height="100%"><circle fill="#DD2E44" cx="18" cy="18" r="18"/><circle fill="#FFF" cx="18" cy="18" r="13.5"/><circle fill="#DD2E44" cx="18" cy="18" r="10"/><circle fill="#FFF" cx="18" cy="18" r="6"/><circle fill="#DD2E44" cx="18" cy="18" r="3"/><path opacity=".2" d="M18.24 18.282l13.144 11.754s-2.647 3.376-7.89 5.109L17.579 18.42l.661-.138z"/><path fill="#FFAC33" d="M18.294 19c-.255 0-.509-.097-.704-.292-.389-.389-.389-1.018 0-1.407l.563-.563c.389-.389 1.018-.389 1.408 0 .388.389.388 1.018 0 1.407l-.564.563c-.194.195-.448.292-.703.292z"/><path fill="#55ACEE" d="M24.016 6.981c-.403 2.079 0 4.691 0 4.691l7.054-7.388c.291-1.454-.528-3.932-1.718-4.238-1.19-.306-4.079.803-5.336 6.935zm5.003 5.003c-2.079.403-4.691 0-4.691 0l7.388-7.054c1.454-.291 3.932.528 4.238 1.718.306 1.19-.803 4.079-6.935 5.336z"/><path fill="#3A87C2" d="M32.798 4.485L21.176 17.587c-.362.362-1.673.882-2.51.046-.836-.836-.419-2.08-.057-2.443L31.815 3.501s.676-.635 1.159-.152-.176 1.136-.176 1.136z"/></svg>`;
-const MASCOT_NOME = "Univaldo";
-function mascotBubble(texto, opts){
-  const pro = opts && opts.pro;
-  const conteudo = (opts && opts.emoji) ? opts.emoji : MASCOT_SVG;
-  return `<div class="mascot-row ${pro ? 'mascot-pro' : ''}">
-    <div class="mascot-avatar">
-      <span class="mascot-emoji mascot-emoji-blink">${conteudo}</span>
-    </div>
-    <div class="mascot-speech"><span class="mascot-name">${MASCOT_NOME}</span>${texto}</div>
-  </div>`;
-}
-function renderQualidadeTip(){
-  const el = document.getElementById('qualidadeTip');
-  if(!el) return;
-  const dicas = [];
-  const encerrandoEm3Dias = campaigns.filter(c=>{
-    if(c.status !== 'andamento') return false;
-    const dias = (new Date(c.fim) - new Date()) / (1000*60*60*24);
-    return dias > 0 && dias <= 3;
+    respostasCorretas.push(isCorrect(q, ans));
   });
-  const finalizadasSemSorteio = campaigns.filter(c=>c.status==='encerrada' && !c.ganhadores);
-  const total100 = campaigns.reduce((a,c)=> a + evaluateEligibility(c.id).eligible.length, 0);
+  const correctCount = respostasCorretas.filter(Boolean).length;
+  const pct = Math.round(correctCount / c.questoes.length * 100);
 
-  if(finalizadasSemSorteio.length){
-    dicas.push(`${finalizadasSemSorteio.length} campanha(s) encerrada(s) já podem ter o sorteio executado — dá uma olhada em "Sorteio".`);
-  }
-  if(encerrandoEm3Dias.length){
-    dicas.push(`${encerrandoEm3Dias.length} campanha(s) encerram nos próximos 3 dias — bom momento para divulgar de novo o link.`);
-  }
-  dicas.push(`Hoje há ${total100} colaborador(es) com 100% de acertos somando todas as campanhas.`);
+  const novoParticipante = {
+    campaignId: c.id, nome: currentUser.nome, matricula: currentUser.matricula,
+    setor: currentUser.setor, filial: currentUser.filial, funcao: currentUser.funcao, cargo: currentUser.cargo,
+    data: new Date(), pct, respostasCorretas
+  };
+  participants.push(novoParticipante);
 
-  el.innerHTML = mascotBubble(dicas[0], {pro:true});
+  fillCampaignSelects();
+  renderDashboard(); renderCampaignGrid(); renderParticipantsTable(); renderEligibleTable(); renderSorteioSetup();
+  renderQuizResult(c, novoParticipante);
+  showToast(`Respostas enviadas! Você acertou ${correctCount} de ${c.questoes.length} questões.`, pct===100 ? "success" : "");
 }
 
-function confettiHTML(){
-  const emojis = ["🎉","🎊","⭐","✨","🏆"];
-  let spans = "";
-  for(let i=0;i<14;i++){
-    const left = Math.round(Math.random()*100);
-    const delay = (Math.random()*0.6).toFixed(2);
-    const size = 14 + Math.round(Math.random()*10);
-    spans += `<span style="left:${left}%; animation-delay:${delay}s; font-size:${size}px;">${randomFrom(emojis)}</span>`;
-  }
-  return `<div class="duo-confetti">${spans}</div>`;
-}
-
-/* Tela final — exatamente o que o colaborador deve ver, nada de gabarito ou
-   detalhamento de acertos/erros por pergunta (isso fica exclusivo da Qualidade). */
-function renderQuizDoneInto(container, c, participant){
-  const roundClosed = campaignAccessStatus(c) !== 'aberta';
-
-  if(!roundClosed){
-    /* Rodada ainda aberta: o colaborador só sabe que a resposta foi registrada.
-       Nada de nota, acertos ou confete — isso só é revelado após o encerramento. */
-    container.innerHTML = `
-      <div class="duo-done">
-        <span class="mascot-figure mascot-figure-emoji">${MASCOT_SVG}</span>
-        <h2>Resposta registrada!</h2>
-        <p>Sua participação em <b>${c.nome}</b> foi registrada com sucesso.</p>
-        <p class="hint">Por transparência com todos os participantes, o resultado só é liberado depois que a rodada encerrar, em <b>${fmtDateTime(new Date(c.fim))}</b>. Volte aqui depois desse prazo para ver seu desempenho.</p>
-      </div>
-      ${mascotBubble("Sua resposta está registrada e segura. Assim que a rodada encerrar, você vê aqui quantas você acertou. Até lá! 🤝")}`;
-    return;
-  }
-
+function renderQuizResult(c, participant){
+  const body = document.getElementById('responderBody');
   const correctCount = participant.respostasCorretas ? participant.respostasCorretas.filter(Boolean).length : Math.round(participant.pct/100*c.questoes.length);
-  const perfeito = participant.pct === 100;
-  const mascotEmoji = perfeito ? "🎉" : MASCOT_EMOJI;
-  const mascotMsg = perfeito
-    ? "Mandou muito bem! 100% de acertos — boa sorte no sorteio! 🍀"
-    : "Valeu por participar! Continue de olho nas próximas campanhas. 💪";
-  container.innerHTML = `
-    <div class="duo-done">
-      ${perfeito ? confettiHTML() : ''}
-      <span class="mascot-figure mascot-figure-emoji">${mascotEmoji}</span>
-      <h2>Obrigado por participar!</h2>
-      <p>Sua participação foi registrada com sucesso.</p>
-      <div class="duo-score">Você acertou <b>${correctCount} de ${c.questoes.length}</b> perguntas.</div>
-      <p class="hint">Boa sorte no sorteio!</p>
+  let eligibilityMsg = "";
+  if(participant.pct === 100){
+    if(CARGOS_IMPEDIDOS.includes(participant.cargo)){
+      eligibilityMsg = `<div class="justification" style="display:block;">Você acertou 100% das questões, porém colaboradores no cargo de <b>${participant.cargo}</b> não participam do sorteio, conforme as regras do programa.</div>`;
+    } else if(isWithinTwoYears(participant.matricula, new Date())){
+      eligibilityMsg = `<div class="justification" style="display:block;">Você acertou 100% das questões, porém já foi premiado(a) em uma campanha do PPG nos últimos 2 anos, o que o(a) impede de concorrer novamente neste período.</div>`;
+    } else {
+      eligibilityMsg = `<div class="justification" style="display:block; background:#E4F3E5; color:var(--success); border-color:#BEE0C1;">Parabéns! Você acertou 100% das questões e está elegível ao sorteio desta campanha.</div>`;
+    }
+  }
+  body.innerHTML = `
+    <div class="score-hero">
+      <div class="score-ring" style="background:conic-gradient(var(--primary) ${participant.pct*3.6}deg, var(--border) 0deg);">
+        <div class="inner"><b>${participant.pct}%</b><span>de acertos</span></div>
+      </div>
+      <div>
+        <h3 style="font-size:16px;">Você acertou ${correctCount} de ${c.questoes.length} questões</h3>
+        <p class="hint" style="margin-top:4px;">Resposta enviada em ${fmtDateTime(participant.data)}. O gabarito completo é de acesso exclusivo da equipe da Qualidade.</p>
+      </div>
     </div>
-    ${mascotBubble(mascotMsg)}`;
-}
-
-function renderRegulamentoStats(){
-  const el = document.getElementById('regulamentoStats');
-  if(!el) return;
-  const totalCampanhas = campaigns.length;
-  const totalPremiados = new Set(wonHistory.map(w=>w.matricula)).size;
-  const allParts = participants;
-  const media = allParts.length ? Math.round(allParts.reduce((a,p)=>a+p.pct,0)/allParts.length) : 0;
-  const totalElegiveisHoje = campaigns.reduce((a,c)=> a + evaluateEligibility(c.id).eligible.length, 0);
-  el.innerHTML = `<div class="transp-stats">
-    <div class="transp-stat"><b>${totalCampanhas}</b><span>Campanhas realizadas</span></div>
-    <div class="transp-stat"><b>${totalPremiados}</b><span>Colaboradores já premiados</span></div>
-    <div class="transp-stat"><b>${media}%</b><span>Média geral de acertos</span></div>
-    <div class="transp-stat"><b>${totalElegiveisHoje}</b><span>Elegíveis somando as rodadas</span></div>
-  </div>`;
-}
-
-/* ======================= PÁGINAS DO COLABORADOR ======================= */
-function colaboradorStreakStrip(){
-  const mine = participants.filter(p=>p.matricula===currentUser.matricula);
-  const total = mine.length;
-  const media = total ? Math.round(mine.reduce((a,p)=>a+p.pct,0)/total) : 0;
-  const premios = campaigns.filter(c=>c.ganhadores && c.ganhadores.some(w=>w.matricula===currentUser.matricula)).length;
-  return `<div class="streak-strip">
-    <div class="streak-chip fire"><div class="si"><i data-lucide="flame"></i></div><div><b>${total}</b><span>Campanhas respondidas</span></div></div>
-    <div class="streak-chip star"><div class="si">⭐</div><div><b>${media}%</b><span>Média de acertos</span></div></div>
-    <div class="streak-chip trophy"><div class="si">🏆</div><div><b>${premios}</b><span>Vezes premiado(a)</span></div></div>
-  </div>`;
-}
-function renderCampanhaAtual(){
-  const body = document.getElementById('campanhaAtualBody');
-  if(!body) return;
-  const open = campaigns.filter(c=>campaignAccessStatus(c)==='aberta');
-  let html = mascotBubble(`Oi, ${currentUser.nome.split(' ')[0]}! ${open.length ? 'Tem campanha nova esperando por você aqui embaixo 👇' : 'Nenhuma campanha aberta agora, mas fica de olho — aviso assim que abrir uma nova!'}`);
-  html += colaboradorStreakStrip();
-  if(!open.length){
-    html += `<div class="panel fun-empty">
-      <div class="fe-icon"><i data-lucide="clock"></i></div>
-      <h3>Nenhuma campanha em andamento</h3>
-      <p class="hint">Assim que uma nova campanha do PPG for aberta, ela aparecerá aqui.</p>
+    ${eligibilityMsg}
+    <div class="panel">
+      <h3>Seu desempenho por questão</h3>
+      <div class="hint">O ícone indica se a sua resposta estava certa, sem revelar a alternativa correta</div>
+      ${c.questoes.map((q,i)=>{
+        const ok = participant.respostasCorretas ? participant.respostasCorretas[i] : null;
+        const badge = ok===null ? "" : `<span class="result-badge ${ok?'ok':'bad'}">${ok?'✓':'✕'}</span>`;
+        return `<div class="quiz-q" style="display:flex; align-items:center; gap:12px;">${badge}<div style="flex:1;"><div class="qt" style="margin-bottom:0;">Pergunta ${i+1}: ${q.texto}</div></div></div>`;
+      }).join('')}
     </div>`;
-    body.innerHTML = html;
-    return;
-  }
-  html += open.map(c=>{
-    const answered = participants.some(p=>p.campaignId===c.id && p.matricula===currentUser.matricula);
-    return `<div class="panel">
-      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;">
-        <div><h3>${c.nome}</h3><p class="hint" style="margin-top:6px; max-width:480px;">${c.descricao}</p></div>
-        ${statusBadge(c.status)}
-      </div>
-      <div class="meta" style="margin:14px 0;">
-        <span><i data-lucide="calendar"></i> Responda até ${c.fim.replace('T',' ')}</span>
-        <span>🎁 Prêmio: ${c.premio || 'a definir'}</span>
-      </div>
-      ${answered
-        ? `<button class="btn btn-ghost" onclick="openQuiz('${c.id}')">Ver meu resultado</button>`
-        : `<button class="btn btn-primary" onclick="openQuiz('${c.id}')"><i data-lucide="rocket"></i> Responder agora</button>`}
-    </div>`;
-  }).join('');
-  body.innerHTML = html;
-}
-function renderHistoricoColaborador(){
-  const body = document.getElementById('historicoColabBody');
-  if(!body) return;
-  const mine = participants.filter(p=>p.matricula===currentUser.matricula).sort((a,b)=>b.data-a.data);
-  let html = mascotBubble("Aqui está tudo que você já respondeu até agora. Bora conferir? 📋");
-  html += mine.map(p=>{
-    const c = campaigns.find(x=>x.id===p.campaignId);
-    const roundClosed = c ? campaignAccessStatus(c) !== 'aberta' : true;
-    const resultadoHtml = roundClosed
-      ? `<span style="font-family:'Manrope'; font-weight:800; font-size:18px; color:var(--secondary);">${p.pct}%</span>`
-      : `<span class="badge programada" title="O resultado é liberado após o encerramento da rodada">🔒 Aguardando encerramento</span>`;
-    return `<div class="panel" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-      <div><h3 style="font-size:14.5px;">${c ? c.nome : p.campaignId}</h3><p class="hint" style="margin-top:4px;">Respondido em ${fmtDateTime(p.data)}</p></div>
-      <div style="display:flex; align-items:center; gap:12px;">
-        ${resultadoHtml}
-        <button class="btn btn-outline btn-sm" onclick="openQuiz('${p.campaignId}')">Ver resultado</button>
-      </div>
-    </div>`;
-  }).join('') || `<div class="panel fun-empty"><div class="fe-icon"><i data-lucide="inbox"></i></div>Você ainda não participou de nenhuma campanha.</div>`;
-  body.innerHTML = html;
-}
-function renderMeuResultado(){
-  const body = document.getElementById('meuResultadoBody');
-  if(!body) return;
-  const mine = participants.filter(p=>p.matricula===currentUser.matricula).sort((a,b)=>b.data-a.data);
-  if(!mine.length){
-    body.innerHTML = mascotBubble("Você ainda não respondeu nenhuma campanha — que tal começar agora?") +
-      `<div class="panel fun-empty"><div class="fe-icon"><i data-lucide="hourglass"></i></div>Assim que você responder, seu resultado mais recente aparece aqui.</div>`;
-    return;
-  }
-  const latest = mine[0];
-  const c = campaigns.find(x=>x.id===latest.campaignId);
-  renderQuizDoneInto(body, c, latest);
-
-  const roundClosed = campaignAccessStatus(c) !== 'aberta';
-  if(!roundClosed) return; // nada de elegibilidade enquanto a rodada não encerra — isso revelaria o desempenho
-
-  /* Transparência total: o colaborador vê exatamente se está elegível ao
-     sorteio e, se não estiver, o(s) motivo(s) exato(s) — os mesmos critérios
-     aplicados a todo mundo, sem exceção. */
-  const {eligible, excluded} = evaluateEligibility(latest.campaignId);
-  const souElegivel = eligible.some(e=>e.matricula===currentUser.matricula);
-  const meuExcluido = excluded.find(e=>e.matricula===currentUser.matricula);
-  const elegHtml = souElegivel
-    ? `<div class="panel eleg-panel eleg-ok">
-        <h3>✅ Você está elegível para o sorteio desta rodada</h3>
-        <p>Isso significa que você atingiu 100% de acertos, sua função não está entre as impedidas de participar e você não foi premiado(a) nos últimos 2 anos. Boa sorte! 🍀</p>
-      </div>`
-    : meuExcluido
-      ? `<div class="panel eleg-panel eleg-excluded">
-          <h3>🔒 Você não está elegível para o sorteio desta rodada</h3>
-          <p><b>Motivo:</b> ${meuExcluido.motivo}</p>
-          <p class="hint">A elegibilidade é calculada automaticamente pelo sistema, seguindo os mesmos 3 critérios oficiais para todos os colaboradores, sem exceção. Veja o detalhamento completo das regras abaixo.</p>
-          <button class="btn btn-outline btn-sm" id="btnVerRegrasElegibilidade"><i data-lucide="scroll-text"></i> Ver regras completas</button>
-        </div>`
-      : '';
-  body.insertAdjacentHTML('beforeend', elegHtml);
-  const btnRegras = document.getElementById('btnVerRegrasElegibilidade');
-  if(btnRegras) btnRegras.addEventListener('click', ()=> document.querySelector('[data-target="regulamento"]').click());
 }
 
 /* ======================= SORTEIO ======================= */
@@ -1964,12 +775,12 @@ function renderSorteioSetup(){
     eligible.map(p=>`<span class="chip">${p.nome} · ${p.setor}</span>`).join('') +
     excluded.map(p=>`<span class="chip excluded" title="${p.motivo}">${p.nome}</span>`).join('');
   const setoresRepresentados = new Set(eligible.map(p=>p.setor)).size;
-  const filiaisRepresentadas = new Set(eligible.map(p=>p.filial)).size;
+  const UnidadesRepresentadas = new Set(eligible.map(p=>p.filial)).size;
   document.getElementById('sorteioStats').innerHTML = `
     <div class="stat"><b>${eligible.length}</b><span>Total de elegíveis</span></div>
     <div class="stat"><b>${excluded.length}</b><span>Excluídos por regra</span></div>
     <div class="stat"><b>${setoresRepresentados}</b><span>Setores representados</span></div>
-    <div class="stat"><b>${filiaisRepresentadas}</b><span>Filiais representadas</span></div>`;
+    <div class="stat"><b>${UnidadesRepresentadas}</b><span>Unidades representadas</span></div>`;
   document.getElementById('randomSeedWrap').style.display = "none";
   document.getElementById('justificationBox').style.display = "none";
   buildEmptySlots(id);
@@ -1985,8 +796,8 @@ function buildEmptySlots(campaignId){
 }
 function pickFairWinners(pool, need){
   const shuffled = [...pool].sort(()=>Math.random()-0.5);
-  const winners = []; const usedSetores = new Set(), usedFiliais = new Set();
-  for(const p of shuffled){ if(winners.length>=need) break; if(!usedSetores.has(p.setor) || !usedFiliais.has(p.filial)){ winners.push(p); usedSetores.add(p.setor); usedFiliais.add(p.filial); } }
+  const winners = []; const usedSetores = new Set(), usedUnidades = new Set();
+  for(const p of shuffled){ if(winners.length>=need) break; if(!usedSetores.has(p.setor) || !usedUnidades.has(p.filial)){ winners.push(p); usedSetores.add(p.setor); usedUnidades.add(p.filial); } }
   for(const p of shuffled){ if(winners.length>=need) break; if(!winners.includes(p)) winners.push(p); }
   const distinctSetores = new Set(winners.map(w=>w.setor)).size;
   const fair = distinctSetores === Math.min(need, new Set(pool.map(p=>p.setor)).size);
@@ -2039,12 +850,7 @@ function revealWinners(slotEls, winners, campaignId, seed, fair, distinctSetores
   for(let i=winners.length;i<slotEls.length;i++){ slotEls[i].classList.remove('rolling'); slotEls[i].querySelector('.info').textContent = "sem elegível disponível"; }
 }
 document.getElementById('btnResetSorteio').addEventListener('click', ()=>{ if(!sorteioRunning) renderSorteioSetup(); });
-document.getElementById('btnValidarSorteio').addEventListener('click', ()=>{
-  if(!window._lastSorteio){ showToast("Realize o sorteio antes de validar.","warning"); return; }
-  window._lastSorteio.validado = true;
-  showToast("Resultado validado por Mariana Queiroz (Qualidade). Resultado ainda provisório até ser registrado no histórico.","success");
-  logAction("Sorteio validado (provisório)", "Resultado confirmado pela equipe da Qualidade — aguardando registro oficial.");
-});
+document.getElementById('btnValidarSorteio').addEventListener('click', ()=> showToast("Resultado validado por Mariana Queiroz (Qualidade).","success"));
 document.getElementById('btnRelatorioOficial').addEventListener('click', ()=>{
   if(!window._lastSorteio){ showToast("Realize o sorteio antes de gerar o relatório.","warning"); return; }
   const {campaignId, winners, seed} = window._lastSorteio;
@@ -2052,31 +858,18 @@ document.getElementById('btnRelatorioOficial').addEventListener('click', ()=>{
   const headers = ["Posição","Nome","Matrícula","Setor","Filial"];
   const rows = winners.map((w,i)=>[i+1, w.nome, w.matricula, w.setor, w.filial]);
   openPrintReport(`Relatório oficial do sorteio — ${c.nome}`, headers, rows, `Número aleatório utilizado: ${seed} · Gerado em ${fmtDateTime(new Date())}`);
-  logAction("Relatório oficial gerado", c.nome);
 });
-document.getElementById('btnRegistrarHistorico').addEventListener('click', async ()=>{
+document.getElementById('btnRegistrarHistorico').addEventListener('click', ()=>{
   if(!window._lastSorteio) return;
-  if(!window._lastSorteio.validado){ showToast("Valide o resultado (botão 'Validar resultado') antes de registrar oficialmente.","warning"); return; }
   const {campaignId, winners, seed, fair, distinctSetores, eligibleCount} = window._lastSorteio;
   const c = campaigns.find(x=>x.id===campaignId);
-  const campanhaAtualizada = {
-    ...c,
-    ganhadores: winners.map(w=>({nome:w.nome, matricula:w.matricula, setor:w.setor, filial:w.filial, funcao:w.funcao})),
-    status: "finalizada", randomSeed: seed, responsavel: currentUser.nome,
-    justificativa: fair ? `Distribuição justa alcançada entre ${distinctSetores} setor(es) distintos.` : `Distribuição parcial: apenas ${distinctSetores} setor(es) representado(s) entre os ${eligibleCount} elegíveis.`
-  };
-  const btn = document.getElementById('btnRegistrarHistorico');
-  btn.disabled = true; btn.textContent = "Registrando...";
-  const resp = await backendCall('salvarCampanha', {campanha: campanhaAtualizada, usuario: currentUser.nome});
-  btn.disabled = false; btn.textContent = "Registrar no histórico";
-  if(!resp.ok){ showToast(resp.erro || "Não foi possível registrar o sorteio.", "warning"); return; }
-  Object.assign(c, campanhaAtualizada);
+  c.ganhadores = winners.map(w=>({nome:w.nome, matricula:w.matricula, setor:w.setor, filial:w.filial, funcao:w.funcao}));
+  c.status = "finalizada"; c.randomSeed = seed; c.responsavel = "Mariana Queiroz";
+  c.justificativa = fair ? `Distribuição justa alcançada entre ${distinctSetores} setor(es) distintos.` : `Distribuição parcial: apenas ${distinctSetores} setor(es) representado(s) entre os ${eligibleCount} elegíveis.`;
   winners.forEach(w=> wonHistory.push({matricula:w.matricula, data:new Date()}));
   historyLog.unshift({campaignId, data:new Date(), texto:`Sorteio realizado para a campanha ${c.nome}.`});
-  logAction("Sorteio registrado no histórico", c.nome);
   fillCampaignSelects();
-  showToast("Sorteio registrado oficialmente! Agora você já pode gerar o banner dos ganhadores em Divulgação.","success");
-  window._lastSorteio = null;
+  showToast("Sorteio registrado no histórico para auditoria.","success");
   document.querySelector('[data-target="historico"]').click();
 });
 
@@ -2090,30 +883,7 @@ function downloadCSV(filename, headers, rows){
   a.href = url; a.download = filename; document.body.appendChild(a); a.click();
   document.body.removeChild(a); URL.revokeObjectURL(url);
 }
-function buildBarChartSVG(labels, values, opts){
-  opts = opts || {};
-  const w = 580, h = 240, padTop = 30, padBottom = 50, padSide = 20;
-  const innerH = h - padTop - padBottom;
-  const max = Math.max(...values, 1);
-  const n = values.length || 1;
-  const gap = 14;
-  const barW = Math.max(16, (w - padSide*2 - gap*(n-1)) / n);
-  let bars = "";
-  values.forEach((v,i)=>{
-    const barH = Math.round((v/max) * innerH);
-    const x = padSide + i*(barW+gap);
-    const y = h - padBottom - barH;
-    const label = String(labels[i]||'').length > 15 ? String(labels[i]).slice(0,14)+'…' : String(labels[i]||'');
-    bars += `<rect x="${x.toFixed(1)}" y="${y}" width="${barW.toFixed(1)}" height="${barH}" fill="#02A39D" rx="5"/>`;
-    bars += `<text x="${(x+barW/2).toFixed(1)}" y="${y-6}" font-size="11" text-anchor="middle" fill="#00695C" font-family="Arial">${v}${opts.suffix||''}</text>`;
-    bars += `<text x="${(x+barW/2).toFixed(1)}" y="${h-padBottom+16}" font-size="9.5" text-anchor="middle" fill="#5B7370" font-family="Arial">${label}</text>`;
-  });
-  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;">
-    <line x1="${padSide}" y1="${h-padBottom}" x2="${w-padSide}" y2="${h-padBottom}" stroke="#E3ECEA"/>
-    ${bars}
-  </svg>`;
-}
-function openPrintReport(title, headers, rows, footNote, chartSvg){
+function openPrintReport(title, headers, rows, footNote){
   const win = window.open('', '_blank');
   if(!win){ showToast("O navegador bloqueou a abertura da janela de impressão.","warning"); return; }
   win.document.write(`
@@ -2125,11 +895,9 @@ function openPrintReport(title, headers, rows, footNote, chartSvg){
       table{width:100%; border-collapse:collapse; margin-top:18px;}
       th,td{border:1px solid #E3ECEA; padding:8px 10px; font-size:12px; text-align:left;}
       th{background:#F7F9FB; color:#5B7370; text-transform:uppercase; font-size:10px;}
-      .chart-wrap{margin-top:16px; text-align:center;}
     </style></head><body>
     <h1>PPG · Programa Política de Gestão</h1>
     <p class="meta">${title} — gerado em ${fmtDateTime(new Date())}</p>
-    ${chartSvg ? `<div class="chart-wrap">${chartSvg}</div>` : ''}
     <table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
     <tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>
     ${footNote ? `<p class="meta" style="margin-top:16px;">${footNote}</p>` : ''}
@@ -2156,10 +924,7 @@ function buildReportData(reportType, campaignId){
   if(reportType === 'distribuicao'){
     const allWinners = campaigns.filter(x=>x.ganhadores).flatMap(x=>x.ganhadores);
     const rows = allWinners.map(w=>[w.nome,w.setor,w.filial,w.funcao]);
-    const counts = {};
-    allWinners.forEach(w=> counts[w.setor] = (counts[w.setor]||0)+1);
-    const chartSvg = Object.keys(counts).length ? buildBarChartSVG(Object.keys(counts), Object.values(counts)) : null;
-    return {title:`Distribuição de ganhadores por setor/filial/função — todas as campanhas`, headers:["Nome","Setor","Filial","Função"], rows, chartSvg};
+    return {title:`Distribuição de ganhadores por setor/filial/função — todas as campanhas`, headers:["Nome","Setor","Filial","Função"], rows};
   }
   if(reportType === 'auditoria'){
     const rows = [[c.nome, c.criterios||"—", c.randomSeed||"—", c.responsavel||"—", c.justificativa||"—"]];
@@ -2168,29 +933,6 @@ function buildReportData(reportType, campaignId){
   if(reportType === 'historico'){
     const rows = campaigns.filter(x=>x.ganhadores || x.status==='encerrada').map(x=>[x.nome, x.inicio.replace('T',' '), x.fim.replace('T',' '), campaignParticipants(x.id).length, x.ganhadores?x.ganhadores.length:0]);
     return {title:"Histórico completo de campanhas", headers:["Campanha","Início","Encerramento","Participantes","Ganhadores"], rows};
-  }
-  if(reportType === 'comparativo'){
-    const rows = campaigns.map(x=>{
-      const parts = campaignParticipants(x.id);
-      const media = parts.length ? Math.round(parts.reduce((a,p)=>a+p.pct,0)/parts.length) : 0;
-      const {eligible} = evaluateEligibility(x.id);
-      return [x.nome, parts.length, eligible.length, media+"%", x.ganhadores?x.ganhadores.length:0, x.status];
-    });
-    const chartSvg = buildBarChartSVG(campaigns.map(x=>x.nome.split('–')[0].trim()), campaigns.map(x=>campaignParticipants(x.id).length), {suffix:' resp.'});
-    return {title:"Comparativo entre campanhas", headers:["Campanha","Participantes","Elegíveis","Média de acertos","Ganhadores","Status"], rows, chartSvg};
-  }
-  if(reportType === 'evolucao'){
-    const ordered = [...campaigns].sort((a,b)=> new Date(a.inicio) - new Date(b.inicio));
-    const rows = ordered.map(x=>{
-      const parts = campaignParticipants(x.id);
-      const media = parts.length ? Math.round(parts.reduce((a,p)=>a+p.pct,0)/parts.length) : 0;
-      return [x.inicio.replace('T',' '), x.nome, parts.length, media+"%"];
-    });
-    const chartSvg = buildBarChartSVG(ordered.map(x=>x.nome.split('–')[0].trim()), ordered.map(x=>{
-      const parts = campaignParticipants(x.id);
-      return parts.length ? Math.round(parts.reduce((a,p)=>a+p.pct,0)/parts.length) : 0;
-    }), {suffix:'%'});
-    return {title:"Evolução histórica — média de acertos por campanha ao longo do tempo", headers:["Início","Campanha","Participantes","Média de acertos"], rows, chartSvg};
   }
 }
 document.querySelectorAll('.report-btn').forEach(btn=>{
@@ -2202,141 +944,25 @@ document.querySelectorAll('.report-btn').forEach(btn=>{
       downloadCSV(data.title.replace(/[^\w]+/g,'_') + ".csv", data.headers, data.rows);
       showToast("Arquivo .csv baixado (compatível com Excel).","success");
     } else {
-      openPrintReport(data.title, data.headers, data.rows, null, data.chartSvg);
+      openPrintReport(data.title, data.headers, data.rows);
       showToast("Abrindo visualização para impressão/PDF.","success");
     }
-    logAction("Relatório exportado", `${btn.dataset.report} (${btn.dataset.type})`);
   });
 });
 
-/* ======================= HISTÓRICO (Qualidade) ======================= */
+/* ======================= HISTÓRICO ======================= */
 function renderTimeline(){
   document.getElementById('timeline').innerHTML = campaigns.filter(c=>c.status==="finalizada" || c.status==="encerrada").map(c=>{
     const {eligible} = evaluateEligibility(c.id);
     const winnersHtml = c.ganhadores ? `<div class="tl-winners">${c.ganhadores.map(w=>`<span class="chip">🏆 ${w.nome} · ${w.setor}</span>`).join('')}</div>` : `<div class="tl-winners"><span class="chip">Sorteio pendente de execução</span></div>`;
     const metaHtml = c.ganhadores ? `
-      <div class="tl-meta"><span><i data-lucide="users"></i> ${campaignParticipants(c.id).length} participantes</span><span><i data-lucide="check-circle-2"></i> ${eligible.length} elegíveis avaliados</span><span><i data-lucide="dices"></i> nº aleatório: ${c.randomSeed || "—"}</span><span><i data-lucide="user"></i> responsável: ${c.responsavel || "—"}</span></div>
+      <div class="tl-meta"><span>👥 ${campaignParticipants(c.id).length} participantes</span><span>✅ ${eligible.length} elegíveis avaliados</span><span>🎲 nº aleatório: ${c.randomSeed || "—"}</span><span>👤 responsável: ${c.responsavel || "—"}</span></div>
       <div class="hint" style="margin-top:6px;">${c.justificativa || ""}</div>` : "";
     return `<div class="tl-item"><div class="tl-dot"></div><div class="tl-body"><h4>${c.nome}</h4><p>${c.inicio.replace('T',' ')} → ${c.fim.replace('T',' ')} · ${statusBadge(c.status)}</p>${winnersHtml}${metaHtml}</div></div>`;
   }).join('') || `<p style="color:var(--ink-soft); font-size:13px;">Nenhuma campanha encerrada ainda.</p>`;
 }
 
-/* ======================= REGRAS & EXCEÇÕES ======================= */
-function renderRegrasExcecoes(){
-  const sel = document.getElementById('excCampanha');
-  if(sel && sel.options.length !== campaigns.length){
-    sel.innerHTML = campaigns.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
-  }
-  const tbody = document.getElementById('tblExcecoes');
-  if(!tbody) return;
-  tbody.innerHTML = ruleChangeLog.map(r=>{
-    const c = campaigns.find(x=>x.id===r.campaignId);
-    return `<tr><td>${fmtDateTime(r.data)}</td><td>${r.responsavel}</td><td>${c?c.nome:r.campaignId}</td><td>${r.regraOriginal}</td><td>${r.alteracao}</td><td>${r.justificativa}</td></tr>`;
-  }).join('') || `<tr><td colspan="6" style="text-align:center; color:var(--ink-soft); padding:20px;">Nenhuma exceção registrada até o momento.</td></tr>`;
-}
-document.getElementById('formExcecao').addEventListener('submit', function(e){
-  e.preventDefault();
-  const campaignId = document.getElementById('excCampanha').value;
-  const regraOriginal = document.getElementById('excRegraOriginal').value.trim();
-  const alteracao = document.getElementById('excAlteracao').value.trim();
-  const justificativa = document.getElementById('excJustificativa').value.trim();
-  if(!campaignId || !regraOriginal || !alteracao || !justificativa) return;
-  const entry = {campaignId, regraOriginal, alteracao, justificativa, responsavel: currentUser ? currentUser.nome : "Qualidade", data: new Date()};
-  ruleChangeLog.unshift(entry);
-  const c = campaigns.find(x=>x.id===campaignId);
-  logAction("Exceção registrada", `${c?c.nome:campaignId} — ${alteracao}`);
-  this.reset();
-  renderRegrasExcecoes();
-  saveState();
-  showToast("Exceção registrada e disponível para auditoria.","success");
-});
-
-/* ======================= DIVULGAÇÃO (banners) ======================= */
-function renderDivulgacao(){
-  const selDiv = document.getElementById('divCampanha');
-  const selGanh = document.getElementById('divCampanhaGanhadores');
-  if(selDiv) selDiv.innerHTML = campaigns.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
-  const comGanhadores = campaigns.filter(c=>c.ganhadores && c.ganhadores.length);
-  if(selGanh) selGanh.innerHTML = comGanhadores.length
-    ? comGanhadores.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('')
-    : `<option value="">Nenhuma campanha com sorteio oficial registrado ainda</option>`;
-}
-function baixarComoImagem(elId, filename){
-  const el = document.getElementById(elId);
-  if(!el){ return; }
-  if(typeof html2canvas === 'undefined'){
-    showToast("Não foi possível gerar a imagem (sem conexão com a internet para carregar a ferramenta de captura).","warning");
-    return;
-  }
-  html2canvas(el, {backgroundColor:null, scale:2}).then(canvas=>{
-    canvas.toBlob(blob=>{
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = filename;
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(()=>URL.revokeObjectURL(url), 4000);
-      showToast("Imagem baixada com sucesso.","success");
-    });
-  }).catch(()=>{
-    showToast("Não foi possível gerar a imagem agora. Tente novamente.","warning");
-  });
-}
-document.getElementById('btnGerarDivulgacao').addEventListener('click', ()=>{
-  const c = campaigns.find(x=>x.id===document.getElementById('divCampanha').value);
-  if(!c) return;
-  const link = `${window.location.origin}${window.location.pathname}?campanha=${c.id}`;
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(link)}`;
-  const wrap = document.getElementById('divPreviewWrap');
-  wrap.style.display = "block";
-  wrap.innerHTML = `
-    <div id="divBannerArt" style="background:linear-gradient(135deg, var(--primary), var(--secondary)); border-radius:20px; padding:36px; color:#fff; text-align:center; max-width:520px; margin:0 auto;">
-      <div style="font-size:13px; letter-spacing:2px; opacity:.85; text-transform:uppercase;">Programa Política de Gestão</div>
-      <div style="width:64px; height:64px; margin:14px auto; animation:mascotBob 3s ease-in-out infinite;">${MASCOT_SVG}</div>
-      <h2 style="margin:6px 0; font-family:'Manrope',sans-serif;">${c.nome}</h2>
-      <p style="opacity:.95; margin-bottom:18px;">Participe respondendo o questionário e concorra aos prêmios!</p>
-      <div style="background:#fff; display:inline-block; padding:10px; border-radius:12px;"><img src="${qrUrl}" alt="QR Code" onerror="this.parentElement.innerHTML='<span style=\\'font-size:11px;color:#333;\\'>QR indisponível offline</span>'"></div>
-      <p style="font-size:11px; margin-top:12px; opacity:.85;">Período: ${c.inicio.replace('T',' ')} até ${c.fim.replace('T',' ')}</p>
-    </div>
-    <div style="text-align:center; margin-top:16px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
-      <button class="btn btn-primary btn-sm" id="btnBaixarDivulgacao">⬇️ Baixar como imagem (PNG)</button>
-      <button class="btn btn-outline btn-sm" onclick="openShareModal('${c.id}')"><i data-lucide="share-2"></i> Ver link e copiar</button>
-    </div>`;
-  document.getElementById('btnBaixarDivulgacao').addEventListener('click', ()=> baixarComoImagem('divBannerArt', `divulgacao-${c.id}.png`));
-  logAction("Arte de divulgação gerada", c.nome);
-});
-document.getElementById('btnGerarBannerGanhadores').addEventListener('click', ()=>{
-  const c = campaigns.find(x=>x.id===document.getElementById('divCampanhaGanhadores').value);
-  const wrap = document.getElementById('bannerGanhadoresWrap');
-  if(!c || !c.ganhadores || !c.ganhadores.length){
-    showToast("Selecione uma campanha com sorteio oficial registrado.","warning");
-    return;
-  }
-  wrap.style.display = "block";
-  wrap.innerHTML = `
-    <div id="bannerGanhadoresArt" style="position:relative; background:linear-gradient(135deg, var(--secondary), var(--primary)); border-radius:20px; padding:36px; color:#fff; text-align:center; max-width:560px; margin:0 auto; overflow:hidden;">
-      <div style="font-size:13px; letter-spacing:2px; opacity:.85; text-transform:uppercase;">Resultado oficial</div>
-      <div style="font-size:70px; margin:10px auto; animation:celebrateBounce .8s ease;">🎉</div>
-      <h2 style="margin:4px 0 18px; font-family:'Manrope',sans-serif;">🎉 Ganhadores — ${c.nome}</h2>
-      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; text-align:left;">
-        ${c.ganhadores.map((w,i)=>`
-          <div style="background:rgba(255,255,255,.15); border-radius:14px; padding:14px;">
-            <div style="font-size:11px; opacity:.85;">${i+1}º lugar</div>
-            <div style="font-weight:700; font-family:'Manrope',sans-serif;">${w.nome}</div>
-            <div style="font-size:11px; opacity:.9;">${w.setor} · ${w.filial}</div>
-          </div>`).join('')}
-      </div>
-      <p style="font-size:11px; margin-top:18px; opacity:.85;">Sorteio realizado com número aleatório auditável: ${c.randomSeed || '—'}</p>
-    </div>
-    <div style="text-align:center; margin-top:16px;">
-      <button class="btn btn-primary btn-sm" id="btnBaixarBannerGanhadores">⬇️ Baixar banner (PNG)</button>
-    </div>`;
-  document.getElementById('btnBaixarBannerGanhadores').addEventListener('click', ()=> baixarComoImagem('bannerGanhadoresArt', `ganhadores-${c.id}.png`));
-  logAction("Banner de ganhadores gerado", c.nome);
-});
-
 /* ======================= INIT ======================= */
-const _hadSavedState = loadState();
-aplicarTema(window.themePreference || 'auto');
 fillCampaignSelects();
 renderDashboard();
 renderCampaignGrid();
@@ -2344,40 +970,4 @@ renderParticipantsTable();
 renderEligibleTable();
 renderSorteioSetup();
 renderTimeline();
-renderBanco();
-if(window.lucide) lucide.createIcons();
-
-/* Ícones Lucide sempre em dia: sempre que qualquer tela muda (tabelas,
-   listas, cards renderizados de novo), este observador redesenha os ícones
-   sozinho. Assim nenhuma tela nova precisa lembrar de chamar isso na mão. */
-if(window.lucide){
-  const _iconObserver = new MutationObserver(()=>{
-    clearTimeout(window._iconObserverTimeout);
-    window._iconObserverTimeout = setTimeout(()=>{ if(window.lucide) lucide.createIcons(); }, 60);
-  });
-  _iconObserver.observe(document.body, {childList:true, subtree:true});
-}
-
-try{
-  if(_hadSavedState && currentUser && currentUser.matricula){
-    document.getElementById('loginScreen').style.display = "none";
-    document.getElementById('appRoot').style.display = "flex";
-    applyRole(currentUser.role);
-    showToast(`Sessão restaurada — bem-vindo(a) de volta, ${currentUser.nome}.`, "");
-    sincronizarDadosDoServidor(true);
-    if(!window._syncIntervalIniciado){
-      window._syncIntervalIniciado = true;
-      setInterval(()=> sincronizarDadosDoServidor(true), 20 * 1000);
-    }
-  } else if(_hadSavedState){
-    if(currentUser){ currentUser = null; saveState(); } // sessão salva não corresponde a nenhum usuário válido — exige novo login
-    showToast("Dados salvos anteriormente neste navegador foram restaurados.", "");
-  } else {
-    saveState(); // primeira vez neste navegador: grava o estado inicial
-  }
-}catch(e){
-  console.warn("Não foi possível restaurar a sessão salva — voltando para a tela de login.", e);
-  clearSavedState();
-  document.getElementById('appRoot').style.display = "none";
-  document.getElementById('loginScreen').style.display = "";
-}
+iniciarPPGTempoReal();
