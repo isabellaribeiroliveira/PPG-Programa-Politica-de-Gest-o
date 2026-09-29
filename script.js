@@ -106,7 +106,7 @@ let respondingCampaignId = null;
  * A tela de Rodadas consulta o Google Apps Script periodicamente.
  * Substitua somente PPG_API_URL pela URL da implantação do seu Apps Script.
  */
-const PPG_API_URL = "COLE_AQUI_A_URL_DA_IMPLANTACAO_DO_APPS_SCRIPT";
+const PPG_API_URL = "https://script.google.com/macros/s/AKfycby_jHTsQQvA9PwOrYwwcf7Z0494lwg1sWHy0v5ol2Z0te2642ICoBBpJuv0WnjFANWGxg/exec";
 const PPG_SYNC_INTERVAL_MS = 10000;
 let ppgSyncTimer = null;
 let ppgSyncBusy = false;
