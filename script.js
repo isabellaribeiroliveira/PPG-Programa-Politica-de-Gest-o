@@ -94,149 +94,11 @@ const _hoje = new Date();
 const _inicioC1 = new Date(_hoje.getTime() - 20*24*60*60*1000);
 const _fimC1 = new Date(_hoje.getTime() + 20*24*60*60*1000);
 
-let campaigns = [
-  {
-    id:"c1", nome:"PPG 2026.1 – Segurança da Informação",
-    descricao:"Avaliação sobre práticas de segurança da informação e proteção de dados corporativos.",
-    objetivo:"Reforçar a cultura de segurança da informação entre todos os colaboradores.",
-    inicio:isoLocal(_inicioC1), fim:isoLocal(_fimC1),
-    qtdGanhadores:4, premio:"Vale-compras R$ 200,00", criterios:"Nenhum critério adicional definido.",
-    status:"andamento", ganhadores:null,
-    questoes:[
-      {texto:"Qual é a prática recomendada ao identificar um e-mail suspeito?", type:"unica", options:[opt("Clicar no link para verificar a origem"),opt("Reportar ao canal de segurança e não interagir com o e-mail",true),opt("Responder pedindo mais informações ao remetente"),opt("Encaminhar para colegas avaliarem")]},
-      {texto:"O que caracteriza uma senha forte?", type:"unica", options:[opt("Data de nascimento e nome do usuário"),opt("Sequência numérica simples, como 123456"),opt("Combinação de letras, números e símbolos, sem dados pessoais",true),opt("A mesma senha usada em vários sistemas")]},
-      {texto:"Dados de clientes podem ser compartilhados sem autorização?", type:"vf", options:[opt("Verdadeiro"),opt("Falso",true)]},
-      {texto:"Qual canal deve ser usado para reportar incidentes de segurança?", type:"unica", options:[opt("Grupo de WhatsApp da equipe"),opt("Canal oficial de segurança da informação",true),opt("Rede social corporativa"),opt("E-mail pessoal do gestor")]}
-    ]
-  },
-  {
-    id:"c2", nome:"PPG 2025.4 – Qualidade e Processos",
-    descricao:"Questionário sobre procedimentos de qualidade, ISO 9001 e melhoria contínua.",
-    objetivo:"Consolidar o entendimento sobre os processos certificados pela ISO 9001.",
-    inicio:"2025-11-01T08:00", fim:"2025-11-20T18:00",
-    qtdGanhadores:4, premio:"Vale-compras R$ 200,00", criterios:"Priorizar setores ainda não contemplados em 2025.",
-    status:"encerrada", ganhadores:null,
-    questoes:[
-      {texto:"O que é uma não conformidade?", type:"unica", options:[opt("Um elogio do cliente"),opt("Um desvio em relação a um requisito estabelecido",true),opt("Uma sugestão de melhoria qualquer"),opt("Um novo processo criado")]},
-      {texto:"Qual a periodicidade da auditoria interna?", type:"unica", options:[opt("Definida no programa de auditoria da empresa",true),opt("Nunca é definida"),opt("Somente quando há reclamação"),opt("A cada 5 anos, sem exceções")]},
-      {texto:"Quais das opções abaixo fazem parte do ciclo PDCA?", type:"multiplas_respostas", options:[opt("Planejar",true),opt("Executar",true),opt("Ignorar os resultados"),opt("Verificar e agir",true)]},
-      {texto:"Quem é responsável por abrir uma RNC (Registro de Não Conformidade)?", type:"unica", options:[opt("Somente a diretoria"),opt("Qualquer colaborador que identificar o desvio",true),opt("Somente auditores externos"),opt("Ninguém, é automático")]}
-    ]
-  },
-  {
-    id:"c3", nome:"PPG 2025.3 – Ética e Compliance",
-    descricao:"Reforço das diretrizes do código de ética e canal de denúncias.",
-    objetivo:"Assegurar o conhecimento do código de ética por todos os colaboradores.",
-    inicio:"2025-08-01T08:00", fim:"2025-08-20T18:00",
-    qtdGanhadores:4, premio:"Vale-compras R$ 150,00", criterios:"Nenhum critério adicional definido.",
-    status:"finalizada",
-    ganhadores:[
-      {nome:"Paulo Dias", matricula:"100004", setor:"Financeiro", filial:"Filial Sul", funcao:"Analista Financeiro"},
-      {nome:"Nelson Dias", matricula:"100017", setor:"Qualidade", filial:"Matriz", funcao:"Analista da Qualidade"},
-      {nome:"Patrícia Dias", matricula:"100023", setor:"Recursos Humanos", filial:"Filial Oeste", funcao:"Assistente de RH"},
-      {nome:"Rodrigo Silva", matricula:"100028", setor:"Manutenção", filial:"Filial Norte", funcao:"Mecânico"}
-    ],
-    randomSeed:"748291063", justificativa:"Distribuição justa alcançada: 4 setores e 3 filiais distintas representadas entre os ganhadores.", responsavel:"Mariana Queiroz",
-    questoes:[
-      {texto:"Qual o canal oficial para registrar uma denúncia?", type:"unica", options:[opt("Comentário em rede social"),opt("Canal de denúncias da Ética e Compliance",true),opt("Conversa informal com colegas"),opt("E-mail pessoal do diretor")]},
-      {texto:"O que é conflito de interesses?", type:"unica", options:[opt("Quando interesses pessoais podem influenciar decisões profissionais",true),opt("Uma discordância entre colegas de equipe"),opt("Um erro de sistema"),opt("Uma reunião com clientes")]},
-      {texto:"Presentes de fornecedores devem ser sempre recusados, independentemente do valor?", type:"vf", options:[opt("Verdadeiro"),opt("Falso — a política define limites de valor e situações permitidas",true)]},
-      {texto:"Quem pode acionar o código de ética da empresa?", type:"unica", options:[opt("Somente gestores"),opt("Qualquer colaborador",true),opt("Somente o setor de Compliance"),opt("Somente fornecedores")]}
-    ]
-  },
-  {
-    id:"c4", nome:"PPG 2025.2 – Sustentabilidade e Meio Ambiente",
-    descricao:"Questionário sobre práticas sustentáveis, descarte correto de resíduos e eficiência energética.",
-    objetivo:"Fortalecer a cultura de sustentabilidade e responsabilidade ambiental na empresa.",
-    inicio:"2025-05-01T08:00", fim:"2025-05-20T18:00",
-    qtdGanhadores:4, premio:"Vale-compras R$ 150,00", criterios:"Nenhum critério adicional definido.",
-    status:"finalizada",
-    ganhadores:[
-      {nome:"Camila Ramos", matricula:"100110", setor:"Tecnologia da Informação", filial:"Matriz", funcao:"Analista de TI"},
-      {nome:"Thiago Barbosa", matricula:"100171", setor:"Operações", filial:"Norte", funcao:"Operador"},
-      {nome:"Bruna Castro", matricula:"100512", setor:"Marketing", filial:"Leste", funcao:"Analista de Marketing"},
-      {nome:"Diego Nunes", matricula:"100640", setor:"Logística", filial:"Sul", funcao:"Auxiliar de Logística"}
-    ],
-    randomSeed:"582917364", justificativa:"Distribuição justa alcançada: 4 setores e 4 filiais distintas representadas entre os ganhadores.", responsavel:"Mariana Queiroz",
-    questoes:[
-      {texto:"Qual o destino correto para pilhas e baterias usadas?", type:"unica", options:[opt("Lixo comum"),opt("Pontos de coleta seletiva específicos",true),opt("Ralo ou vaso sanitário"),opt("Queima em local aberto")]},
-      {texto:"O que significa a política dos 3 R's?", type:"unica", options:[opt("Reduzir, Reutilizar e Reciclar",true),opt("Reclamar, Repetir e Reagir"),opt("Registrar, Relatar e Revisar"),opt("Renovar, Remover e Repor")]},
-      {texto:"Manter equipamentos ligados sem uso ajuda a economizar energia?", type:"vf", options:[opt("Verdadeiro"),opt("Falso — desligar equipamentos ociosos reduz o consumo",true)]},
-      {texto:"Quais práticas abaixo contribuem para a sustentabilidade na empresa?", type:"multiplas_respostas", options:[opt("Impressão apenas quando necessária",true),opt("Descarte correto de resíduos eletrônicos",true),opt("Deixar torneiras abertas sem necessidade"),opt("Separação de recicláveis",true)]}
-    ]
-  },
-  {
-    id:"c5", nome:"PPG 2025.1 – Atendimento ao Cliente",
-    descricao:"Reforço das diretrizes de excelência no atendimento e relacionamento com o cliente.",
-    objetivo:"Padronizar o atendimento e elevar a satisfação dos clientes internos e externos.",
-    inicio:"2025-02-03T08:00", fim:"2025-02-20T18:00",
-    qtdGanhadores:4, premio:"Vale-compras R$ 150,00", criterios:"Nenhum critério adicional definido.",
-    status:"finalizada",
-    ganhadores:[
-      {nome:"Renata Alves", matricula:"100233", setor:"Atendimento", filial:"Matriz", funcao:"Atendente"},
-      {nome:"Marcos Vieira", matricula:"100788", setor:"Comercial", filial:"Oeste", funcao:"Vendedor"},
-      {nome:"Fábio Rocha", matricula:"100345", setor:"Produção", filial:"Norte", funcao:"Operador de Produção"},
-      {nome:"Larissa Melo", matricula:"100902", setor:"Financeiro", filial:"Sul", funcao:"Assistente Financeiro"}
-    ],
-    randomSeed:"913746205", justificativa:"Distribuição justa alcançada: 4 setores e 4 filiais distintas representadas entre os ganhadores.", responsavel:"Mariana Queiroz",
-    questoes:[
-      {texto:"Qual a postura correta ao atender um cliente insatisfeito?", type:"unica", options:[opt("Discutir para provar que ele está errado"),opt("Ouvir com atenção, sem interromper, e buscar uma solução",true),opt("Transferir a ligação sem explicação"),opt("Ignorar a reclamação")]},
-      {texto:"O que é essencial em um atendimento de qualidade?", type:"unica", options:[opt("Agilidade sem se importar com a clareza"),opt("Empatia, clareza e agilidade",true),opt("Falar o mínimo possível"),opt("Usar termos técnicos difíceis")]},
-      {texto:"É permitido prometer prazos que a empresa não pode cumprir para agradar o cliente?", type:"vf", options:[opt("Verdadeiro"),opt("Falso — promessas devem ser realistas e cumpríveis",true)]},
-      {texto:"Quais atitudes fortalecem a confiança do cliente na empresa?", type:"multiplas_respostas", options:[opt("Cumprir o que foi combinado",true),opt("Dar retorno dentro do prazo informado",true),opt("Deixar o cliente sem resposta"),opt("Ser transparente sobre prazos e limitações",true)]}
-    ]
-  },
-  {
-    id:"c6", nome:"PPG 2024.4 – Prevenção de Acidentes e Segurança do Trabalho",
-    descricao:"Questionário sobre uso de EPIs, sinalização de riscos e procedimentos de segurança.",
-    objetivo:"Reduzir a ocorrência de acidentes de trabalho por meio da conscientização contínua.",
-    inicio:"2024-11-01T08:00", fim:"2024-11-20T18:00",
-    qtdGanhadores:4, premio:"Vale-compras R$ 150,00", criterios:"Nenhum critério adicional definido.",
-    status:"finalizada",
-    ganhadores:[
-      {nome:"Eduardo Lima", matricula:"100057", setor:"Manutenção", filial:"Matriz", funcao:"Técnico de Manutenção"},
-      {nome:"Simone Cardoso", matricula:"100489", setor:"Recursos Humanos", filial:"Leste", funcao:"Analista de RH"},
-      {nome:"Rafael Nogueira", matricula:"100761", setor:"Almoxarifado", filial:"Oeste", funcao:"Auxiliar de Almoxarifado"},
-      {nome:"Vanessa Teixeira", matricula:"100815", setor:"Qualidade", filial:"Norte", funcao:"Analista da Qualidade"}
-    ],
-    randomSeed:"204958371", justificativa:"Distribuição justa alcançada: 4 setores e 4 filiais distintas representadas entre os ganhadores.", responsavel:"Mariana Queiroz",
-    questoes:[
-      {texto:"O uso de EPI (Equipamento de Proteção Individual) é obrigatório quando indicado?", type:"vf", options:[opt("Verdadeiro",true),opt("Falso")]},
-      {texto:"O que fazer ao identificar uma condição insegura no ambiente de trabalho?", type:"unica", options:[opt("Ignorar, não é da minha área"),opt("Reportar imediatamente ao responsável de segurança",true),opt("Resolver sozinho sem avisar ninguém"),opt("Esperar alguém se machucar para agir")]},
-      {texto:"Qual sinalização indica risco de choque elétrico?", type:"unica", options:[opt("Placa verde de saída"),opt("Placa amarela com símbolo de raio",true),opt("Placa azul de obrigatoriedade"),opt("Nenhuma sinalização é necessária")]},
-      {texto:"Quais são boas práticas de prevenção de acidentes?", type:"multiplas_respostas", options:[opt("Manter vias de circulação desobstruídas",true),opt("Usar EPI apenas quando alguém estiver fiscalizando"),opt("Reportar quase-acidentes",true),opt("Participar dos treinamentos de segurança",true)]}
-    ]
-  }
-];
+let campaigns = [];
 
-let participants = [
-  ...buildParticipants("c1", 34, 6),
-  ...buildParticipants("c2", 28, 5),
-  ...buildParticipants("c3", 22, 4),
-  ...buildParticipants("c4", 30, 5),
-  ...buildParticipants("c5", 26, 4),
-  ...buildParticipants("c6", 24, 4),
-];
+let participants = [];
 
-let wonHistory = [
-  {matricula:"100004", data:new Date(2025,7,21)},
-  {matricula:"100017", data:new Date(2025,7,21)},
-  {matricula:"100023", data:new Date(2025,7,21)},
-  {matricula:"100028", data:new Date(2025,7,21)},
-  {matricula:"100110", data:new Date(2025,4,20)},
-  {matricula:"100171", data:new Date(2025,4,20)},
-  {matricula:"100512", data:new Date(2025,4,20)},
-  {matricula:"100640", data:new Date(2025,4,20)},
-  {matricula:"100233", data:new Date(2025,1,20)},
-  {matricula:"100788", data:new Date(2025,1,20)},
-  {matricula:"100345", data:new Date(2025,1,20)},
-  {matricula:"100902", data:new Date(2025,1,20)},
-  {matricula:"100057", data:new Date(2024,10,20)},
-  {matricula:"100489", data:new Date(2024,10,20)},
-  {matricula:"100761", data:new Date(2024,10,20)},
-  {matricula:"100815", data:new Date(2024,10,20)},
-  {matricula:participants.find(p=>p.campaignId==="c1")?.matricula, data:new Date(2025,2,10)}
-];
+let wonHistory = [];
 
 /* ======================= BANCO DE PERGUNTAS ======================= */
 let questionBank = [
@@ -439,7 +301,7 @@ window.audVerPerfil = function(matricula){
       <td>${fmtDateTime(p.dataFim||p.data)}</td><td>${duracaoLabel(p.dataInicio, p.dataFim||p.data)}</td>
       <td><span class="${p.pct===100?'pct100':'pctless'}">${p.pct}%</span></td>
       <td>${audEligLabel(p)}</td>
-      <td>${ganhou ? '<span class="badge finalizada">🏆 Ganhador</span>' : '—'}</td>
+      <td>${ganhou ? '<span class="badge finalizada"><i data-lucide="trophy" style="width:12px;height:12px;vertical-align:-2px;"></i> Ganhador</span>' : '—'}</td>
     </tr>`;
   }).join('');
   const premiosHtml = premios.length
@@ -531,7 +393,7 @@ function saveState(){
       version: STATE_VERSION,
       campaigns, participants, wonHistory, questionBank, actionLog, ruleChangeLog,
       responseSeqCounter, currentUser, currentRole,
-      darkMode: document.body.classList.contains('dark'),
+      themePreference: window.themePreference || 'auto',
       savedAt: new Date()
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -556,7 +418,7 @@ function loadState(){
     if(typeof state.responseSeqCounter === 'number') responseSeqCounter = state.responseSeqCounter;
     currentUser = state.currentUser || null;
     currentRole = state.currentRole || "qualidade";
-    if(state.darkMode) document.body.classList.add('dark');
+    window.themePreference = state.themePreference || 'auto';
     return true;
   }catch(e){ console.warn("Não foi possível carregar os dados salvos:", e); return false; }
 }
@@ -596,7 +458,7 @@ const titles = {
   inicio:"Início", campanhas:"Rodadas", nova:"Nova Campanha", participantes:"Resultados",
   elegiveis:"Elegíveis", sorteio:"Sorteio", relatorios:"Relatórios", historico:"Histórico",
   banco:"Banco de Perguntas", auditoria:"Auditoria", config:"Configurações", responder:"Questionário",
-  "regras-excecoes":"Regras & Exceções", "divulgacao":"Divulgação",
+  "regras-excecoes":"Regras & Exceções", "divulgacao":"Divulgação", "fale-conosco":"Fale com a Qualidade", "importar-historico":"Importar Histórico",
   "campanha-atual":"Campanha Atual", "historico-colab":"Histórico", "meu-resultado":"Meu Resultado", regulamento:"Regulamento"
 };
 
@@ -628,6 +490,8 @@ function goToSection(target){
   if(target==="auditoria"){ renderAuditoria(); renderAuditoriaDetalhe(); }
   if(target==="regras-excecoes") renderRegrasExcecoes();
   if(target==="divulgacao") renderDivulgacao();
+  if(target==="fale-conosco" && currentRole==="qualidade") renderDuvidas();
+  if(target==="importar-historico") renderHistoricoImportado();
   if(target==="config" && currentRole==="qualidade") renderPedidosSenha();
   if(target==="campanha-atual") renderCampanhaAtual();
   if(target==="historico-colab") renderHistoricoColaborador();
@@ -645,7 +509,7 @@ function closeSidebarMobile(){ document.getElementById('sidebar').classList.remo
 const btnResetDemoData = document.getElementById('btnResetDemoData');
 if(btnResetDemoData){
   btnResetDemoData.addEventListener('click', ()=>{
-    if(confirm("Isso vai apagar todos os dados salvos neste navegador (campanhas, respostas, banco de perguntas) e voltar ao estado inicial de demonstração. Continuar?")){
+    if(confirm("Isso vai apagar os dados salvos neste navegador (sessão, tema, cache local) e recarregar a página. Os dados da planilha não são afetados. Continuar?")){
       clearSavedState();
       window.location.reload();
     }
@@ -731,7 +595,7 @@ const deepLinkCampaignId = urlParams.get('campanha');
 /* ======================= LOGIN ======================= */
 /* A autenticação de verdade agora mora na planilha (via Google Apps Script).
    Não existe mais senha nenhuma escrita aqui no código. */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycby8SoMLAFQiT-eMF7FxR_1mcmoJD9Fua8pf_pxHlQMZ9K5eJ0bDY-GII11CbLt7VYmGJQ/exec";
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbx7muTAi8Ywx_9nALTu8BV6saTvEnlRRgopWdpTNyUFbfAMT-wvfTzG1tisG6bevhuBVQ/exec";
 
 async function backendCall(action, payload){
   try{
@@ -758,8 +622,13 @@ async function backendCall(action, payload){
   }
 }
 
+function normalizarTextoCliente(s){
+  return String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+}
+const PAPEIS_QUALIDADE = ["qualidade", "admin", "administrador", "gestao", "gestor", "coordenacao", "coordenador"];
 function mapColaboradorParaUser(colab){
-  const role = String(colab.papel||"").toLowerCase() === "qualidade" ? "qualidade" : "colaborador";
+  const papelNorm = normalizarTextoCliente(colab.papel);
+  const role = PAPEIS_QUALIDADE.some(p => papelNorm.includes(p)) ? "qualidade" : "colaborador";
   return {
     matricula: String(colab.matricula), nome: colab.nome, role,
     setor: colab.setor, filial: colab.filial, funcao: colab.funcao, cargo: colab.cargo || colab.funcao,
@@ -890,6 +759,135 @@ document.getElementById('btnEsqueciSenha').addEventListener('click', ()=>{
   });
 });
 
+/* ======================= IMPORTAR HISTÓRICO DE CAMPANHAS PASSADAS ======================= */
+let historicoParseado = null;
+
+document.getElementById('btnBaixarModeloHistorico')?.addEventListener('click', ()=>{
+  const headers = ["campanha","periodoInicio","periodoFim","matricula","nome","setor","filial","funcao","percentualAcertos","ganhador","premio"];
+  const rows = [["PPG 2023.2 – Ética","2023-08-01","2023-08-20","100234","Ana Souza","TI","Matriz","Analista","100","Sim","Vale-compras R$ 150,00"]];
+  downloadCSV('modelo_historico_ppg.csv', headers, rows);
+});
+
+document.getElementById('historicoImportFile')?.addEventListener('change', function(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(evt){
+    try{
+      const data = new Uint8Array(evt.target.result);
+      const wb = XLSX.read(data, {type:'array'});
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, {defval:""});
+      historicoParseado = rows.map(r=>({
+        campanha: String(r.campanha || r.Campanha || '').trim(),
+        periodoInicio: String(r.periodoInicio || r['Período Início'] || r.inicio || '').trim(),
+        periodoFim: String(r.periodoFim || r['Período Fim'] || r.fim || '').trim(),
+        matricula: String(r.matricula || r.Matricula || r['Matrícula'] || '').trim(),
+        nome: String(r.nome || r.Nome || '').trim(),
+        setor: String(r.setor || r.Setor || '').trim(),
+        filial: String(r.filial || r.Filial || '').trim(),
+        funcao: String(r.funcao || r.Funcao || r['Função'] || '').trim(),
+        percentualAcertos: Number(r.percentualAcertos || r['% Acertos'] || r.pct || 0),
+        ganhador: /sim|true|1/i.test(String(r.ganhador || r.Ganhador || '')),
+        premio: String(r.premio || r.Premio || r['Prêmio'] || '').trim()
+      })).filter(r=>r.campanha && r.matricula);
+
+      if(!historicoParseado.length){ showToast("Não encontrei linhas válidas nesse arquivo. Confira se as colunas 'campanha' e 'matricula' estão preenchidas.","warning"); return; }
+
+      const campanhasUnicas = new Set(historicoParseado.map(r=>r.campanha));
+      const ganhadoresCount = historicoParseado.filter(r=>r.ganhador).length;
+      document.getElementById('historicoResumoPreview').innerHTML = `
+        <div class="stat"><b>${campanhasUnicas.size}</b><span>Campanha(s) encontrada(s)</span></div>
+        <div class="stat"><b>${historicoParseado.length}</b><span>Participações no arquivo</span></div>
+        <div class="stat"><b>${ganhadoresCount}</b><span>Marcado(s) como ganhador</span></div>`;
+
+      document.getElementById('tblHistoricoPreview').innerHTML = historicoParseado.slice(0,200).map(r=>`
+        <tr><td>${r.campanha}</td><td>${r.matricula}</td><td>${r.nome}</td><td>${r.setor}</td><td>${r.percentualAcertos}%</td><td>${r.ganhador?'🏆 Sim':'—'}</td></tr>
+      `).join('');
+      document.getElementById('historicoPreviewWrap').style.display = "block";
+      if(window.lucide) lucide.createIcons();
+    }catch(err){
+      showToast("Não foi possível ler o arquivo. Verifique se é .xlsx ou .csv com as colunas esperadas.","warning");
+    }
+    e.target.value = "";
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+document.getElementById('btnCancelarImportHistorico')?.addEventListener('click', ()=>{
+  historicoParseado = null;
+  document.getElementById('historicoPreviewWrap').style.display = "none";
+});
+
+document.getElementById('btnConfirmarImportHistorico')?.addEventListener('click', async ()=>{
+  if(!historicoParseado || !historicoParseado.length) return;
+  const btn = document.getElementById('btnConfirmarImportHistorico');
+  btn.disabled = true; btn.textContent = "Importando...";
+  const resp = await backendCall('importarHistorico', {linhas: historicoParseado, importadoPor: currentUser.nome});
+  btn.disabled = false; btn.innerHTML = '<i data-lucide="check"></i> Confirmar importação';
+  if(window.lucide) lucide.createIcons();
+  if(!resp.ok){ showToast(resp.erro || "Não foi possível importar.", "warning"); return; }
+  showToast(`${resp.importadas} linha(s) importada(s) com sucesso! Já fica visível para toda a equipe.`, "success");
+  logAction("Histórico importado", `${resp.importadas} linha(s) via arquivo`);
+  document.getElementById('historicoPreviewWrap').style.display = "none";
+  historicoParseado = null;
+  renderHistoricoImportado();
+});
+
+async function renderHistoricoImportado(){
+  const tbody = document.getElementById('tblHistoricoImportado');
+  if(!tbody) return;
+  tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--ink-soft); padding:16px;">Carregando…</td></tr>`;
+  const resp = await backendCall('getHistorico');
+  if(!resp.ok){
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--error); padding:16px;">${resp.erro || 'Não foi possível carregar.'}</td></tr>`;
+    return;
+  }
+  const linhas = resp.historico || [];
+  const porCampanha = {};
+  linhas.forEach(l=>{
+    if(!porCampanha[l.campanha]) porCampanha[l.campanha] = {periodo:`${l.periodoInicio} – ${l.periodoFim}`, total:0, ganhadores:0};
+    porCampanha[l.campanha].total++;
+    if(String(l.ganhador).toLowerCase() === 'sim') porCampanha[l.campanha].ganhadores++;
+  });
+  tbody.innerHTML = Object.entries(porCampanha).map(([nome, info])=>`
+    <tr><td>${nome}</td><td>${info.periodo}</td><td>${info.total}</td><td>${info.ganhadores}</td></tr>
+  `).join('') || `<tr><td colspan="4" style="text-align:center; color:var(--ink-soft); padding:16px;">Nenhum histórico importado ainda.</td></tr>`;
+}
+document.getElementById('btnAtualizarHistoricoImportado')?.addEventListener('click', renderHistoricoImportado);
+
+/* ======================= FALE COM A QUALIDADE ======================= */
+document.getElementById('formFaleConosco')?.addEventListener('submit', async function(e){
+  e.preventDefault();
+  const erroEl = document.getElementById('fcErro');
+  erroEl.style.display = "none";
+  const assunto = document.getElementById('fcAssunto').value.trim();
+  const mensagem = document.getElementById('fcMensagem').value.trim();
+  const btn = this.querySelector('button[type="submit"]');
+  btn.disabled = true; btn.textContent = "Enviando...";
+  const resp = await backendCall('enviarDuvida', {matricula: currentUser.matricula, assunto, mensagem});
+  btn.disabled = false; btn.innerHTML = '<i data-lucide="send"></i> Enviar para a Qualidade';
+  if(window.lucide) lucide.createIcons();
+  if(!resp.ok){ erroEl.textContent = resp.erro || "Não foi possível enviar sua mensagem."; erroEl.style.display = "block"; return; }
+  this.reset();
+  showToast("Mensagem enviada! A equipe de Qualidade foi avisada por e-mail.", "success");
+});
+async function renderDuvidas(){
+  const tbody = document.getElementById('tblDuvidas');
+  if(!tbody) return;
+  tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--ink-soft); padding:16px;">Carregando…</td></tr>`;
+  const resp = await backendCall('listarDuvidas');
+  if(!resp.ok){
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--error); padding:16px;">${resp.erro || 'Não foi possível carregar as mensagens.'}</td></tr>`;
+    return;
+  }
+  const duvidas = (resp.duvidas || []).sort((a,b)=> new Date(b.dataHora) - new Date(a.dataHora));
+  tbody.innerHTML = duvidas.map(d=>`
+    <tr><td>${fmtDateTime(new Date(d.dataHora))}</td><td>${d.matricula}</td><td>${d.nome}</td><td>${d.assunto}</td><td>${d.mensagem}</td></tr>
+  `).join('') || `<tr><td colspan="5" style="text-align:center; color:var(--ink-soft); padding:16px;">Nenhuma mensagem recebida ainda.</td></tr>`;
+}
+document.getElementById('btnAtualizarDuvidas')?.addEventListener('click', renderDuvidas);
+
 /* ======================= QUALIDADE: RESOLVER PEDIDOS DE SENHA ======================= */
 async function renderPedidosSenha(){
   const tbody = document.getElementById('tblPedidosSenha');
@@ -939,7 +937,8 @@ document.getElementById('btnLogout').addEventListener('click', ()=>{
   currentUser = null;
   saveState();
   document.getElementById('appRoot').style.display = "none";
-  document.getElementById('loginScreen').style.display = "flex";
+  document.getElementById('loginScreen').style.display = "";
+  document.getElementById('loginScreen').scrollTo(0, 0);
   document.getElementById('loginForm').reset();
 });
 function applyRole(role){
@@ -966,9 +965,28 @@ function applyRole(role){
 }
 
 /* ======================= TEMA ======================= */
-function setDarkMode(on){ document.body.classList.toggle('dark', on); document.getElementById('themeToggle').checked = on; saveState(); }
-document.getElementById('themeToggle').addEventListener('change', (e)=> setDarkMode(e.target.checked));
-document.getElementById('themeToggleTop').addEventListener('click', ()=> setDarkMode(!document.body.classList.contains('dark')));
+function setDarkMode(on){ document.body.classList.toggle('dark', on); }
+window.themePreference = 'auto';
+function aplicarTema(pref){
+  window.themePreference = pref;
+  const escuro = pref === 'auto'
+    ? !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    : pref === 'dark';
+  setDarkMode(escuro);
+  document.querySelectorAll('#themeTabs .login-tab').forEach(t => t.classList.toggle('active', t.dataset.theme === pref));
+  saveState();
+}
+document.querySelectorAll('#themeTabs .login-tab').forEach(tab=>{
+  tab.addEventListener('click', ()=> aplicarTema(tab.dataset.theme));
+});
+document.getElementById('themeToggleTop').addEventListener('click', ()=>{
+  aplicarTema(document.body.classList.contains('dark') ? 'light' : 'dark');
+});
+if(window.matchMedia){
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ()=>{
+    if(window.themePreference === 'auto') aplicarTema('auto');
+  });
+}
 
 /* ======================= TOAST ======================= */
 function showToast(msg, type=""){
@@ -1082,14 +1100,14 @@ function renderCampaignGrid(){
       <div style="display:flex; justify-content:space-between; align-items:flex-start;"><h4>${c.nome}</h4>${statusBadge(c.status)}</div>
       <div class="desc">${c.descricao}</div>
       <div class="meta">
-        <span>📅 ${c.inicio.replace('T',' ')} → ${c.fim.replace('T',' ')}</span>
-        <span>📝 ${c.questoes ? c.questoes.length : '—'} perguntas · 🏆 ${c.qtdGanhadores} ganhadores</span>
-        <span>👥 ${n} participantes · ✅ ${eligible.length} elegíveis</span>
+        <span><i data-lucide="calendar"></i> ${c.inicio.replace('T',' ')} → ${c.fim.replace('T',' ')}</span>
+        <span><i data-lucide="clipboard-list"></i> ${c.questoes ? c.questoes.length : '—'} perguntas · <i data-lucide="trophy"></i> ${c.qtdGanhadores} ganhadores</span>
+        <span><i data-lucide="users"></i> ${n} participantes · <i data-lucide="check-circle-2"></i> ${eligible.length} elegíveis</span>
       </div>
       <div class="actions">
         <button class="btn btn-ghost btn-sm" onclick="goToParticipants('${c.id}')">Ver participantes</button>
         <button class="btn btn-outline btn-sm" onclick="loadCampaignForEdit('${c.id}')">Editar</button>
-        <button class="btn btn-outline btn-sm" onclick="openShareModal('${c.id}')">🔗 Compartilhar</button>
+        <button class="btn btn-outline btn-sm" onclick="openShareModal('${c.id}')"><i data-lucide="share-2"></i> Compartilhar</button>
       </div>
     </div>`;
   }).join('') || `<p style="color:var(--ink-soft); font-size:13px;">Nenhuma campanha cadastrada.</p>`;
@@ -1742,9 +1760,9 @@ function colaboradorStreakStrip(){
   const media = total ? Math.round(mine.reduce((a,p)=>a+p.pct,0)/total) : 0;
   const premios = campaigns.filter(c=>c.ganhadores && c.ganhadores.some(w=>w.matricula===currentUser.matricula)).length;
   return `<div class="streak-strip">
-    <div class="streak-chip fire"><div class="si">🔥</div><div><b>${total}</b><span>Campanhas respondidas</span></div></div>
+    <div class="streak-chip fire"><div class="si"><i data-lucide="flame"></i></div><div><b>${total}</b><span>Campanhas respondidas</span></div></div>
     <div class="streak-chip star"><div class="si">⭐</div><div><b>${media}%</b><span>Média de acertos</span></div></div>
-    <div class="streak-chip trophy"><div class="si">🏆</div><div><b>${premios}</b><span>Vezes premiado(a)</span></div></div>
+    <div class="streak-chip trophy"><div class="si"><i data-lucide="trophy"></i></div><div><b>${premios}</b><span>Vezes premiado(a)</span></div></div>
   </div>`;
 }
 function renderCampanhaAtual(){
@@ -1755,7 +1773,7 @@ function renderCampanhaAtual(){
   html += colaboradorStreakStrip();
   if(!open.length){
     html += `<div class="panel fun-empty">
-      <div class="fe-icon">🕒</div>
+      <div class="fe-icon"><i data-lucide="clock"></i></div>
       <h3>Nenhuma campanha em andamento</h3>
       <p class="hint">Assim que uma nova campanha do PPG for aberta, ela aparecerá aqui.</p>
     </div>`;
@@ -1770,12 +1788,12 @@ function renderCampanhaAtual(){
         ${statusBadge(c.status)}
       </div>
       <div class="meta" style="margin:14px 0;">
-        <span>📅 Responda até ${c.fim.replace('T',' ')}</span>
-        <span>🏆 Prêmio: ${c.premio || 'a definir'}</span>
+        <span><i data-lucide="calendar"></i> Responda até ${c.fim.replace('T',' ')}</span>
+        <span><i data-lucide="gift"></i> Prêmio: ${c.premio || 'a definir'}</span>
       </div>
       ${answered
         ? `<button class="btn btn-ghost" onclick="openQuiz('${c.id}')">Ver meu resultado</button>`
-        : `<button class="btn btn-primary" onclick="openQuiz('${c.id}')">🚀 Responder agora</button>`}
+        : `<button class="btn btn-primary" onclick="openQuiz('${c.id}')"><i data-lucide="rocket"></i> Responder agora</button>`}
     </div>`;
   }).join('');
   body.innerHTML = html;
@@ -1798,7 +1816,7 @@ function renderHistoricoColaborador(){
         <button class="btn btn-outline btn-sm" onclick="openQuiz('${p.campaignId}')">Ver resultado</button>
       </div>
     </div>`;
-  }).join('') || `<div class="panel fun-empty"><div class="fe-icon">📭</div>Você ainda não participou de nenhuma campanha.</div>`;
+  }).join('') || `<div class="panel fun-empty"><div class="fe-icon"><i data-lucide="inbox"></i></div>Você ainda não participou de nenhuma campanha.</div>`;
   body.innerHTML = html;
 }
 function renderMeuResultado(){
@@ -1807,7 +1825,7 @@ function renderMeuResultado(){
   const mine = participants.filter(p=>p.matricula===currentUser.matricula).sort((a,b)=>b.data-a.data);
   if(!mine.length){
     body.innerHTML = mascotBubble("Você ainda não respondeu nenhuma campanha — que tal começar agora?") +
-      `<div class="panel fun-empty"><div class="fe-icon">🤔</div>Assim que você responder, seu resultado mais recente aparece aqui.</div>`;
+      `<div class="panel fun-empty"><div class="fe-icon"><i data-lucide="hourglass"></i></div>Assim que você responder, seu resultado mais recente aparece aqui.</div>`;
     return;
   }
   const latest = mine[0];
@@ -1833,7 +1851,7 @@ function renderMeuResultado(){
           <h3>🔒 Você não está elegível para o sorteio desta rodada</h3>
           <p><b>Motivo:</b> ${meuExcluido.motivo}</p>
           <p class="hint">A elegibilidade é calculada automaticamente pelo sistema, seguindo os mesmos 3 critérios oficiais para todos os colaboradores, sem exceção. Veja o detalhamento completo das regras abaixo.</p>
-          <button class="btn btn-outline btn-sm" id="btnVerRegrasElegibilidade">📜 Ver regras completas</button>
+          <button class="btn btn-outline btn-sm" id="btnVerRegrasElegibilidade"><i data-lucide="scroll-text"></i> Ver regras completas</button>
         </div>`
       : '';
   body.insertAdjacentHTML('beforeend', elegHtml);
@@ -2092,9 +2110,9 @@ document.querySelectorAll('.report-btn').forEach(btn=>{
 function renderTimeline(){
   document.getElementById('timeline').innerHTML = campaigns.filter(c=>c.status==="finalizada" || c.status==="encerrada").map(c=>{
     const {eligible} = evaluateEligibility(c.id);
-    const winnersHtml = c.ganhadores ? `<div class="tl-winners">${c.ganhadores.map(w=>`<span class="chip">🏆 ${w.nome} · ${w.setor}</span>`).join('')}</div>` : `<div class="tl-winners"><span class="chip">Sorteio pendente de execução</span></div>`;
+    const winnersHtml = c.ganhadores ? `<div class="tl-winners">${c.ganhadores.map(w=>`<span class="chip"><i data-lucide="trophy" style="width:12px;height:12px;vertical-align:-2px;"></i> ${w.nome} · ${w.setor}</span>`).join('')}</div>` : `<div class="tl-winners"><span class="chip">Sorteio pendente de execução</span></div>`;
     const metaHtml = c.ganhadores ? `
-      <div class="tl-meta"><span>👥 ${campaignParticipants(c.id).length} participantes</span><span>✅ ${eligible.length} elegíveis avaliados</span><span>🎲 nº aleatório: ${c.randomSeed || "—"}</span><span>👤 responsável: ${c.responsavel || "—"}</span></div>
+      <div class="tl-meta"><span><i data-lucide="users"></i> ${campaignParticipants(c.id).length} participantes</span><span><i data-lucide="check-circle-2"></i> ${eligible.length} elegíveis avaliados</span><span><i data-lucide="dices"></i> nº aleatório: ${c.randomSeed || "—"}</span><span><i data-lucide="user"></i> responsável: ${c.responsavel || "—"}</span></div>
       <div class="hint" style="margin-top:6px;">${c.justificativa || ""}</div>` : "";
     return `<div class="tl-item"><div class="tl-dot"></div><div class="tl-body"><h4>${c.nome}</h4><p>${c.inicio.replace('T',' ')} → ${c.fim.replace('T',' ')} · ${statusBadge(c.status)}</p>${winnersHtml}${metaHtml}</div></div>`;
   }).join('') || `<p style="color:var(--ink-soft); font-size:13px;">Nenhuma campanha encerrada ainda.</p>`;
@@ -2178,7 +2196,7 @@ document.getElementById('btnGerarDivulgacao').addEventListener('click', ()=>{
     </div>
     <div style="text-align:center; margin-top:16px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
       <button class="btn btn-primary btn-sm" id="btnBaixarDivulgacao">⬇️ Baixar como imagem (PNG)</button>
-      <button class="btn btn-outline btn-sm" onclick="openShareModal('${c.id}')">🔗 Ver link e copiar</button>
+      <button class="btn btn-outline btn-sm" onclick="openShareModal('${c.id}')"><i data-lucide="share-2"></i> Ver link e copiar</button>
     </div>`;
   document.getElementById('btnBaixarDivulgacao').addEventListener('click', ()=> baixarComoImagem('divBannerArt', `divulgacao-${c.id}.png`));
   logAction("Arte de divulgação gerada", c.nome);
@@ -2215,6 +2233,7 @@ document.getElementById('btnGerarBannerGanhadores').addEventListener('click', ()
 
 /* ======================= INIT ======================= */
 const _hadSavedState = loadState();
+aplicarTema(window.themePreference || 'auto');
 fillCampaignSelects();
 renderDashboard();
 renderCampaignGrid();
@@ -2226,7 +2245,7 @@ renderBanco();
 if(window.lucide) lucide.createIcons();
 
 try{
-  if(_hadSavedState && currentUser && USERS[currentUser.matricula]){
+  if(_hadSavedState && currentUser && currentUser.matricula){
     document.getElementById('loginScreen').style.display = "none";
     document.getElementById('appRoot').style.display = "flex";
     applyRole(currentUser.role);
@@ -2235,11 +2254,11 @@ try{
     if(currentUser){ currentUser = null; saveState(); } // sessão salva não corresponde a nenhum usuário válido — exige novo login
     showToast("Dados salvos anteriormente neste navegador foram restaurados.", "");
   } else {
-    saveState(); // primeira vez neste navegador: grava os dados de demonstração como ponto de partida
+    saveState(); // primeira vez neste navegador: grava o estado inicial
   }
 }catch(e){
   console.warn("Não foi possível restaurar a sessão salva — voltando para a tela de login.", e);
   clearSavedState();
   document.getElementById('appRoot').style.display = "none";
-  document.getElementById('loginScreen').style.display = "flex";
+  document.getElementById('loginScreen').style.display = "";
 }

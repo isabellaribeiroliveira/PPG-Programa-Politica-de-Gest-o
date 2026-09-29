@@ -26,7 +26,7 @@
       <ul>
         <li>Sua <b>matrícula</b> e <b>senha</b> são as mesmas do sistema interno da empresa.</li>
         <li>Esqueceu a senha? Fale com a equipe de <b>Qualidade</b>.</li>
-        <li>Só testando o sistema? Toque em <b>"Ver credenciais de teste"</b>, logo abaixo do botão Entrar.</li>
+        <li>É seu primeiro acesso? Toque em <b>"Como faço meu primeiro acesso?"</b>, logo abaixo do botão Entrar.</li>
         <li>Quer conhecer o programa antes de acessar? Role a tela para baixo 👇</li>
       </ul>
     </div>
@@ -81,7 +81,7 @@
     <section class="ll-steps">
       <div class="ll-step">
         <div class="ll-step-num">1</div>
-        <h4>📋 Responda o questionário</h4>
+        <h4><i data-lucide="clipboard-list"></i> Responda o questionário</h4>
         <p>Poucas perguntas, direto ao ponto, sobre o tema da rodada atual.</p>
       </div>
       <div class="ll-step">
@@ -91,7 +91,7 @@
       </div>
       <div class="ll-step">
         <div class="ll-step-num">3</div>
-        <h4>🎉 Concorra ao sorteio</h4>
+        <h4><i data-lucide="party-popper"></i> Concorra ao sorteio</h4>
         <p>Sorteio auditável e transparente, com distribuição justa entre setores e filiais.</p>
       </div>
     </section>
@@ -99,9 +99,9 @@
     <section class="ll-block ll-rules">
       <h3>Critérios de elegibilidade</h3>
       <ul>
-        <li>✅ Ter 100% de acertos no questionário da rodada.</li>
-        <li>✅ Não ocupar um cargo de liderança impedido de participar (regra oficial do programa).</li>
-        <li>✅ Não ter sido premiado nos últimos 2 anos.</li>
+        <li><i data-lucide="check-circle-2"></i> Ter 100% de acertos no questionário da rodada.</li>
+        <li><i data-lucide="check-circle-2"></i> Não ocupar um cargo de liderança impedido de participar (regra oficial do programa).</li>
+        <li><i data-lucide="check-circle-2"></i> Não ter sido premiado nos últimos 2 anos.</li>
       </ul>
       <p class="hint">Todas as regras, o passo a passo do sorteio e o histórico completo ficam disponíveis para consulta em <b>Regras e Transparência</b>, dentro do sistema.</p>
     </section>
@@ -137,6 +137,7 @@
           <button class="menu-item sub" data-target="historico"><i data-lucide="history"></i><span class="label">Histórico</span></button>
           <button class="menu-item sub" data-target="banco"><i data-lucide="database"></i><span class="label">Banco de Perguntas</span></button>
           <button class="menu-item sub" data-target="regras-excecoes"><i data-lucide="scale"></i><span class="label">Regras & Exceções</span></button>
+          <button class="menu-item sub" data-target="importar-historico"><i data-lucide="upload-cloud"></i><span class="label">Importar Histórico</span></button>
         </div>
       </div>
 
@@ -144,6 +145,7 @@
       <button class="menu-item qualidade-only" data-target="sorteio"><i data-lucide="dices"></i><span class="label">Sorteio</span></button>
       <button class="menu-item qualidade-only" data-target="divulgacao"><i data-lucide="megaphone"></i><span class="label">Divulgação</span></button>
       <button class="menu-item qualidade-only" data-target="auditoria"><i data-lucide="shield-check"></i><span class="label">Auditoria</span></button>
+      <button class="menu-item qualidade-only" data-target="fale-conosco"><i data-lucide="message-circle-question"></i><span class="label">Mensagens recebidas</span></button>
       <button class="menu-item qualidade-only" data-target="relatorios"><i data-lucide="file-text"></i><span class="label">Relatórios</span></button>
 
       <!-- ===== Perfil Colaborador ===== -->
@@ -151,10 +153,11 @@
       <button class="menu-item colaborador-only" data-target="historico-colab"><i data-lucide="history"></i><span class="label">Histórico</span></button>
       <button class="menu-item colaborador-only" data-target="meu-resultado"><i data-lucide="award"></i><span class="label">Meu Resultado</span></button>
       <button class="menu-item colaborador-only" data-target="regulamento"><i data-lucide="book-open"></i><span class="label">Regulamento</span></button>
+      <button class="menu-item colaborador-only" data-target="fale-conosco"><i data-lucide="message-circle-question"></i><span class="label">Fale com a Qualidade</span></button>
 
       <button class="menu-item" data-target="config"><i data-lucide="settings"></i><span class="label">Configurações</span></button>
     </nav>
-    <div class="sidebar-foot">v4.0 · Protótipo funcional<br>Dados fictícios para demonstração</div>
+    <div class="sidebar-foot">PPG · Programa Política de Gestão</div>
   </aside>
 
   <div class="overlay" id="overlay"></div>
@@ -236,10 +239,10 @@
           <div class="form-grid">
             <div class="field"><label>Quantidade de ganhadores</label><input type="number" name="qtdGanhadores" min="1" value="4"></div>
             <div class="field"><label>Descrição do prêmio</label><input type="text" name="premio" placeholder="Ex: Vale-compras R$ 200,00"></div>
-            <div class="field full"><label>Critérios específicos da campanha <span class="lock-note">🔒 Somente Qualidade</span></label><textarea name="criterios" rows="2" placeholder="Ex: Priorizar setores que ainda não foram contemplados em 2026"></textarea></div>
+            <div class="field full"><label>Critérios específicos da campanha <span class="lock-note"><i data-lucide="lock"></i> Somente Qualidade</span></label><textarea name="criterios" rows="2" placeholder="Ex: Priorizar setores que ainda não foram contemplados em 2026"></textarea></div>
           </div>
 
-          <div class="form-subhead"><div class="fsh-icon"><i data-lucide="help-circle"></i></div><h3>Questionário</h3><span class="lock-note" style="margin-left:auto;">🔒 Gabarito visível apenas para a Qualidade</span></div>
+          <div class="form-subhead"><div class="fsh-icon"><i data-lucide="help-circle"></i></div><h3>Questionário</h3><span class="lock-note" style="margin-left:auto;"><i data-lucide="lock"></i> Gabarito visível apenas para a Qualidade</span></div>
           <div class="hint">Monte as perguntas diretamente no sistema, ou reaproveite uma pergunta já cadastrada no Banco de Perguntas.</div>
 
           <div class="bq-picker">
@@ -310,7 +313,7 @@
           <div id="sorteioResultActions" style="display:none; gap:10px; margin-top:14px;">
             <button class="btn btn-ghost" id="btnValidarSorteio">✓ Validar resultado</button>
             <button class="btn btn-outline" id="btnRegistrarHistorico">Registrar no histórico</button>
-            <button class="btn btn-outline" id="btnRelatorioOficial">📄 Gerar relatório oficial</button>
+            <button class="btn btn-outline" id="btnRelatorioOficial"><i data-lucide="file-text"></i> Gerar relatório oficial</button>
           </div>
         </div>
       </section>
@@ -347,7 +350,7 @@
           <div class="bq-alert"><i data-lucide="info" style="width:15px;height:15px;"></i> Perguntas usadas há menos de 2 anos recebem um alerta — mas a Qualidade pode reutilizá-las se necessário.</div>
           <div class="bq-toolbar">
             <label class="btn btn-outline btn-sm" style="cursor:pointer;">
-              📥 Importar Excel/CSV <input type="file" id="bqImportFile" accept=".csv,.xlsx,.xls" style="display:none;">
+              <i data-lucide="upload"></i> Importar Excel/CSV <input type="file" id="bqImportFile" accept=".csv,.xlsx,.xls" style="display:none;">
             </label>
           </div>
           <div class="table-wrap">
@@ -417,6 +420,56 @@
         </div>
       </section>
 
+      <!-- ================= IMPORTAR HISTÓRICO (Qualidade) ================= -->
+      <section class="section qualidade-only" id="sec-importar-historico">
+        <div class="section-head"><div><h2>Importar Histórico</h2><p>Suba uma planilha com campanhas anteriores do PPG (de antes deste sistema) para manter o histórico completo.</p></div></div>
+
+        <div class="panel">
+          <h3><i data-lucide="info"></i> Formato esperado da planilha</h3>
+          <p class="hint" style="margin-bottom:10px;">Uma linha por participante, com estas colunas (a ordem não importa, mas os nomes devem ser parecidos com estes):</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>campanha</th><th>periodoInicio</th><th>periodoFim</th><th>matricula</th><th>nome</th><th>setor</th><th>filial</th><th>funcao</th><th>percentualAcertos</th><th>ganhador</th><th>premio</th></tr></thead>
+              <tbody><tr><td>PPG 2023.2 – Ética</td><td>2023-08-01</td><td>2023-08-20</td><td>100234</td><td>Ana Souza</td><td>TI</td><td>Matriz</td><td>Analista</td><td>100</td><td>Sim</td><td>Vale-compras R$ 150,00</td></tr></tbody>
+            </table>
+          </div>
+          <button class="btn btn-outline btn-sm" id="btnBaixarModeloHistorico" style="margin-top:12px;"><i data-lucide="download"></i> Baixar modelo (.csv)</button>
+        </div>
+
+        <div class="panel">
+          <h3><i data-lucide="upload-cloud"></i> Subir planilha</h3>
+          <label class="btn btn-primary" style="cursor:pointer; display:inline-flex;">
+            <i data-lucide="upload"></i> Escolher arquivo (.xlsx ou .csv)
+            <input type="file" id="historicoImportFile" accept=".csv,.xlsx,.xls" style="display:none;">
+          </label>
+          <div id="historicoPreviewWrap" style="display:none; margin-top:16px;">
+            <div class="sorteio-stats" id="historicoResumoPreview"></div>
+            <div class="table-wrap" style="max-height:320px; overflow-y:auto;">
+              <table>
+                <thead><tr><th>Campanha</th><th>Matrícula</th><th>Nome</th><th>Setor</th><th>%</th><th>Ganhador</th></tr></thead>
+                <tbody id="tblHistoricoPreview"></tbody>
+              </table>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:14px;">
+              <button class="btn btn-primary" id="btnConfirmarImportHistorico"><i data-lucide="check"></i> Confirmar importação</button>
+              <button class="btn btn-outline" id="btnCancelarImportHistorico">Cancelar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3><i data-lucide="history"></i> Já importado</h3>
+          <div class="hint">Campanhas passadas já registradas no histórico compartilhado</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Campanha</th><th>Período</th><th>Participantes</th><th>Ganhadores</th></tr></thead>
+              <tbody id="tblHistoricoImportado"></tbody>
+            </table>
+          </div>
+          <button class="btn btn-outline btn-sm" id="btnAtualizarHistoricoImportado" style="margin-top:12px;"><i data-lucide="refresh-cw"></i> Atualizar lista</button>
+        </div>
+      </section>
+
       <!-- ================= DIVULGAÇÃO (Qualidade) ================= -->
       <section class="section qualidade-only" id="sec-divulgacao">
         <div class="section-head"><div><h2>Divulgação</h2><p>Gere uma arte de divulgação da campanha (com link e QR Code) e, após o sorteio, o banner dos ganhadores.</p></div></div>
@@ -427,7 +480,7 @@
             <div class="field full"><label>Campanha</label><select id="divCampanha"></select></div>
           </div>
           <div style="display:flex; gap:10px; margin-top:14px;">
-            <button class="btn btn-primary" id="btnGerarDivulgacao">🪧 Gerar arte de divulgação</button>
+            <button class="btn btn-primary" id="btnGerarDivulgacao"><i data-lucide="megaphone"></i> Gerar arte de divulgação</button>
           </div>
         </div>
         <div class="panel" id="divPreviewWrap" style="display:none;"></div>
@@ -439,7 +492,7 @@
             <div class="field full"><label>Campanha</label><select id="divCampanhaGanhadores"></select></div>
           </div>
           <div style="display:flex; gap:10px; margin-top:14px;">
-            <button class="btn btn-primary" id="btnGerarBannerGanhadores">🏆 Gerar banner dos ganhadores</button>
+            <button class="btn btn-primary" id="btnGerarBannerGanhadores"><i data-lucide="trophy"></i> Gerar banner dos ganhadores</button>
           </div>
         </div>
         <div class="panel" id="bannerGanhadoresWrap" style="display:none;"></div>
@@ -464,8 +517,8 @@
           <div style="display:flex; gap:10px; margin-top:14px;">
             <button class="btn btn-primary btn-sm" id="audAplicarFiltros">Aplicar filtros</button>
             <button class="btn btn-outline btn-sm" id="audLimparFiltros">Limpar filtros</button>
-            <button class="btn btn-outline btn-sm" id="audExportXlsx">📊 Exportar .xlsx</button>
-            <button class="btn btn-outline btn-sm" id="audExportPdf">📄 Exportar .pdf</button>
+            <button class="btn btn-outline btn-sm" id="audExportXlsx"><i data-lucide="file-spreadsheet"></i> Exportar .xlsx</button>
+            <button class="btn btn-outline btn-sm" id="audExportPdf"><i data-lucide="file-text"></i> Exportar .pdf</button>
           </div>
         </div>
 
@@ -580,19 +633,44 @@
         </div>
       </section>
 
-      <!-- ================= CONFIGURAÇÕES (ambos os perfis) ================= -->
+      <!-- ================= FALE COM A QUALIDADE (ambos os perfis, conteúdo diferente) ================= -->
+      <section class="section" id="sec-fale-conosco">
+        <div class="section-head colaborador-only"><div><h2>Fale com a Qualidade</h2><p>Dúvidas, sugestões ou problemas com o PPG? Manda pra gente.</p></div></div>
+        <div class="section-head qualidade-only"><div><h2>Mensagens recebidas</h2><p>Dúvidas enviadas pelos colaboradores através do aplicativo.</p></div></div>
+
+        <form class="panel colaborador-only" id="formFaleConosco">
+          <div class="field" style="margin-bottom:12px;"><label>Assunto</label><input type="text" id="fcAssunto" placeholder="Ex: Dúvida sobre o sorteio" required></div>
+          <div class="field" style="margin-bottom:6px;"><label>Mensagem</label><textarea id="fcMensagem" rows="5" placeholder="Escreva sua dúvida ou sugestão..." required></textarea></div>
+          <div class="login-error" id="fcErro"></div>
+          <button type="submit" class="btn btn-primary" style="margin-top:12px;"><i data-lucide="send"></i> Enviar para a Qualidade</button>
+        </form>
+
+        <div class="panel qualidade-only">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Data/hora</th><th>Matrícula</th><th>Nome</th><th>Assunto</th><th>Mensagem</th></tr></thead>
+              <tbody id="tblDuvidas"></tbody>
+            </table>
+          </div>
+          <button class="btn btn-outline btn-sm" id="btnAtualizarDuvidas" style="margin-top:12px;"><i data-lucide="refresh-cw"></i> Atualizar lista</button>
+        </div>
+      </section>
       <section class="section" id="sec-config">
         <div class="section-head"><div><h2>Configurações</h2><p id="configSubtitle">Preferências pessoais e parâmetros do sistema.</p></div></div>
-        <div class="panel"><h3>Aparência</h3><div class="hint">Disponível para todos os perfis</div>
-          <div style="display:flex; align-items:center; gap:12px;"><label class="switch"><input type="checkbox" id="themeToggle"><span class="switch-track"></span></label><span style="font-size:13px;">Tema escuro</span></div>
+        <div class="panel"><h3><i data-lucide="sun-moon"></i> Aparência</h3><div class="hint">Disponível para todos os perfis — "Automático" segue o tema do seu aparelho</div>
+          <div class="login-tabs" id="themeTabs" style="max-width:360px; margin-top:10px;">
+            <button type="button" class="login-tab" data-theme="auto"><i data-lucide="monitor"></i> Automático</button>
+            <button type="button" class="login-tab" data-theme="light"><i data-lucide="sun"></i> Claro</button>
+            <button type="button" class="login-tab" data-theme="dark"><i data-lucide="moon"></i> Escuro</button>
+          </div>
         </div>
         <div class="panel">
-          <h3>🔒 Minha senha</h3>
+          <h3><i data-lucide="lock"></i> Minha senha</h3>
           <div class="hint">Disponível para todos os perfis</div>
           <button class="btn btn-outline btn-sm" id="btnTrocarMinhaSenha" style="margin-top:10px;">Trocar minha senha</button>
         </div>
         <div class="panel qualidade-only">
-          <h3>🔑 Pedidos de redefinição de senha</h3>
+          <h3><i data-lucide="key-round"></i> Pedidos de redefinição de senha</h3>
           <div class="hint">Vem da planilha em tempo real — resolva liberando uma senha temporária para a pessoa.</div>
           <div class="table-wrap">
             <table>
@@ -600,7 +678,7 @@
               <tbody id="tblPedidosSenha"></tbody>
             </table>
           </div>
-          <button class="btn btn-outline btn-sm" id="btnAtualizarPedidosSenha" style="margin-top:12px;">🔄 Atualizar lista</button>
+          <button class="btn btn-outline btn-sm" id="btnAtualizarPedidosSenha" style="margin-top:12px;"><i data-lucide="refresh-cw"></i> Atualizar lista</button>
         </div>
         <div class="panel">
           <h3>Dados e armazenamento</h3>
@@ -609,7 +687,7 @@
             <span style="width:9px;height:9px;border-radius:50%; background:var(--success); display:inline-block;"></span>
             <span style="font-size:13px; color:var(--ink-soft);">Salvamento automático ativo — os dados continuam aqui mesmo recarregando a página</span>
           </div>
-          <button class="btn btn-outline btn-sm" id="btnResetDemoData">🗑️ Zerar e recomeçar com os dados de demonstração</button>
+          <button class="btn btn-outline btn-sm" id="btnResetDemoData"><i data-lucide="trash-2"></i> Limpar dados salvos neste navegador</button>
         </div>
         <div class="two-col qualidade-only">
           <div class="panel"><h3>Regras de elegibilidade</h3><div class="hint">Gerenciadas pela equipe da Qualidade</div>
