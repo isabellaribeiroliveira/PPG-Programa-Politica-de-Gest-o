@@ -43,7 +43,7 @@
   .login-hero, .login-landing{ position:relative; z-index:1; }
   .login-hero{min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px;}
   .login-card{width:100%; max-width:460px; background:var(--card); border-radius:18px; padding:34px 30px; box-shadow:0 20px 60px rgba(0,0,0,0.35);}
-  .login-mark{width:52px;height:52px;border-radius:14px; background:var(--primary); color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Manrope'; font-weight:800; font-size:19px; margin-bottom:16px;}
+  .login-logo{height:58px; width:auto; max-width:230px; object-fit:contain; margin:0 auto 18px; display:block;}
   .login-card h2{font-size:20px;}
   .login-card p{font-size:12.5px; color:var(--ink-soft); margin:6px 0 22px;}
   .login-demo{background:var(--bg); border-radius:10px; padding:10px 12px; font-size:11.5px; color:var(--ink-soft); margin-top:16px; line-height:1.6;}
@@ -53,7 +53,7 @@
   .app{display:flex; min-height:100vh;}
   .sidebar{width:252px; flex-shrink:0; background:linear-gradient(180deg, var(--secondary) 0%, #023831 100%); color:#EAF7F5; display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; z-index:40; transition:transform .25s ease;}
   .brand{display:flex; align-items:center; gap:10px; padding:22px 20px 18px; border-bottom:1px solid rgba(255,255,255,0.12);}
-  .brand-mark{width:38px;height:38px;border-radius:10px; background:var(--primary); display:flex;align-items:center;justify-content:center; font-family:'Manrope',sans-serif;font-weight:800;font-size:15px;color:#fff; flex-shrink:0;}
+  .brand-logo{width:38px; height:38px; object-fit:contain; flex-shrink:0;}
   .brand-text h1{font-size:16px;color:#fff;}
   .brand-text span{font-size:11px;color:#B9DCD8;letter-spacing:.02em;}
   nav.menu{padding:14px 12px; display:flex; flex-direction:column; gap:2px; overflow-y:auto; flex:1;}
@@ -494,12 +494,49 @@
     animation:optionPop .25s ease;
   }
   @keyframes optionPop{0%{transform:scale(.96);} 60%{transform:scale(1.02);} 100%{transform:scale(1);}}
-  .duo-progress{height:14px !important; position:relative;}
-  .duo-progress-fill{position:relative;}
-  .duo-progress-fill:after{
-    content:"🏃"; position:absolute; right:-10px; top:50%; transform:translateY(-50%); font-size:16px;
-  }
   .duo-nav .btn-primary{border-radius:16px;}
+
+  /* ---------- Pop-up de celebração ---------- */
+  .celebrate-backdrop{
+    position:fixed; inset:0; z-index:300; display:flex; align-items:center; justify-content:center;
+    background:rgba(6,30,28,0); pointer-events:none; transition:background .25s ease;
+  }
+  .celebrate-backdrop.show{ background:rgba(6,30,28,.5); pointer-events:auto; backdrop-filter:blur(4px); }
+  .celebrate-card{
+    background:var(--card); border-radius:26px; padding:34px 30px; max-width:360px; width:90%;
+    text-align:center; box-shadow:0 24px 60px rgba(0,0,0,.35); transform:scale(.85) translateY(14px); opacity:0;
+    transition:transform .35s cubic-bezier(.34,1.56,.64,1), opacity .3s ease;
+  }
+  .celebrate-backdrop.show .celebrate-card{ transform:scale(1) translateY(0); opacity:1; }
+  .celebrate-emoji{ font-size:56px; margin-bottom:10px; animation:celebrateBounce .6s ease; display:inline-block; }
+  .celebrate-card h3{ font-size:18px; margin-bottom:8px; }
+  .celebrate-card p{ font-size:13.5px; color:var(--ink-soft); margin-bottom:20px; line-height:1.5; }
+
+  /* ---------- Transição suave ao entrar no app (login → painel) ---------- */
+  .login-screen.login-exit{ animation:loginExit .4s ease forwards; }
+  @keyframes loginExit{ from{ opacity:1; } to{ opacity:0; transform:scale(1.02); } }
+  .app.app-enter{ animation:appEnter .45s cubic-bezier(.16,1,.3,1); }
+  @keyframes appEnter{ from{ opacity:0; transform:translateY(10px) scale(.99); } to{ opacity:1; transform:translateY(0) scale(1); } }
+
+  /* ---------- Barra de progresso segmentada (uma pílula por pergunta) ---------- */
+  .duo-progress-segmented{ display:flex; gap:6px; margin-bottom:10px; }
+  .duo-seg{
+    flex:1; height:9px; border-radius:100px; background:var(--border);
+    overflow:hidden; position:relative; transition:background .3s ease;
+  }
+  .duo-seg.done{ background:var(--grad-brand, linear-gradient(90deg, var(--primary), var(--secondary))); box-shadow:0 0 8px rgba(2,163,157,0.45); }
+  .duo-seg.current{ background:var(--border); }
+  .duo-seg.current::after{
+    content:""; position:absolute; inset:0; border-radius:100px;
+    background:var(--grad-brand, linear-gradient(90deg, var(--primary), var(--secondary)));
+    animation:segFill 1.4s ease-in-out infinite;
+    transform-origin:left center;
+  }
+  @keyframes segFill{
+    0%{ transform:scaleX(0.15); opacity:.55; }
+    50%{ transform:scaleX(1); opacity:1; }
+    100%{ transform:scaleX(0.15); opacity:.55; }
+  }
 
   /* ---------- Tela de conclusão — celebração ---------- */
   .duo-done{border-radius:24px; position:relative; overflow:hidden; border-bottom:6px solid var(--success);}
@@ -642,7 +679,6 @@
     border-right:1px solid rgba(255,255,255,0.08);
     border-radius:0 26px 26px 0;
   }
-  .brand-mark{ background:var(--grad-brand) !important; box-shadow:0 4px 14px rgba(2,163,157,0.5); }
   .menu-item.active{
     background:var(--grad-brand) !important; box-shadow:0 6px 18px rgba(2,163,157,0.45) !important;
     border-radius:14px !important;
@@ -775,7 +811,7 @@
     background:radial-gradient(circle, rgba(2,163,157,0.22), transparent 70%); border-radius:50%; z-index:-1;
   }
   .login-card > *{ animation:cardRise .6s cubic-bezier(.16,1,.3,1) both; }
-  .login-mascot-row{ animation-delay:.02s; } .login-mark{ animation-delay:.08s; }
+  .login-mascot-row{ animation-delay:.02s; } .login-logo{ animation-delay:.08s; }
   .login-card h2{ animation-delay:.14s; } #loginSubtitle{ animation-delay:.18s; }
   .login-tabs{ animation-delay:.22s; } #loginForm{ animation-delay:.28s; }
   .login-demo-toggle{ animation-delay:.34s; } .login-scroll-hint{ animation-delay:.4s; }

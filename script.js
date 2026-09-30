@@ -680,8 +680,16 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
 });
 
 function entrarNoApp(){
-  document.getElementById('loginScreen').style.display = "none";
-  document.getElementById('appRoot').style.display = "flex";
+  const loginScreen = document.getElementById('loginScreen');
+  const appRoot = document.getElementById('appRoot');
+  loginScreen.classList.add('login-exit');
+  appRoot.style.display = "flex";
+  appRoot.classList.add('app-enter');
+  setTimeout(()=>{
+    loginScreen.style.display = "none";
+    loginScreen.classList.remove('login-exit');
+    appRoot.classList.remove('app-enter');
+  }, 420);
   applyRole(currentUser.role);
   saveState();
   showToast(`Bem-vindo(a), ${currentUser.nome}.`, "success");
@@ -1056,6 +1064,29 @@ function showToast(msg, type=""){
   clearTimeout(window._toastTimer);
   window._toastTimer = setTimeout(()=> t.className = "toast " + type, 2800);
 }
+/* Pop-up de celebração — para momentos que merecem mais destaque que um
+   toast rápido (campanha criada, sorteio oficializado, etc). */
+function showCelebrationPopup(titulo, mensagem, emoji){
+  const antigo = document.getElementById('celebratePopup');
+  if(antigo) antigo.remove();
+  const backdrop = document.createElement('div');
+  backdrop.className = 'celebrate-backdrop';
+  backdrop.id = 'celebratePopup';
+  backdrop.innerHTML = `
+    <div class="celebrate-card">
+      <div class="celebrate-emoji">${emoji || '🎉'}</div>
+      <h3>${titulo}</h3>
+      <p>${mensagem}</p>
+      <button class="btn btn-primary" id="btnFecharCelebracao">Continuar</button>
+    </div>`;
+  document.body.appendChild(backdrop);
+  requestAnimationFrame(()=> backdrop.classList.add('show'));
+  const fechar = ()=>{ backdrop.classList.remove('show'); setTimeout(()=> backdrop.remove(), 250); };
+  document.getElementById('btnFecharCelebracao').addEventListener('click', fechar);
+  backdrop.addEventListener('click', (e)=>{ if(e.target === backdrop) fechar(); });
+  window._celebrateTimer && clearTimeout(window._celebrateTimer);
+  window._celebrateTimer = setTimeout(fechar, 4500);
+}
 
 /* ======================= HELPERS ======================= */
 function statusBadge(status){
@@ -1414,7 +1445,7 @@ document.getElementById('formCampanha').addEventListener('submit', async functio
     btnSubmit.disabled = false; btnSubmit.textContent = textoOriginal;
     if(!resp.ok){ showToast(resp.erro || "Não foi possível salvar a campanha.", "warning"); return; }
     campaigns.unshift({id: resp.id, ganhadores:null, ...payload});
-    showToast("Campanha e questionário cadastrados com sucesso!","success");
+    showCelebrationPopup("Campanha criada!", `"${payload.nome}" já está pronta e visível para os colaboradores dentro do período configurado.`, "🚀");
     logAction("Nova campanha cadastrada", payload.nome);
   }
   fillCampaignSelects();
@@ -1665,9 +1696,13 @@ function renderQuizStep(){
   const progressPct = Math.round((index / total) * 100);
   const body = document.getElementById('responderBody');
   const selected = answers[index];
+  const segmentosHtml = campaign.questoes.map((_,i)=>{
+    const cls = i < index ? 'done' : (i === index ? 'current' : '');
+    return `<div class="duo-seg ${cls}"></div>`;
+  }).join('');
   body.innerHTML = `
     <div class="duo-wrap">
-      <div class="duo-progress"><div class="duo-progress-fill" style="width:${progressPct}%"></div></div>
+      <div class="duo-progress-segmented">${segmentosHtml}</div>
       <div class="duo-counter">Pergunta ${index+1} de ${total}</div>
       <div class="duo-card" id="duoCard">
         <div class="duo-question">${q.texto}</div>
@@ -1970,15 +2005,25 @@ function renderMeuResultado(){
   const elegHtml = souElegivel
     ? `<div class="panel eleg-panel eleg-ok">
         <h3>✅ Você está elegível para o sorteio desta rodada</h3>
-        <p>Isso significa que você atingiu 100% de acertos, sua função não está entre as impedidas de participar e você não foi premiado(a) nos últimos 2 anos. Boa sorte! 🍀</p>
+        <p>Você atingiu 100% de acertos e atende aos critérios do programa para concorrer. Boa sorte! 🍀</p>
       </div>`
     : meuExcluido
-      ? `<div class="panel eleg-panel eleg-excluded">
-          <h3>🔒 Você não está elegível para o sorteio desta rodada</h3>
-          <p><b>Motivo:</b> ${meuExcluido.motivo}</p>
-          <p class="hint">A elegibilidade é calculada automaticamente pelo sistema, seguindo os mesmos 3 critérios oficiais para todos os colaboradores, sem exceção. Veja o detalhamento completo das regras abaixo.</p>
-          <button class="btn btn-outline btn-sm" id="btnVerRegrasElegibilidade"><i data-lucide="scroll-text"></i> Ver regras completas</button>
-        </div>`
+      ? (()=>{
+          // Só o critério de "100% de acertos" fica explícito pro colaborador
+          // (é sobre o próprio desempenho). Os demais critérios internos do
+          // programa ficam visíveis apenas para a equipe de Qualidade.
+          const motivoDesempenho = meuExcluido.motivos.find(m => m.includes('100%'));
+          const temOutrosCriterios = meuExcluido.motivos.some(m => !m.includes('100%'));
+          const textoMotivo = motivoDesempenho && !temOutrosCriterios
+            ? motivoDesempenho
+            : 'Você não atende a um ou mais critérios de elegibilidade desta rodada.';
+          return `<div class="panel eleg-panel eleg-excluded">
+            <h3>🔒 Você não está elegível para o sorteio desta rodada</h3>
+            <p><b>Motivo:</b> ${textoMotivo}</p>
+            <p class="hint">A elegibilidade é calculada automaticamente pelo sistema, seguindo os critérios oficiais do programa. Veja mais em "Regras e Transparência".</p>
+            <button class="btn btn-outline btn-sm" id="btnVerRegrasElegibilidade"><i data-lucide="scroll-text"></i> Ver regras completas</button>
+          </div>`;
+        })()
       : '';
   body.insertAdjacentHTML('beforeend', elegHtml);
   const btnRegras = document.getElementById('btnVerRegrasElegibilidade');
@@ -2107,7 +2152,7 @@ document.getElementById('btnRegistrarHistorico').addEventListener('click', async
   historyLog.unshift({campaignId, data:new Date(), texto:`Sorteio realizado para a campanha ${c.nome}.`});
   logAction("Sorteio registrado no histórico", c.nome);
   fillCampaignSelects();
-  showToast("Sorteio registrado oficialmente! Agora você já pode gerar o banner dos ganhadores em Divulgação.","success");
+  showCelebrationPopup("Sorteio oficializado!", "Os ganhadores já estão registrados. Agora você pode gerar o banner de divulgação em \"Divulgação\".", "🏆");
   window._lastSorteio = null;
   document.querySelector('[data-target="historico"]').click();
 });
