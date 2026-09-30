@@ -972,7 +972,7 @@ async function sincronizarDadosDoServidor(silencioso){
       backendCall('getRespostas'),
       backendCall('getHistorico')
     ]);
-    if(respCamp.ok && Array.isArray(respCamp.campanhas)) campaigns = respCamp.campanhas;
+    if(respCamp.ok && Array.isArray(respCamp.campanhas)) campaigns = respCamp.campanhas.map(c=>({...c, id: String(c.id)}));
 
     // Corrige o status pela data (programada → andamento → encerrada), só
     // para exibição — cada dispositivo calcula isso sozinho a partir das
@@ -982,7 +982,11 @@ async function sincronizarDadosDoServidor(silencioso){
     campaigns.forEach(c=>{ try{ c.status = calcularStatusPorData(c); }catch(e){ console.warn(`Não foi possível calcular o status de "${c && c.nome}":`, e); } });
     if(respBanco.ok && Array.isArray(respBanco.perguntas)) questionBank = respBanco.perguntas;
     if(respRespostas.ok && Array.isArray(respRespostas.respostas)){
-      participants = respRespostas.respostas.map(r=>({...r, data: r.dataFim ? new Date(r.dataFim) : new Date(), dataInicio: r.dataInicio ? new Date(r.dataInicio) : null, dataFim: r.dataFim ? new Date(r.dataFim) : null}));
+      participants = respRespostas.respostas.map(r=>({
+        ...r,
+        matricula: String(r.matricula), campaignId: String(r.campaignId),
+        data: r.dataFim ? new Date(r.dataFim) : new Date(), dataInicio: r.dataInicio ? new Date(r.dataInicio) : null, dataFim: r.dataFim ? new Date(r.dataFim) : null
+      }));
     }
     const historicoImportado = (respHist.ok && Array.isArray(respHist.historico)) ? respHist.historico : [];
     const ganhosImportados = historicoImportado
