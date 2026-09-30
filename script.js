@@ -971,7 +971,7 @@ async function sincronizarDadosDoServidor(silencioso){
     // datas, sem escrever de volta no servidor a cada sincronização (evita
     // conflito quando várias pessoas estão usando ao mesmo tempo).
     // "Finalizada" nunca é sobrescrito aqui — só o registro oficial do sorteio muda isso.
-    campaigns.forEach(c=>{ c.status = calcularStatusPorData(c); });
+    campaigns.forEach(c=>{ try{ c.status = calcularStatusPorData(c); }catch(e){ console.warn(`Não foi possível calcular o status de "${c && c.nome}":`, e); } });
     if(respBanco.ok && Array.isArray(respBanco.perguntas)) questionBank = respBanco.perguntas;
     if(respRespostas.ok && Array.isArray(respRespostas.respostas)){
       participants = respRespostas.respostas.map(r=>({...r, data: r.dataFim ? new Date(r.dataFim) : new Date(), dataInicio: r.dataInicio ? new Date(r.dataInicio) : null, dataFim: r.dataFim ? new Date(r.dataFim) : null}));
@@ -1060,7 +1060,7 @@ function showToast(msg, type=""){
 /* ======================= HELPERS ======================= */
 function statusBadge(status){
   const map = {programada:["programada","Programada"], andamento:["andamento","Em andamento"], encerrada:["encerrada","Encerrada"], finalizada:["finalizada","Finalizada"]};
-  const [cls,label] = map[status];
+  const [cls,label] = map[status] || ["encerrada", status || "—"];
   return `<span class="badge ${cls}">${label}</span>`;
 }
 function campaignParticipants(id){ return participants.filter(p=>p.campaignId===id); }
