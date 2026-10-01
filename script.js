@@ -521,6 +521,7 @@ function renderSectionContent(target){
   if(target==="regras-excecoes") renderRegrasExcecoes();
   if(target==="divulgacao") renderDivulgacao();
   if(target==="fale-conosco" && currentRole==="qualidade") renderDuvidas();
+  if(target==="fale-conosco" && currentRole==="colaborador") renderMinhasDuvidas();
   if(target==="importar-historico") renderHistoricoImportado();
   if(target==="config" && currentRole==="qualidade") renderPedidosSenha();
   if(target==="campanha-atual") renderCampanhaAtual();
@@ -603,7 +604,7 @@ const deepLinkCampaignId = urlParams.get('campanha');
 /* ======================= LOGIN ======================= */
 /* A autenticação de verdade agora mora na planilha (via Google Apps Script).
    Não existe mais senha nenhuma escrita aqui no código. */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbyaLA4oM3pYebWhgaxrCL_WnnkNtVpcIGFfVvwjg8woNfD5Qr64-UgMJi1mxD9v1JPHPQ/exec";
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwfKlz_TuxeCNl2F21M4_ebtnHy2lMn-ppggOXU5kjZwDoNQaoTv1E0DLYSvBcyQK_x9Q/exec";
 
 async function backendCall(action, payload){
   try{
@@ -901,21 +902,76 @@ document.getElementById('formFaleConosco')?.addEventListener('submit', async fun
   if(!resp.ok){ erroEl.textContent = resp.erro || "Não foi possível enviar sua mensagem."; erroEl.style.display = "block"; return; }
   this.reset();
   showToast("Mensagem enviada! A equipe de Qualidade foi avisada por e-mail.", "success");
+  renderMinhasDuvidas();
 });
+
+async function renderMinhasDuvidas(){
+  const lista = document.getElementById('listaMinhasDuvidas');
+  if(!lista || !currentUser) return;
+  lista.innerHTML = `<p class="hint">Carregando…</p>`;
+  const resp = await backendCall('getMinhasDuvidas', {matricula: currentUser.matricula});
+  if(!resp.ok){ lista.innerHTML = `<p class="hint" style="color:var(--error);">${resp.erro || 'Não foi possível carregar.'}</p>`; return; }
+  const minhas = (resp.duvidas || []).sort((a,b)=> new Date(b.dataHora) - new Date(a.dataHora));
+  if(!minhas.length){ lista.innerHTML = `<p class="hint">Você ainda não enviou nenhuma mensagem.</p>`; return; }
+  lista.innerHTML = minhas.map(d=>`
+    <div class="panel duvida-card">
+      <div class="duvida-head">
+        <b>${d.assunto}</b>
+        <span class="badge ${d.status==='pendente'?'programada':'finalizada'}">${d.status==='pendente'?'Aguardando resposta':'Respondida'}</span>
+      </div>
+      <p class="hint" style="margin:8px 0 ${d.resposta?'12px':'0'};">${d.mensagem}</p>
+      ${d.resposta ? `<div class="duvida-resposta"><b>Resposta de ${d.respondidoPor} em ${fmtDateTime(new Date(d.respondidoEm))}:</b><p>${d.resposta}</p></div>` : ''}
+    </div>
+  `).join('');
+}
+
+let _duvidasAtuais = [];
 async function renderDuvidas(){
-  const tbody = document.getElementById('tblDuvidas');
-  if(!tbody) return;
-  tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--ink-soft); padding:16px;">Carregando…</td></tr>`;
+  const lista = document.getElementById('listaDuvidas');
+  if(!lista) return;
+  lista.innerHTML = `<p class="hint" style="padding:16px; text-align:center;">Carregando…</p>`;
   const resp = await backendCall('listarDuvidas');
   if(!resp.ok){
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--error); padding:16px;">${resp.erro || 'Não foi possível carregar as mensagens.'}</td></tr>`;
+    lista.innerHTML = `<p class="hint" style="padding:16px; text-align:center; color:var(--error);">${resp.erro || 'Não foi possível carregar as mensagens.'}</p>`;
     return;
   }
-  const duvidas = (resp.duvidas || []).sort((a,b)=> new Date(b.dataHora) - new Date(a.dataHora));
-  tbody.innerHTML = duvidas.map(d=>`
-    <tr><td>${fmtDateTime(new Date(d.dataHora))}</td><td>${d.matricula}</td><td>${d.nome}</td><td>${d.assunto}</td><td>${d.mensagem}</td></tr>
-  `).join('') || `<tr><td colspan="5" style="text-align:center; color:var(--ink-soft); padding:16px;">Nenhuma mensagem recebida ainda.</td></tr>`;
+  _duvidasAtuais = (resp.duvidas || []).sort((a,b)=> new Date(b.dataHora) - new Date(a.dataHora));
+  if(!_duvidasAtuais.length){
+    lista.innerHTML = `<div class="panel fun-empty"><div class="fe-icon"><i data-lucide="inbox"></i></div>Nenhuma mensagem recebida ainda.</div>`;
+    if(window.lucide) lucide.createIcons();
+    return;
+  }
+  lista.innerHTML = _duvidasAtuais.map((d,i)=>`
+    <div class="panel duvida-card">
+      <div class="duvida-head">
+        <div><b>${d.nome}</b> <span class="hint">· ${d.matricula} · ${fmtDateTime(new Date(d.dataHora))}</span></div>
+        <span class="badge ${d.status==='pendente'?'programada':'finalizada'}">${d.status==='pendente'?'Aguardando resposta':'Respondida'}</span>
+      </div>
+      <p style="margin:10px 0 4px;"><b>${d.assunto}</b></p>
+      <p class="hint" style="margin:0 0 12px;">${d.mensagem}</p>
+      ${d.resposta
+        ? `<div class="duvida-resposta"><b>Resposta de ${d.respondidoPor} em ${fmtDateTime(new Date(d.respondidoEm))}:</b><p>${d.resposta}</p></div>`
+        : `<div class="duvida-responder">
+            <textarea id="respTexto_${i}" rows="2" placeholder="Escreva uma resposta para ${d.nome.split(' ')[0]}..."></textarea>
+            <button class="btn btn-primary btn-sm" onclick="enviarRespostaDuvida(${i})" style="margin-top:8px;"><i data-lucide="send"></i> Enviar resposta</button>
+          </div>`
+      }
+    </div>
+  `).join('');
+  if(window.lucide) lucide.createIcons();
 }
+window.enviarRespostaDuvida = async function(i){
+  const d = _duvidasAtuais[i];
+  const textarea = document.getElementById(`respTexto_${i}`);
+  const resposta = textarea.value.trim();
+  if(!resposta){ showToast("Escreva uma resposta antes de enviar.", "warning"); return; }
+  const btn = textarea.nextElementSibling;
+  btn.disabled = true; btn.textContent = "Enviando...";
+  const resp = await backendCall('responderDuvida', {matricula: d.matricula, dataHora: d.dataHora, resposta, respondidoPor: currentUser.nome});
+  if(!resp.ok){ showToast(resp.erro || "Não foi possível enviar a resposta.", "warning"); btn.disabled = false; btn.innerHTML = '<i data-lucide="send"></i> Enviar resposta'; return; }
+  showToast("Resposta enviada! A pessoa também recebe um aviso por e-mail.", "success");
+  renderDuvidas();
+};
 document.getElementById('btnAtualizarDuvidas')?.addEventListener('click', renderDuvidas);
 
 /* ======================= QUALIDADE: RESOLVER PEDIDOS DE SENHA ======================= */

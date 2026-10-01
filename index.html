@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PPG · Programa Política de Gestão</title>
-<link rel="stylesheet" href="style.css?v=20260930d">
+<link rel="stylesheet" href="style.css?v=20260930i">
 </head>
 <body>
 
@@ -611,15 +611,13 @@
           <button type="submit" class="btn btn-primary" style="margin-top:12px;"><i data-lucide="send"></i> Enviar para a Qualidade</button>
         </form>
 
-        <div class="panel qualidade-only">
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Data/hora</th><th>Matrícula</th><th>Nome</th><th>Assunto</th><th>Mensagem</th></tr></thead>
-              <tbody id="tblDuvidas"></tbody>
-            </table>
-          </div>
-          <button class="btn btn-outline btn-sm" id="btnAtualizarDuvidas" style="margin-top:12px;"><i data-lucide="refresh-cw"></i> Atualizar lista</button>
+        <div class="colaborador-only">
+          <h3 style="font-size:15px; margin:20px 0 10px;">Minhas mensagens</h3>
+          <div id="listaMinhasDuvidas"></div>
         </div>
+
+        <div class="qualidade-only" id="listaDuvidas"></div>
+        <button class="btn btn-outline btn-sm qualidade-only" id="btnAtualizarDuvidas" style="margin-top:12px;"><i data-lucide="refresh-cw"></i> Atualizar lista</button>
       </section>
       <section class="section" id="sec-config">
         <div class="section-head"><div><h2>Configurações</h2><p id="configSubtitle">Preferências pessoais e parâmetros do sistema.</p></div></div>
@@ -693,6 +691,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="empresa.config.js"></script>
-<script src="script.js?v=20260930g"></script>
+<script src="script.js?v=20260930i"></script>
 </body>
 </html>
