@@ -604,7 +604,7 @@ const deepLinkCampaignId = urlParams.get('campanha');
 /* ======================= LOGIN ======================= */
 /* A autenticação de verdade agora mora na planilha (via Google Apps Script).
    Não existe mais senha nenhuma escrita aqui no código. */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbylzNEysmTLia32tNCOInJ7RbThcFx50YfK2VrO_Vgf-fCrGCBCi2JS5gsacYIgGp8Xdw/exec";
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwfKlz_TuxeCNl2F21M4_ebtnHy2lMn-ppggOXU5kjZwDoNQaoTv1E0DLYSvBcyQK_x9Q/exec";
 
 async function backendCall(action, payload){
   try{
@@ -1178,7 +1178,9 @@ function renderDashboard(){
   document.getElementById('kpiTotalCampanhas').textContent = campaigns.length;
   document.getElementById('kpiAndamento').textContent = campaigns.filter(c=>c.status==="andamento").length;
   document.getElementById('kpiProgramadas').textContent = campaigns.filter(c=>c.status==="programada").length;
-  const latest = campaigns[0];
+  const emAndamento = campaigns.filter(c=>c.status==="andamento");
+  const candidatos = emAndamento.length ? emAndamento : campaigns;
+  const latest = [...candidatos].sort((a,b)=> new Date(b.inicio||0) - new Date(a.inicio||0))[0];
   document.getElementById('kpiParticipantes').textContent = latest ? campaignParticipants(latest.id).length : 0;
   document.getElementById('kpiElegiveis').textContent = latest ? evaluateEligibility(latest.id).eligible.length : 0;
   const ganhadores = campaigns.filter(c=>c.ganhadores).reduce((a,c)=>a+c.ganhadores.length,0);
@@ -1890,7 +1892,7 @@ function mascotBubble(texto, opts){
     <div class="mascot-avatar">
       <span class="mascot-emoji mascot-emoji-blink">${conteudo}</span>
     </div>
-    <div class="mascot-speech"><span class="mascot-name">${MASCOT_NOME}</span>${texto}</div>
+    <div class="mascot-speech">${texto}</div>
   </div>`;
 }
 function renderQualidadeTip(){
