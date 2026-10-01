@@ -607,11 +607,19 @@ const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwfKlz_TuxeCNl2F21M
 
 async function backendCall(action, payload){
   try{
-    const res = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: {"Content-Type": "text/plain;charset=utf-8"}, // evita pre-flight de CORS no Apps Script
-      body: JSON.stringify({action, solicitante: (typeof currentUser !== 'undefined' && currentUser) ? currentUser.matricula : null, ...(payload||{})})
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(()=> controller.abort(), 20000); // nunca deixa uma chamada travada pra sempre
+    let res;
+    try{
+      res = await fetch(BACKEND_URL, {
+        method: "POST",
+        headers: {"Content-Type": "text/plain;charset=utf-8"}, // evita pre-flight de CORS no Apps Script
+        body: JSON.stringify({action, solicitante: (typeof currentUser !== 'undefined' && currentUser) ? currentUser.matricula : null, ...(payload||{})}),
+        signal: controller.signal
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
     const textoCru = await res.text();
     if(!res.ok){
       console.error(`Backend respondeu HTTP ${res.status} para a ação "${action}". Corpo da resposta:`, textoCru);
@@ -926,15 +934,14 @@ async function renderPedidosSenha(){
       <td>${fmtDateTime(new Date(p.dataHora))}</td><td>${p.matricula}</td><td>${p.nome}</td>
       <td><span class="badge ${p.status==='pendente'?'programada':'finalizada'}">${p.status}</span></td>
       <td>${p.status==='pendente'
-        ? `<button class="btn btn-outline btn-sm" onclick="resolverPedidoSenha('${p.matricula}')">Definir senha temporária</button>`
+        ? `<button class="btn btn-outline btn-sm" onclick="resolverPedidoSenha('${p.matricula}')">Redefinir senha</button>`
         : `—`}</td>
     </tr>`).join('') || `<tr><td colspan="5" style="text-align:center; color:var(--ink-soft); padding:16px;">Nenhum pedido registrado.</td></tr>`;
 }
 window.resolverPedidoSenha = function(matricula){
-  const senhaTemp = prompt(`Defina a senha temporária para a matrícula ${matricula}:\n(a pessoa vai precisar trocá-la no próximo acesso)`);
-  if(!senhaTemp) return;
-  backendCall('resolveReset', {matricula, novaSenhaTemp: senhaTemp, atendidoPor: currentUser.nome}).then(resp=>{
-    if(resp.ok){ showToast("Senha temporária definida com sucesso.", "success"); renderPedidosSenha(); }
+  if(!confirm(`Redefinir a senha da matrícula ${matricula}?\n\nA senha volta a ser a própria matrícula (igual ao primeiro acesso) — a pessoa será obrigada a criar uma senha nova no próximo login.`)) return;
+  backendCall('resolveReset', {matricula, atendidoPor: currentUser.nome}).then(resp=>{
+    if(resp.ok){ showToast("Senha redefinida — a pessoa já pode entrar usando a matrícula como senha.", "success"); renderPedidosSenha(); }
     else showToast(resp.erro || "Não foi possível concluir.", "warning");
   });
 };
@@ -980,7 +987,7 @@ async function sincronizarDadosDoServidor(silencioso){
     // conflito quando várias pessoas estão usando ao mesmo tempo).
     // "Finalizada" nunca é sobrescrito aqui — só o registro oficial do sorteio muda isso.
     campaigns.forEach(c=>{ try{ c.status = calcularStatusPorData(c); }catch(e){ console.warn(`Não foi possível calcular o status de "${c && c.nome}":`, e); } });
-    if(respBanco.ok && Array.isArray(respBanco.perguntas)) questionBank = respBanco.perguntas;
+    if(respBanco.ok && Array.isArray(respBanco.perguntas)) questionBank = respBanco.perguntas.map(q=>({...q, codigo: String(q.codigo)}));
     if(respRespostas.ok && Array.isArray(respRespostas.respostas)){
       participants = respRespostas.respostas.map(r=>({
         ...r,
