@@ -33,15 +33,12 @@ function fmtDateTime(d){return pad(d.getDate())+"/"+pad(d.getMonth()+1)+"/"+d.ge
    em vez do texto simples original. Isso não pode quebrar a tela inteira de
    campanhas por causa de uma linha só, nem mostrar algo feio tipo ".000Z". */
 function fmtPeriodoValor(valor){
-  if(!valor) return '—';
-  if(valor instanceof Date) return fmtDateTime(valor);
-  const t = String(valor);
-  if(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(t)){
-    const d = new Date(t);
-    if(!isNaN(d.getTime())) return fmtDateTime(d);
-  }
-  if(/^\d{4}-\d{2}-\d{2}$/.test(t)){ const [y,m,d] = t.split('-'); return `${d}/${m}/${y}`; }
-  return t.replace('T',' ');
+  if(valor == null || valor === '') return '—';
+  if(valor instanceof Date) return isNaN(valor) ? '—' : fmtDateTime(valor);
+  const s = String(valor);
+  if(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(s)){ const d = new Date(s); return isNaN(d) ? s : fmtDateTime(d); }
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s)){ const [y,mo,d] = s.split('-'); return `${d}/${mo}/${y}`; }
+  return s;
 }
 function opt(text, correct){ return {text, correct: !!correct}; }
 
@@ -115,6 +112,7 @@ const _inicioC1 = new Date(_hoje.getTime() - 20*24*60*60*1000);
 const _fimC1 = new Date(_hoje.getTime() + 20*24*60*60*1000);
 
 let campaigns = [];
+let campanhasAntigas = [], participantesAntigos = [];   // campanhas importadas (método anterior)
 
 let participants = [];
 
@@ -123,14 +121,17 @@ let wonHistory = [];
 /* ======================= BANCO DE PERGUNTAS ======================= */
 let questionBank = [];
 function bqUsageStatus(q){
+  /* Pergunta vinda de campanha antiga (método anterior) já foi usada: guarda a data em que a rodada terminou. */
+  const antiga = /^Campanha antiga:/.test(q.origem || '');
+  const nomeAnt = antiga ? String(q.origem).replace(/^Campanha antiga:\s*/, '').replace(/\s*\(método anterior\)\s*$/, '') : '';
   if(!q.ultimaUtilizacao) return {label:"Nunca utilizada", cls:"nunca"};
   const twoYearsMs = 2*365*24*60*60*1000;
   const diff = new Date() - new Date(q.ultimaUtilizacao);
   if(diff < twoYearsMs){
     const months = Math.max(1, Math.round(diff/(30*24*60*60*1000)));
-    return {label:`Usada há ${months} mês(es) — considere outra`, cls:"recente"};
+    return {label: antiga ? `Já usada em ${nomeAnt} (método anterior) · há ${months} mês(es) — considere outra` : `Usada há ${months} mês(es) — considere outra`, cls:"recente"};
   }
-  return {label:"Livre para reutilização", cls:"livre"};
+  return {label: antiga ? `Já usada em ${nomeAnt} (método anterior) — livre para reutilizar` : "Livre para reutilização", cls:"livre"};
 }
 
 /* ======================= AUDITORIA (log de ações) ======================= */
@@ -153,10 +154,10 @@ function renderAuditoria(){
 function audFillFilterSelects(){
   const camp = document.getElementById('audFiltroCampanha');
   if(!camp) return;
-  const distintos = campo => [...new Set([...(EMPRESA.colaboradores||[]).map(c=>c[campo]), ...participants.map(p=>p[campo]), ...(historicoServidor||[]).map(h=>h[campo])].filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'pt-BR'));
+  const distintos = campo => [...new Set([...(EMPRESA.colaboradores||[]).map(c=>c[campo]), ...todosParticipantes().map(p=>p[campo]), ...(historicoServidor||[]).map(h=>h[campo])].filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'pt-BR'));
   const preencher = (id, rotuloTodos, valores) => { const el = document.getElementById(id); if(!el) return; const atual = el.value; el.innerHTML = `<option value="">${rotuloTodos}</option>` + valores.map(v=>`<option value="${escH(v)}">${escH(v)}</option>`).join(''); el.value = atual; };
   const prevCamp = camp.value;
-  camp.innerHTML = '<option value="">Todas</option>' + campaigns.map(c=>`<option value="${escH(c.id)}">${escH(c.nome)}</option>`).join('');
+  camp.innerHTML = '<option value="">Todas</option>' + todasCampanhas().map(c=>`<option value="${escH(c.id)}">${escH(c.nome)}</option>`).join('');
   camp.value = prevCamp;
   preencher('audFiltroSetor', 'Todos', distintos('setor'));
   preencher('audFiltroFilial', 'Todas', distintos('filial'));
@@ -171,7 +172,7 @@ function audGetFilteredParticipants(){
   const dataAte = document.getElementById('audFiltroDataAte').value;
   const status = document.getElementById('audFiltroStatus').value;
   const busca = document.getElementById('audFiltroBusca').value.trim().toLowerCase();
-  return participants.filter(p=>{
+  return todosParticipantes().filter(p=>{
     if(campId && p.campaignId !== campId) return false;
     if(setor && p.setor !== setor) return false;
     if(filial && p.filial !== filial) return false;
@@ -198,6 +199,7 @@ function audGetFilteredParticipants(){
   });
 }
 function audEligLabel(p){
+  if(p.importada) return '<span class="badge finalizada">Campanha anterior</span>';
   const {eligible, excluded} = evaluateEligibility(p.campaignId);
   const ex = excluded.find(e=>e.matricula===p.matricula);
   if(ex) return `<span class="badge excluido" title="${ex.motivo}">${ex.motivo}</span>`;
@@ -219,14 +221,14 @@ function renderAuditoriaDetalhe(){
   audFillFilterSelects();
   const list = audGetFilteredParticipants().sort((a,b)=> (b.dataFim||b.data) - (a.dataFim||a.data));
   tbody.innerHTML = list.map(p=>{
-    const c = campaigns.find(x=>x.id===p.campaignId);
+    const c = todasCampanhas().find(x=>x.id===p.campaignId);
     return `<tr>
       <td>${p.nome}</td><td>${p.matricula}</td><td>${p.funcao||p.cargo}</td><td>${p.setor}</td><td>${p.filial}</td>
       <td>${c?c.nome:p.campaignId}</td><td style="font-family:monospace; font-size:11px;">${p.codigoResposta||'—'}</td>
       <td>${p.dataInicio?fmtDateTime(p.dataInicio):'—'}</td><td>${p.dataFim?fmtDateTime(p.dataFim):fmtDateTime(p.data)}</td>
       <td>${duracaoLabel(p.dataInicio, p.dataFim||p.data)}</td>
       <td>${p.acertosQtd!=null && p.totalQuestoes ? `${p.acertosQtd}/${p.totalQuestoes}` : '—'}</td>
-      <td><span class="${p.pct===100?'pct100':'pctless'}">${p.pct}%</span></td>
+      <td><span class="${p.pct===100?'pct100':'pctless'}">${pctTxt(p.pct)}</span></td>
       <td style="font-size:11px;">${escH(p.dispositivo||'—')}<br><span style="font-family:monospace; color:var(--ink-soft); font-size:10px;">${escH(p.sessaoId||'')}</span></td>
       <td>${audEligLabel(p)}</td>
       <td style="display:flex; gap:6px; flex-wrap:wrap;">
@@ -263,9 +265,10 @@ function renderAuditoriaDetalhe(){
   renderAuditoriaBarChart('audChartEvolucao', evoData);
 }
 window.audVerDetalhe = function(campaignId, matricula){
-  const p = participants.find(pp=>pp.campaignId===campaignId && pp.matricula===matricula);
-  const c = campaigns.find(x=>x.id===campaignId);
+  const p = todosParticipantes().find(pp=>pp.campaignId===campaignId && pp.matricula===matricula);
+  const c = todasCampanhas().find(x=>x.id===campaignId);
   if(!p || !c) return;
+  if(c.importada){ showToast('Campanha anterior ao sistema: não há respostas por pergunta registradas.', 'warning'); return; }
   const rows = c.questoes.map((q,i)=>{
     const ans = p.respostasSelecionadas ? p.respostasSelecionadas[i] : undefined;
     const selTexts = Array.isArray(ans) ? ans.map(a=> (q.options[a]||{}).text).join(', ') : (ans!==undefined && ans!==null && q.options[ans] ? q.options[ans].text : 'Não disponível (registro histórico)');
@@ -291,12 +294,12 @@ window.audVerDetalhe = function(campaignId, matricula){
   document.getElementById('audCloseDetalhe').addEventListener('click', ()=> backdrop.remove());
 };
 window.audVerPerfil = function(matricula){
-  const historico = participants.filter(p=>p.matricula===matricula).sort((a,b)=> (b.dataFim||b.data) - (a.dataFim||a.data));
+  const historico = todosParticipantes().filter(p=>p.matricula===matricula).sort((a,b)=> (b.dataFim||b.data) - (a.dataFim||a.data));
   if(!historico.length) return;
   const ref = historico[0];
   const premios = wonHistory.filter(w=>w.matricula===matricula).sort((a,b)=>b.data-a.data);
   const rows = historico.map(p=>{
-    const c = campaigns.find(x=>x.id===p.campaignId);
+    const c = todasCampanhas().find(x=>x.id===p.campaignId);
     const ganhou = c && c.ganhadores && c.ganhadores.some(g=>g.matricula===matricula);
     return `<tr>
       <td>${c?c.nome:p.campaignId}</td><td style="font-family:monospace; font-size:11px;">${p.codigoResposta||'—'}</td>
@@ -340,7 +343,7 @@ document.getElementById('audExportXlsx')?.addEventListener('click', ()=>{
   if(!list.length){ showToast("Não há dados para exportar com os filtros atuais.","warning"); return; }
   const headers = ["Nome","Matrícula","Função","Setor","Filial","Campanha","Código","Início","Fim","Duração","Acertos","% Acertos","Dispositivo","Sessão","Elegibilidade"];
   const rows = list.map(p=>{
-    const c = campaigns.find(x=>x.id===p.campaignId);
+    const c = todasCampanhas().find(x=>x.id===p.campaignId);
     const {eligible, excluded} = evaluateEligibility(p.campaignId);
     const ex = excluded.find(e=>e.matricula===p.matricula);
     const elegStr = ex ? `Excluído — ${ex.motivo}` : 'Elegível';
@@ -358,7 +361,7 @@ document.getElementById('audExportPdf')?.addEventListener('click', ()=>{
   if(!list.length){ showToast("Não há dados para exportar com os filtros atuais.","warning"); return; }
   const headers = ["Nome","Matrícula","Setor","Filial","Campanha","Código","Duração","% Acertos","Dispositivo","Elegibilidade"];
   const rows = list.map(p=>{
-    const c = campaigns.find(x=>x.id===p.campaignId);
+    const c = todasCampanhas().find(x=>x.id===p.campaignId);
     const {eligible, excluded} = evaluateEligibility(p.campaignId);
     const ex = excluded.find(e=>e.matricula===p.matricula);
     const elegStr = ex ? `Excluído — ${ex.motivo}` : 'Elegível';
@@ -523,7 +526,7 @@ function renderSectionContent(target){
   if(target==="divulgacao") renderDivulgacao();
   if(target==="fale-conosco" && currentRole==="qualidade") renderDuvidas();
   if(target==="fale-conosco" && currentRole==="colaborador") renderMinhasDuvidas();
-  if(target==="config" && currentRole==="qualidade"){ renderPedidosSenha(); renderRegrasExcecoes(); renderInfoPlanilha(); }
+  if(target==="config" && currentRole==="qualidade"){ renderPedidosSenha(); renderRegrasExcecoes(); renderInfoPlanilha(); renderQuadro(); }
   if(target==="campanha-atual") renderCampanhaAtual();
   if(target==="historico-colab") renderHistoricoColaborador();
   if(target==="regulamento") renderRegulamentoStats();
@@ -603,7 +606,7 @@ const deepLinkCampaignId = urlParams.get('campanha');
 /* ======================= LOGIN ======================= */
 /* A autenticação de verdade agora mora na planilha (via Google Apps Script).
    Não existe mais senha nenhuma escrita aqui no código. */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbyzKTfHT2eEH9DAVmZOwe6u4sNEsZoeyLSxKEbXityuKFtrrd6AqYfeZqHXl-RqunqU/exec";
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwfKlz_TuxeCNl2F21M4_ebtnHy2lMn-ppggOXU5kjZwDoNQaoTv1E0DLYSvBcyQK_x9Q/exec";
 
 function urlDoApp(){ try{ return location.href.split('#')[0].split('?')[0]; }catch(e){ return ''; } }
 
@@ -688,6 +691,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
   try{
     currentUser = mapColaboradorParaUser(resp.colaborador, resp.role);
     if(resp.token) currentUser.token = resp.token;
+    if(resp.snapshot) _snapPendente = resp.snapshot;
     if(resp.precisaTrocarSenha){
       abrirModalTrocaSenha({obrigatoria: true, primeiroAcesso: !!resp.primeiroAcesso, senhaAtual: senha});
       return; // só entra de fato no app depois de trocar a senha
@@ -702,6 +706,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
 });
 
 function entrarNoApp(){
+  if(_snapPendente){ try{ aplicarSnapshot(_snapPendente); _aplicouNoLogin = true; }catch(e){ console.warn('Dados do login não aplicados:', e); } _snapPendente = null; }
   const loginScreen = document.getElementById('loginScreen');
   const appRoot = document.getElementById('appRoot');
   loginScreen.classList.add('login-exit');
@@ -725,6 +730,7 @@ function abrirModalTrocaSenha(opts){
   const backdrop = document.createElement('div');
   backdrop.className = 'share-backdrop';
   backdrop.id = 'trocaSenhaBackdrop';
+  if(opts && opts.obrigatoria) backdrop.dataset.fixo = '1';   // criação obrigatória da senha: ESC não fecha
   backdrop.innerHTML = `
     <div class="share-card" style="max-width:380px; text-align:left;">
       <h3>${opts.primeiroAcesso ? '👋 Bem-vindo(a)! Crie sua senha' : '🔒 Trocar senha'}</h3>
@@ -760,7 +766,7 @@ function abrirModalTrocaSenha(opts){
     btn.disabled = false; btn.textContent = "Salvar nova senha";
     if(!resp.ok){ erroEl.textContent = resp.erro || "Não foi possível trocar a senha."; erroEl.style.display = "block"; return; }
     backdrop.remove();
-    if(resp.token){ currentUser.token = resp.token; if(resp.role) currentUser.role = resp.role; saveState(); }
+    if(resp.token){ currentUser.token = resp.token; if(resp.role) currentUser.role = resp.role; if(resp.snapshot && obrigatoria) _snapPendente = resp.snapshot; saveState(); }
     showToast("Senha atualizada com sucesso!", "success");
     if(obrigatoria) entrarNoApp();
   });
@@ -959,7 +965,7 @@ async function sincronizarColaboradores(){
   if(!currentUser || currentRole !== 'qualidade') return; // só a Qualidade precisa (e só ela recebe) o quadro de pessoas
   const resp = await backendCall('getColaboradores');
   if(resp.ok && Array.isArray(resp.colaboradores)){
-    EMPRESA.colaboradores = resp.colaboradores.map(c=>({matricula:String(c.matricula), nome:c.nome, setor:c.setor, filial:c.filial, funcao:c.funcao}));
+    EMPRESA.colaboradores = resp.colaboradores.map(c=>({matricula:String(c.matricula), nome:c.nome, setor:c.setor, filial:c.filial, funcao:c.funcao, qualidade:!!c.qualidade, temEmail:!!c.temEmail}));
     _renderPendente = true;
   }
 }
@@ -988,61 +994,10 @@ function renderSilencioso(){
 }
 setInterval(()=>{ if(_renderPendente && currentUser) renderSilencioso(); }, 2500);
 
-async function sincronizarDadosDoServidor(silencioso){
-  if(sincronizando || !currentUser || !currentUser.token) return;
-  sincronizando = true;
-  try{
-    const resp = await backendCall('getSnapshot');
-    if(!resp.ok){ if(!resp.sessaoExpirada) _falhasSync++; return; }
-    _falhasSync = 0;
-    const assinatura = JSON.stringify([resp.campanhas, resp.respostas, resp.historico, resp.perguntas || null]);
-    if(assinatura === _ultimaAssinatura) return; // nada mudou: não redesenha nada
-    _ultimaAssinatura = assinatura;
-
-    campaigns = (resp.campanhas || []).map(c=>({...c, id: String(c.id)}));
-    // Status pela data (programada → andamento → encerrada), só para exibição.
-    campaigns.forEach(c=>{ try{ c.status = calcularStatusPorData(c); }catch(e){} });
-    if(resp.perguntas) questionBank = resp.perguntas.map(q=>({...q, codigo: String(q.codigo)}));
-    participants = (resp.respostas || []).map(r=>({
-      ...r, matricula: String(r.matricula), campaignId: String(r.campaignId),
-      data: r.dataFim ? new Date(r.dataFim) : new Date(),
-      dataInicio: r.dataInicio ? new Date(r.dataInicio) : null, dataFim: r.dataFim ? new Date(r.dataFim) : null
-    }));
-    historicoServidor = resp.historico || [];
-    const ganhosImportados = historicoServidor
-      .filter(h => String(h.ganhador).toLowerCase() === 'sim')
-      .map(h => ({matricula: String(h.matricula), data: new Date(h.periodoFim || h.importadoEm || Date.now())}));
-    const ganhosAoVivo = [];
-    campaigns.forEach(c=>{
-      if(c.ganhadores && c.ganhadores.length) c.ganhadores.forEach(g => ganhosAoVivo.push({matricula: String(g.matricula), data: new Date(c.fim)}));
-    });
-    wonHistory = [...ganhosImportados, ...ganhosAoVivo];
-    renderSilencioso();
-  }catch(e){
-    _falhasSync++; console.warn("Não foi possível sincronizar com o servidor agora:", e);
-  }finally{
-    sincronizando = false;
-  }
-}
-
-function iniciarSincronizacao(){
-  _ultimaAssinatura = null; _falhasSync = 0;
-  sincronizarDadosDoServidor(true);
-  sincronizarColaboradores();
-  if(window._syncAtivo) return;
-  window._syncAtivo = true;
-  const ciclo = async ()=>{
-    try{ if(currentUser && document.visibilityState === 'visible') await sincronizarDadosDoServidor(true); }catch(e){}
-    const base = currentRole === 'qualidade' ? 20000 : 30000;
-    setTimeout(ciclo, base * Math.min(4, 1 + _falhasSync)); // se o servidor estiver instável, espaça as tentativas
-  };
-  setTimeout(ciclo, 20000);
-  document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState === 'visible' && currentUser) sincronizarDadosDoServidor(true); });
-}
-
 function sairDoApp(msg){
   currentUser = null; _ultimaAssinatura = null; quizState = null;
   campaigns = []; participants = []; questionBank = []; wonHistory = []; historicoServidor = []; EMPRESA.colaboradores = [];
+  campanhasAntigas = []; participantesAntigos = []; _dadosCarregados = false; _ultimoSyncOk = 0; _snapPendente = null; limparCacheSnapshot();
   saveState();
   document.getElementById('appRoot').style.display = "none";
   document.getElementById('loginScreen').style.display = "";
@@ -1135,15 +1090,17 @@ function statusBadge(status){
   const [cls,label] = map[status] || ["encerrada", status || "—"];
   return `<span class="badge ${cls}">${label}</span>`;
 }
-function campaignParticipants(id){ return participants.filter(p=>p.campaignId===id); }
+function campaignParticipants(id){ return (String(id).indexOf('hist:') === 0 ? participantesAntigos : participants).filter(p=>p.campaignId===id); }
 function fillCampaignSelects(){
-  const selects = [document.getElementById('selectCampanhaParticipantes'), document.getElementById('selectCampanhaElegiveis'), document.getElementById('selectCampanhaSorteio'), document.getElementById('selectCampanhaRelatorio')];
-  const assinatura = campaigns.map(c=>c.id+'|'+c.nome).join('¦');
-  selects.forEach(sel=>{
-    if(!sel || sel.dataset.sig === assinatura) return;
+  const comAntigas = {selectCampanhaParticipantes:true, selectCampanhaRelatorio:true, selectCampanhaElegiveis:false, selectCampanhaSorteio:false};
+  Object.keys(comAntigas).forEach(id=>{
+    const sel = document.getElementById(id); if(!sel) return;
+    const lista = comAntigas[id] ? [...campaigns, ...ordenarPorFim(campanhasAntigas).reverse()] : campaigns;
+    const assinatura = lista.map(c=>c.id+'|'+c.nome).join('¦');
+    if(sel.dataset.sig === assinatura) return;
     const prev = sel.value;
-    sel.innerHTML = campaigns.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
-    if(prev) sel.value = prev;
+    sel.innerHTML = lista.map(c=>`<option value="${escH(c.id)}">${escH(c.nome)}${c.importada ? ' (anterior)' : ''}</option>`).join('');
+    if(prev && [...sel.options].some(o=>o.value === prev)) sel.value = prev;
     sel.dataset.sig = assinatura;
   });
 }
@@ -1152,7 +1109,7 @@ function fillCampaignSelects(){
 function renderDashboard(){
   renderQualidadeTip();
   renderHomeExtras();
-  document.getElementById('kpiTotalCampanhas').textContent = campaigns.length;
+  document.getElementById('kpiTotalCampanhas').textContent = todasCampanhas().length;
   document.getElementById('kpiAndamento').textContent = campaigns.filter(c=>c.status==="andamento").length;
   document.getElementById('kpiProgramadas').textContent = campaigns.filter(c=>c.status==="programada").length;
   const emAndamento = campaigns.filter(c=>c.status==="andamento");
@@ -1160,12 +1117,13 @@ function renderDashboard(){
   const latest = [...candidatos].sort((a,b)=> new Date(b.inicio||0) - new Date(a.inicio||0))[0];
   document.getElementById('kpiParticipantes').textContent = latest ? campaignParticipants(latest.id).length : 0;
   document.getElementById('kpiElegiveis').textContent = latest ? evaluateEligibility(latest.id).eligible.length : 0;
-  const ganhadores = campaigns.filter(c=>c.ganhadores).reduce((a,c)=>a+c.ganhadores.length,0);
+  const ganhadores = todasCampanhas().filter(c=>c.ganhadores).reduce((a,c)=>a+c.ganhadores.length,0);
   document.getElementById('kpiGanhadores').textContent = ganhadores;
 
   const barsEl = document.getElementById('chartParticipacao');
-  const maxCount = Math.max(...campaigns.map(c=>campaignParticipants(c.id).length), 1);
-  barsEl.innerHTML = campaigns.map(c=>{
+  const barras = ordenarPorFim(todasCampanhas()).slice(-12);
+  const maxCount = Math.max(...barras.map(c=>campaignParticipants(c.id).length), 1);
+  barsEl.innerHTML = barras.map(c=>{
     const n = campaignParticipants(c.id).length;
     const h = Math.max(8, Math.round((n/maxCount)*130));
     const shortName = c.nome.split('–')[0].trim();
@@ -1188,11 +1146,11 @@ function renderDashboard(){
       </div></div>
     <div class="donut-legend">${seg.map(s=>`<div><span class="legend-dot" style="background:${s.c}"></span>${s.label} — ${s.v}</div>`).join('')}</div>`;
 
-  const allWinners = campaigns.filter(c=>c.ganhadores).flatMap(c=>c.ganhadores);
+  const allWinners = todasCampanhas().filter(c=>c.ganhadores).flatMap(c=>c.ganhadores);
   renderHBarChart('chartSetor', allWinners, 'setor', [...new Set(allWinners.map(w=>w.setor).filter(Boolean))]);
   renderHBarChart('chartFilial', allWinners, 'filial', [...new Set(allWinners.map(w=>w.filial).filter(Boolean))]);
 
-  document.getElementById('tblUltimasCampanhas').innerHTML = campaigns.map(c=>{
+  document.getElementById('tblUltimasCampanhas').innerHTML = ordenarPorFim(todasCampanhas()).reverse().slice(0,10).map(c=>{
     const n = campaignParticipants(c.id).length;
     return `<tr><td>${c.nome}</td><td>${fmtPeriodoValor(c.inicio)} – ${fmtPeriodoValor(c.fim)}</td><td>${n}</td><td>${statusBadge(c.status)}</td></tr>`;
   }).join('');
@@ -1262,9 +1220,9 @@ window.goToParticipants = function(id){
 function renderParticipantsTable(){
   const sel = document.getElementById('selectCampanhaParticipantes');
   const id = sel.value;
-  const list = campaignParticipants(id).sort((a,b)=>b.pct-a.pct);
+  const list = campaignParticipants(id).sort((a,b)=>(b.pct||0)-(a.pct||0));
   document.getElementById('tblParticipantes').innerHTML = list.map(p=>`
-    <tr><td>${p.nome}</td><td>${p.matricula}</td><td>${p.cargo}</td><td>${p.setor}</td><td>${p.filial}</td><td>${fmtDateTime(p.data)}</td><td><span class="${p.pct===100?'pct100':'pctless'}">${p.pct}%</span></td></tr>`).join('') ||
+    <tr><td>${p.nome}</td><td>${p.matricula}</td><td>${p.cargo}</td><td>${p.setor}</td><td>${p.filial}</td><td>${fmtDateTime(p.data)}</td><td><span class="${p.pct===100?'pct100':'pctless'}">${pctTxt(p.pct)}</span></td></tr>`).join('') ||
     `<tr><td colspan="7" style="text-align:center; color:var(--ink-soft); padding:20px;">Nenhum participante ainda.</td></tr>`;
   const media = list.length ? Math.round(list.reduce((a,p)=>a+p.pct,0)/list.length) : 0;
   const {eligible} = evaluateEligibility(id);
@@ -1287,7 +1245,7 @@ function renderParticipantsTable(){
     }
     return {texto:q.texto, pct:pctCorrect};
   });
-  const asc = [...stats].sort((a,b)=>a.pct-b.pct), desc = [...stats].sort((a,b)=>b.pct-a.pct);
+  const asc = [...stats].sort((a,b)=>a.pct-b.pct), desc = [...stats].sort((a,b)=>(b.pct||0)-(a.pct||0));
   document.getElementById('questoesErro').innerHTML = asc.slice(0,3).map(s=>`<div class="hbar-row"><div class="hbar-label" style="width:auto; flex:1; white-space:normal;">${s.texto}</div><div class="hbar-value" style="color:var(--error); width:40px;">${s.pct}%</div></div>`).join('') || '<p class="hint">Sem dados.</p>';
   document.getElementById('questoesAcerto').innerHTML = desc.slice(0,3).map(s=>`<div class="hbar-row"><div class="hbar-label" style="width:auto; flex:1; white-space:normal;">${s.texto}</div><div class="hbar-value" style="color:var(--success); width:40px;">${s.pct}%</div></div>`).join('') || '<p class="hint">Sem dados.</p>';
 }
@@ -1535,17 +1493,18 @@ function renderBanco(){
   if(!tbody) return;
   tbody.innerHTML = questionBank.map(q=>{
     const u = bqUsageStatus(q);
+    const opts = (q.options || []).map(o=>`<li class="${o.correct ? 'ok' : ''}">${o.correct ? '✓' : '○'} ${escH(o.text)}</li>`).join('');
     return `<tr>
-      <td>${q.codigo}</td><td>${q.categoria}</td><td>${q.tema}</td><td>${q.procedimento||'—'}</td>
-      <td>${q.qtdUtilizacoes}x</td>
-      <td><span class="bq-badge ${u.cls}">${u.label}</span></td>
+      <td class="bq-q"><div class="bq-enun">${escH(q.texto)}</div><ul class="bq-alts">${opts}</ul><span class="hint bq-cod">${escH(q.codigo)}${q.type === 'multiplas_respostas' ? ' · múltipla escolha' : ''}</span></td>
+      <td>${escH(q.categoria || '—')}${q.tema ? `<div class="hint">${escH(q.tema)}</div>` : ''}${q.procedimento ? `<div class="hint">${escH(q.procedimento)}</div>` : ''}</td>
+      <td>${q.qtdUtilizacoes || 0}x<br><span class="bq-badge ${u.cls}">${escH(u.label)}</span>${q.origem && !/^Campanha antiga:/.test(q.origem) ? `<div class="hint" style="margin-top:4px;font-size:11px;">${escH(q.origem)}</div>` : ''}</td>
       <td><span class="badge ${q.status==='ativa'?'finalizada':'excluido'}">${q.status==='ativa'?'Ativa':'Inativa'}</span></td>
-      <td style="display:flex; gap:6px;">
-        <button class="btn btn-outline btn-sm" onclick="editBQ('${q.codigo}')">Editar</button>
-        <button class="btn btn-outline btn-sm" onclick="deleteBQ('${q.codigo}')">Excluir</button>
-      </td>
+      <td><div style="display:flex; gap:6px; flex-wrap:wrap;">
+        <button class="btn btn-outline btn-sm" onclick="editBQ('${escH(q.codigo)}')">Editar</button>
+        <button class="btn btn-outline btn-sm" onclick="deleteBQ('${escH(q.codigo)}')">Excluir</button>
+      </div></td>
     </tr>`;
-  }).join('') || `<tr><td colspan="8" style="text-align:center; color:var(--ink-soft); padding:20px;">Nenhuma pergunta cadastrada no banco.</td></tr>`;
+  }).join('') || `<tr><td colspan="5" style="text-align:center; color:var(--ink-soft); padding:20px;">Nenhuma pergunta cadastrada no banco.</td></tr>`;
   fillBQPicker();
 }
 function bqRenderOptions(type, options){
@@ -1937,7 +1896,7 @@ function tempoRestanteTexto(fim){
 function rodadaFechada(c, p){ return campaignAccessStatus(c) !== 'aberta' && (!p || p.pct != null); }
 
 function colaboradorStreakStrip(){
-  const mine = participants.filter(p=>p.matricula===currentUser.matricula);
+  const mine = todosParticipantes().filter(p=>p.matricula===currentUser.matricula);
   const fechadas = mine.filter(p=>p.pct != null);   // média só das rodadas já encerradas (nunca antecipa resultado)
   const media = fechadas.length ? Math.round(fechadas.reduce((a,p)=>a+p.pct,0)/fechadas.length) : null;
   const premios = wonHistory.filter(w=>w.matricula===currentUser.matricula).length;
@@ -1950,6 +1909,7 @@ function colaboradorStreakStrip(){
 function renderCampanhaAtual(){
   const body = document.getElementById('campanhaAtualBody');
   if(!body) return;
+  if(!_dadosCarregados){ body.innerHTML = esqueletoHtml(); return; }
   const open = campaigns.filter(c=>campaignAccessStatus(c)==='aberta');
   const respondida = c => participants.some(p=>p.campaignId===c.id && p.matricula===currentUser.matricula);
   const pendentes = open.filter(c=>!respondida(c));
@@ -1977,6 +1937,7 @@ function renderCampanhaAtual(){
       <div class="meta" style="margin:14px 0;">
         <span><i data-lucide="calendar"></i> Responda até ${fmtPeriodoValor(c.fim)}</span>
         <span><i data-lucide="hourglass"></i> Encerra em ${tempoRestanteTexto(c.fim)}</span>
+        ${(!ja && (new Date(c.fim) - new Date()) < 86400000) ? '<span class="urgente">⏰ Últimas horas — responda hoje!</span>' : ''}
         <span>🎁 Prêmio: ${c.premio || 'a definir'}</span>
       </div>
       ${ja
@@ -2015,7 +1976,8 @@ function painelElegibilidadeHtml(p){
 function renderHistoricoColaborador(){
   const body = document.getElementById('historicoColabBody');
   if(!body) return;
-  const mine = participants.filter(p=>p.matricula===currentUser.matricula).sort((a,b)=>b.data-a.data);
+  if(!_dadosCarregados){ body.innerHTML = esqueletoHtml(); return; }
+  const mine = todosParticipantes().filter(p=>p.matricula===currentUser.matricula).sort((a,b)=>b.data-a.data);
   let html = mascotBubble(mine.length ? "Aqui estão todas as suas participações. O resultado de cada rodada aparece assim que ela encerra. 📋" : "Você ainda não participou de nenhuma campanha — que tal começar agora?");
   html += colaboradorStreakStrip();
   if(!mine.length){
@@ -2024,9 +1986,13 @@ function renderHistoricoColaborador(){
     return;
   }
   html += mine.map(p=>{
-    const c = campaigns.find(x=>x.id===p.campaignId);
+    const c = todasCampanhas().find(x=>x.id===p.campaignId);
     const nome = c ? c.nome : p.campaignId;
     const quando = `Respondido em ${fmtDateTime(p.data)}`;
+    if(c && c.importada){
+      const ganhou = (c.ganhadores||[]).some(g=>matK(g.matricula) && matK(g.matricula) === matK(currentUser.matricula));
+      return `<div class="panel part-card"><div><h3 style="font-size:14.5px;">${escH(nome)} <span class="badge antiga">Campanha anterior</span></h3><p class="hint" style="margin-top:4px;">${c.fim ? escH(fmtPeriodoValor(c.fim)) : ''}</p></div><div class="part-status">${p.pct != null ? `<span class="part-pct">${p.pct}%</span>` : ''}${ganhou ? '<span class="badge programada">🏆 Você foi premiado(a)</span>' : ''}</div></div>`;
+    }
     if(!(c ? rodadaFechada(c, p) : p.pct != null)){
       return `<div class="panel part-card">
         <div><h3 style="font-size:14.5px;">${nome}</h3><p class="hint" style="margin-top:4px;">${quando}</p></div>
@@ -2043,7 +2009,7 @@ function renderHistoricoColaborador(){
       </div>
     </div>`;
   }).join('');
-  const ultimaFechada = mine.find(p=>{ const c = campaigns.find(x=>x.id===p.campaignId); return c && rodadaFechada(c, p); });
+  const ultimaFechada = mine.find(p=>{ const c = todasCampanhas().find(x=>x.id===p.campaignId); return c && !c.importada && rodadaFechada(c, p); });
   if(ultimaFechada) html += painelElegibilidadeHtml(ultimaFechada);
   body.innerHTML = html;
   const btnRegras = document.getElementById('btnVerRegrasElegibilidade');
@@ -2237,9 +2203,9 @@ function openPrintReport(title, headers, rows, footNote, chartSvg){
   setTimeout(()=> win.print(), 300);
 }
 function buildReportData(reportType, campaignId){
-  const c = campaigns.find(x=>x.id===campaignId);
+  const c = todasCampanhas().find(x=>x.id===campaignId);
   if(reportType === 'participantes'){
-    const rows = campaignParticipants(campaignId).map(p=>[p.nome,p.matricula,p.cargo,p.setor,p.filial,fmtDateTime(p.data),p.pct+"%"]);
+    const rows = campaignParticipants(campaignId).map(p=>[p.nome,p.matricula,p.cargo,p.setor,p.filial,fmtDateTime(p.data),pctTxt(p.pct)]);
     return {title:`Lista de participantes — ${c.nome}`, headers:["Nome","Matrícula","Cargo","Setor","Filial","Data/hora","% Acertos"], rows};
   }
   if(reportType === 'elegiveis'){
@@ -2252,7 +2218,7 @@ function buildReportData(reportType, campaignId){
     return {title:`Ganhadores sorteados — ${c.nome}`, headers:["Posição","Nome","Matrícula","Setor","Filial","Função"], rows};
   }
   if(reportType === 'distribuicao'){
-    const allWinners = campaigns.filter(x=>x.ganhadores).flatMap(x=>x.ganhadores);
+    const allWinners = todasCampanhas().filter(x=>x.ganhadores).flatMap(x=>x.ganhadores);
     const rows = allWinners.map(w=>[w.nome,w.setor,w.filial,w.funcao]);
     const counts = {};
     allWinners.forEach(w=> counts[w.setor] = (counts[w.setor]||0)+1);
@@ -2264,17 +2230,17 @@ function buildReportData(reportType, campaignId){
     return {title:`Registro de auditoria do sorteio — ${c.nome}`, headers:["Campanha","Critérios aplicados","Nº aleatório","Responsável","Justificativa"], rows};
   }
   if(reportType === 'historico'){
-    const rows = campaigns.filter(x=>x.ganhadores || x.status==='encerrada').map(x=>[x.nome, fmtPeriodoValor(x.inicio), fmtPeriodoValor(x.fim), campaignParticipants(x.id).length, x.ganhadores?x.ganhadores.length:0]);
+    const rows = todasCampanhas().filter(x=>x.ganhadores || x.status==='encerrada').map(x=>[x.nome, fmtPeriodoValor(x.inicio), fmtPeriodoValor(x.fim), campaignParticipants(x.id).length, x.ganhadores?x.ganhadores.length:0]);
     return {title:"Histórico completo de campanhas", headers:["Campanha","Início","Encerramento","Participantes","Ganhadores"], rows};
   }
   if(reportType === 'comparativo'){
-    const rows = campaigns.map(x=>{
+    const rows = todasCampanhas().map(x=>{
       const parts = campaignParticipants(x.id);
       const media = parts.length ? Math.round(parts.reduce((a,p)=>a+p.pct,0)/parts.length) : 0;
       const {eligible} = evaluateEligibility(x.id);
       return [x.nome, parts.length, eligible.length, media+"%", x.ganhadores?x.ganhadores.length:0, x.status];
     });
-    const chartSvg = buildBarChartSVG(campaigns.map(x=>x.nome.split('–')[0].trim()), campaigns.map(x=>campaignParticipants(x.id).length), {suffix:' resp.'});
+    const chartSvg = buildBarChartSVG(todasCampanhas().map(x=>x.nome.split('–')[0].trim()), todasCampanhas().map(x=>campaignParticipants(x.id).length), {suffix:' resp.'});
     return {title:"Comparativo entre campanhas", headers:["Campanha","Participantes","Elegíveis","Média de acertos","Ganhadores","Status"], rows, chartSvg};
   }
   if(reportType === 'evolucao'){
@@ -2308,15 +2274,15 @@ document.querySelectorAll('.report-btn').forEach(btn=>{
 });
 
 /* ======================= HISTÓRICO (Qualidade) ======================= */
-function renderTimeline(){
-  document.getElementById('timeline').innerHTML = campaigns.filter(c=>c.status==="finalizada" || c.status==="encerrada").map(c=>{
+function renderTimelineReais(){
+  return campaigns.filter(c=>c.status==="finalizada" || c.status==="encerrada").map(c=>{
     const {eligible} = evaluateEligibility(c.id);
     const winnersHtml = c.ganhadores ? `<div class="tl-winners">${c.ganhadores.map(w=>`<span class="chip">🏆 ${w.nome} · ${w.setor}</span>`).join('')}</div>` : `<div class="tl-winners"><span class="chip">Sorteio pendente de execução</span></div>`;
     const metaHtml = c.ganhadores ? `
       <div class="tl-meta"><span><i data-lucide="users"></i> ${campaignParticipants(c.id).length} participantes</span><span><i data-lucide="check-circle-2"></i> ${eligible.length} elegíveis avaliados</span><span><i data-lucide="dices"></i> nº aleatório: ${c.randomSeed || "—"}</span><span><i data-lucide="user"></i> responsável: ${c.responsavel || "—"}</span></div>
       <div class="hint" style="margin-top:6px;">${c.justificativa || ""}</div>` : "";
     return `<div class="tl-item"><div class="tl-dot"></div><div class="tl-body"><h4>${c.nome}</h4><p>${fmtPeriodoValor(c.inicio)} → ${fmtPeriodoValor(c.fim)} · ${statusBadge(c.status)}</p>${winnersHtml}${metaHtml}</div></div>`;
-  }).join('') || `<p style="color:var(--ink-soft); font-size:13px;">Nenhuma campanha encerrada ainda.</p>`;
+  }).join('') ;
 }
 
 /* ======================= REGRAS & EXCEÇÕES ======================= */
@@ -2436,9 +2402,11 @@ document.getElementById('btnGerarBannerGanhadores').addEventListener('click', ()
 function escH(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function matK(v){ return (window.PPGImport && PPGImport.matKey) ? PPGImport.matKey(v) : String(v==null?'':v).trim().replace(/^0+(?=\d)/,''); }
 
+let _focoAntes = null;
 function fecharMiniPagina(){
   const b = document.getElementById('miniPagina'); if(!b) return;
-  b.classList.remove('show'); setTimeout(()=>{ if(b.parentNode) b.remove(); }, 220);
+  b.classList.remove('show');
+  try{ if(_focoAntes && _focoAntes.focus) _focoAntes.focus(); }catch(e){} setTimeout(()=>{ if(b.parentNode) b.remove(); }, 220);
   document.removeEventListener('keydown', _escMini);
 }
 function _escMini(e){ if(e.key === 'Escape') fecharMiniPagina(); }
@@ -2454,12 +2422,17 @@ function abrirMiniPagina(o){
   const corpo = b.querySelector('.pop-body');
   if(typeof o.corpo === 'string') corpo.innerHTML = o.corpo; else if(o.corpo) corpo.appendChild(o.corpo);
   if(o.rodape){ const f = b.querySelector('.pop-foot'); if(typeof o.rodape === 'string') f.innerHTML = o.rodape; else f.appendChild(o.rodape); }
+  _focoAntes = antigo ? _focoAntes : document.activeElement;
   document.body.appendChild(b);
-  b.addEventListener('click', e=>{ if(e.target === b) fecharMiniPagina(); });
+  let _baixou = false;   // só fecha se o clique COMEÇOU fora (selecionar texto e soltar fora não fecha)
+  b.addEventListener('mousedown', e=>{ _baixou = (e.target === b); });
+  b.addEventListener('touchstart', e=>{ _baixou = (e.target === b); }, {passive:true});
+  b.addEventListener('click', e=>{ if(e.target === b && _baixou) fecharMiniPagina(); _baixou = false; });
   b.querySelector('.pop-close').addEventListener('click', fecharMiniPagina);
   document.addEventListener('keydown', _escMini);
   requestAnimationFrame(()=> b.classList.add('show'));
   if(window.lucide) lucide.createIcons();
+  try{ b.querySelector('.pop-close').focus(); }catch(e){}
   return b;
 }
 function tabelaHtml(cabecalhos, linhas, vazio){
@@ -2559,7 +2532,7 @@ function impForm(){
 
   r.innerHTML = `
     <div class="imp-bar"><div><i data-lucide="file-check-2"></i> <b>${escH(IMP.doc.nome)}</b> <span class="hint">· ${IMP.doc.tipo} · ${f.linhas.length} linha(s) na aba</span></div>
-      <button type="button" class="btn btn-outline btn-sm" data-impacao="trocar"><i data-lucide="refresh-cw"></i> Trocar arquivo</button></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;"><button type="button" class="btn btn-outline btn-sm" data-impacao="perguntas"><i data-lucide="help-circle"></i> Importar também as perguntas</button><button type="button" class="btn btn-outline btn-sm" data-impacao="trocar"><i data-lucide="refresh-cw"></i> Trocar arquivo</button></div></div>
     ${(IMP.doc.avisos||[]).map(a=>`<div class="imp-aviso"><i data-lucide="alert-triangle"></i> ${escH(a)}</div>`).join('')}
 
     <div class="imp-passo"><span class="imp-num">1</span> Onde estão os dados?</div>
@@ -2641,6 +2614,7 @@ function impValidar(regs){
   return '';
 }
 function impAcao(a){
+  if(a === 'perguntas'){ impPerguntasDoArquivo(); return; }
   if(a === 'trocar'){ if(IMP.enviando) return; impInicio(); return; }
   if(a === 'confirmar') impConfirmar();
 }
@@ -2663,90 +2637,9 @@ async function impConfirmar(){
   IMP.enviando = false;
   logAction('Histórico importado', `${enviadas} linha(s) de "${IMP.doc.nome}"`);
   const gan = regs.filter(r=>r.ganhador).length;
-  showCelebrationPopup('Histórico importado!', `${enviadas} participação(ões) de “${regs[0].campanha}” foram guardadas${gan ? `, com ${gan} ganhador(es) que já contam na regra dos 2 anos` : ''}.`, '📚');
+  showCelebrationPopup('Histórico importado!', `${enviadas} participação(ões) de “${escH(regs[0].campanha)}” foram guardadas${gan ? `, com ${gan} ganhador(es) que já contam na regra dos 2 anos` : ''}.`, '📚');
   _ultimaAssinatura = null; sincronizarDadosDoServidor(true);
   impInicio(); renderHistoricoImportado();
-}
-
-/* ======================= BANCO DE PERGUNTAS INTELIGENTE ======================= */
-const PREV = {lista:[], categoria:'', tema:'', avisos:[]};
-async function bqImportarArquivo(file){
-  if(!file) return;
-  showToast('Lendo "'+file.name+'"…');
-  try{
-    const doc = await PPGImport.lerArquivoUniversal(file);
-    const r = PPGImport.parsearPerguntas(doc);
-    if(!r.perguntas.length){ showToast('Não consegui identificar perguntas nesse arquivo. Confira se há enunciados seguidos de alternativas (a, b, c…).', 'warning'); return; }
-    PREV.lista = r.perguntas.map(p=>({texto:p.texto, categoria:p.categoria||'', options:p.options.map(o=>({text:o.text, correct:!!o.correct}))}));
-    PREV.categoria = ''; PREV.tema = ''; PREV.avisos = [].concat(r.avisos || [], doc.avisos || []);
-    const corpo = document.createElement('div'); corpo.id = 'prevCorpo';
-    const rodape = document.createElement('div'); rodape.className = 'pop-actions';
-    rodape.innerHTML = `<span class="hint" id="prevResumo"></span><div style="display:flex;gap:8px;"><button type="button" class="btn btn-outline" id="prevCancelar">Cancelar</button><button type="button" class="btn btn-primary" id="prevSalvar"><i data-lucide="check"></i> Salvar no banco</button></div>`;
-    abrirMiniPagina({titulo:'Conferir as perguntas encontradas', subtitulo:`${PREV.lista.length} pergunta(s) em “${doc.nome}” · leitura: ${r.estrategia}. Ajuste o que precisar — nada é salvo antes de você confirmar.`, corpo, rodape, largura:900});
-    corpo.addEventListener('input', prevOnInput); corpo.addEventListener('click', prevOnClick); corpo.addEventListener('change', prevOnChange);
-    rodape.querySelector('#prevCancelar').addEventListener('click', fecharMiniPagina);
-    rodape.querySelector('#prevSalvar').addEventListener('click', prevSalvar);
-    prevRender();
-  }catch(e){ showToast(e.message || 'Não foi possível ler o arquivo.', 'warning'); }
-}
-function prevResumo(){
-  const sem = PREV.lista.filter(p=>!p.options.some(o=>o.correct)).length;
-  const el = document.getElementById('prevResumo');
-  if(el) el.innerHTML = `<b>${PREV.lista.length}</b> pergunta(s)${sem ? ` · <span style="color:var(--warning)"><b>${sem}</b> sem gabarito (serão salvas como inativas)</span>` : ''}`;
-}
-function prevRender(){
-  const c = document.getElementById('prevCorpo'); if(!c) return;
-  const sc = c.parentElement ? c.parentElement.scrollTop : 0;
-  c.innerHTML = (PREV.avisos.length ? `<div class="imp-aviso"><i data-lucide="alert-triangle"></i> ${PREV.avisos.slice(0,4).map(escH).join('<br>')}</div>` : '') +
-    `<div class="form-grid" style="margin-bottom:14px;"><div class="field"><label>Categoria para todas (opcional)</label><input type="text" data-prev="cat" value="${escH(PREV.categoria)}" placeholder="Ex: Segurança"></div><div class="field"><label>Tema para todas (opcional)</label><input type="text" data-prev="tema" value="${escH(PREV.tema)}" placeholder="Ex: Segurança da Informação"></div></div>` +
-    PREV.lista.map((p,i)=>{
-      const n = p.options.filter(o=>o.correct).length;
-      return `<div class="prev-q${n===0?' sem-gab':''}">
-        <div class="prev-q-head"><b>${i+1}.</b><span class="badge ${n>1?'finalizada':'andamento'}">${n>1?'Múltipla escolha':'Resposta única'}</span>${n===0?'<span class="badge programada">sem gabarito — marque a correta</span>':''}<span style="flex:1"></span><button type="button" class="icon-btn" data-prev="delq" data-i="${i}" title="Remover pergunta"><i data-lucide="trash-2"></i></button></div>
-        <textarea rows="2" data-prev="qtexto" data-i="${i}">${escH(p.texto)}</textarea>
-        ${p.options.map((o,j)=>`<div class="prev-alt"><input type="checkbox" title="Marque se for a correta" data-prev="ok" data-i="${i}" data-j="${j}" ${o.correct?'checked':''}><input type="text" data-prev="atexto" data-i="${i}" data-j="${j}" value="${escH(o.text)}"><button type="button" class="icon-btn" data-prev="delalt" data-i="${i}" data-j="${j}" title="Remover alternativa"><i data-lucide="x"></i></button></div>`).join('')}
-        <button type="button" class="btn btn-ghost btn-sm" data-prev="addalt" data-i="${i}"><i data-lucide="plus"></i> alternativa</button>
-      </div>`;
-    }).join('');
-  if(c.parentElement) c.parentElement.scrollTop = sc;
-  prevResumo();
-  if(window.lucide) lucide.createIcons();
-}
-function prevOnInput(e){
-  const t = e.target, k = t.dataset.prev; if(!k) return;
-  if(k === 'cat') PREV.categoria = t.value; else if(k === 'tema') PREV.tema = t.value;
-  else if(k === 'qtexto') PREV.lista[+t.dataset.i].texto = t.value;
-  else if(k === 'atexto') PREV.lista[+t.dataset.i].options[+t.dataset.j].text = t.value;
-}
-function prevOnChange(e){
-  const t = e.target; if(t.dataset.prev !== 'ok') return;
-  PREV.lista[+t.dataset.i].options[+t.dataset.j].correct = t.checked; prevRender();
-}
-function prevOnClick(e){
-  const b = e.target.closest('button[data-prev]'); if(!b) return;
-  const i = +b.dataset.i, j = +b.dataset.j, k = b.dataset.prev;
-  if(k === 'delq') PREV.lista.splice(i, 1);
-  else if(k === 'delalt') PREV.lista[i].options.splice(j, 1);
-  else if(k === 'addalt') PREV.lista[i].options.push({text:'', correct:false});
-  else return;
-  prevRender();
-}
-async function prevSalvar(){
-  const validas = PREV.lista.filter(p=>p.texto.trim() && p.options.filter(o=>o.text.trim()).length >= 2);
-  if(!validas.length){ showToast('Nenhuma pergunta válida para salvar (cada uma precisa de enunciado e 2+ alternativas).', 'warning'); return; }
-  const payload = validas.map(p=>{
-    const opts = p.options.filter(o=>o.text.trim()).map(o=>({text:o.text.trim(), correct:!!o.correct}));
-    const n = opts.filter(o=>o.correct).length;
-    return {texto:p.texto.trim(), type:n>1?'multiplas_respostas':'unica', options:opts, categoria:PREV.categoria.trim() || p.categoria || 'Importada', tema:PREV.tema.trim(), status:n===0?'inativa':'ativa'};
-  });
-  const btn = document.getElementById('prevSalvar'); btn.disabled = true; btn.textContent = 'Salvando…';
-  const resp = await backendCall('salvarPerguntasLote', {perguntas: payload});
-  if(!resp.ok){ btn.disabled = false; btn.innerHTML = '<i data-lucide="check"></i> Salvar no banco'; showToast(resp.erro || 'Não foi possível salvar as perguntas.', 'warning'); return; }
-  const sem = payload.filter(p=>p.status === 'inativa').length;
-  fecharMiniPagina();
-  logAction('Importação de perguntas', `${resp.salvas} pergunta(s) importada(s)`);
-  showToast(`${resp.salvas} pergunta(s) salva(s) no banco${sem ? ` — ${sem} sem gabarito ficaram inativas` : ''}.`, 'success');
-  _ultimaAssinatura = null; sincronizarDadosDoServidor(true);
 }
 
 /* ======================= PÁGINA INICIAL DA QUALIDADE: rodada, atalhos, setor/filial e pop-ups ======================= */
@@ -2757,12 +2650,13 @@ function rodadaDestaque(){
   return [...lista].sort((a,b)=> new Date(b.inicio||0) - new Date(a.inicio||0))[0] || null;
 }
 function statusRodada(c){
-  const roster = EMPRESA.colaboradores || [];
+  const roster = (EMPRESA.colaboradores || []).filter(c=>!c.qualidade);   // a Qualidade não participa
   const resp = new Set(participants.filter(p=>p.campaignId === c.id).map(p=>matK(p.matricula)));
   return {roster, respondeu: roster.filter(r=>resp.has(matK(r.matricula))), faltam: roster.filter(r=>!resp.has(matK(r.matricula))), totalRespostas: resp.size};
 }
 function renderHomeQualidade(){
   const box = document.getElementById('homeRodada'); if(!box) return;
+  if(!_dadosCarregados){ box.innerHTML = '<div class="rodada-card"><div class="skel skel-l1"></div><div class="skel skel-bar"></div><div class="skel skel-l2"></div></div>'; return; }
   const c = rodadaDestaque();
   if(!c){
     box.innerHTML = `<div class="rodada-card vazio"><div><h3>Nenhuma campanha ainda</h3><p class="hint">Crie a primeira rodada do PPG para começar a receber respostas.</p></div><button type="button" class="btn btn-primary" onclick="goToSection('nova')"><i data-lucide="plus-circle"></i> Criar campanha</button></div>`;
@@ -2844,7 +2738,7 @@ window.abrirQuemFalta = function(){
     <div class="field full"><label>Buscar por nome ou matrícula</label><input type="text" data-qf="busca" placeholder="Digite para filtrar…"></div></div>
     <div id="qfLista"></div>`;
   const rodape = document.createElement('div'); rodape.className = 'pop-actions';
-  rodape.innerHTML = `<span class="hint" id="qfContagem"></span><div style="display:flex;gap:8px;flex-wrap:wrap;"><button type="button" class="btn btn-outline btn-sm" id="qfCopiar"><i data-lucide="copy"></i> Copiar lista</button><button type="button" class="btn btn-outline btn-sm" id="qfCsv"><i data-lucide="download"></i> Baixar .csv</button></div>`;
+  rodape.innerHTML = `<span class="hint" id="qfContagem"></span><div style="display:flex;gap:8px;flex-wrap:wrap;"><button type="button" class="btn btn-outline btn-sm" id="qfCopiar"><i data-lucide="copy"></i> Copiar lista</button><button type="button" class="btn btn-outline btn-sm" id="qfCsv"><i data-lucide="download"></i> Baixar .csv</button>${campaignAccessStatus(c) === 'aberta' ? '<button type="button" class="btn btn-primary btn-sm" id="qfLembrar"><i data-lucide="mail"></i> Enviar lembrete por e-mail</button>' : ''}</div>`;
   let filtrados = [];
   const aplicar = ()=>{
     const f = {setor: corpo.querySelector('[data-qf=setor]').value, filial: corpo.querySelector('[data-qf=filial]').value, busca: PPGImport.norm(corpo.querySelector('[data-qf=busca]').value)};
@@ -2856,6 +2750,7 @@ window.abrirQuemFalta = function(){
   abrirMiniPagina({titulo:'Quem ainda não respondeu', subtitulo:`${c.nome} · ${st.respondeu.length} de ${st.roster.length} já responderam`, corpo, rodape, largura:820});
   rodape.querySelector('#qfCopiar').addEventListener('click', ()=> copiarTexto(filtrados.map(r=>`${r.nome} (${r.matricula}) — ${r.setor||''} / ${r.filial||''}`).join('\n'), 'Lista copiada!'));
   rodape.querySelector('#qfCsv').addEventListener('click', ()=> downloadCSV('quem_falta_responder.csv', ['Nome','Matrícula','Setor','Filial'], filtrados.map(r=>[r.nome, r.matricula, r.setor||'', r.filial||''])));
+  const bl = rodape.querySelector('#qfLembrar'); if(bl) bl.addEventListener('click', ()=> lembrarQuemFalta(c, bl));
   aplicar();
 };
 window.popGrupo = function(campo, kEnc){
@@ -2889,6 +2784,301 @@ window.kpiPopup = function(tipo){
 };
 
 
+/* ======================= CAMPANHAS ANTIGAS (importadas) — entram no Histórico, Relatórios, Auditoria e Resultados ======================= */
+function hashTxt(s){ let h = 5381; s = String(s); for(let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return Math.abs(h).toString(36); }
+function pctTxt(v){ return (v == null || v === '' || isNaN(v)) ? '—' : v + '%'; }
+function ordenarPorFim(lista){ return [...lista].sort((a,b)=> new Date(a.fim || a.inicio || 0) - new Date(b.fim || b.inicio || 0)); }
+function todasCampanhas(){ return [...campaigns, ...campanhasAntigas]; }
+function todosParticipantes(){ return [...participants, ...participantesAntigos]; }
+function construirAntigas(hist){
+  const grupos = {};
+  (hist || []).forEach(h=>{
+    const nome = String(h.campanha || '').trim() || '(sem nome)';
+    const fim = (window.PPGImport ? PPGImport.normalizarData(h.periodoFim) : '') || '';
+    const ini = (window.PPGImport ? PPGImport.normalizarData(h.periodoInicio) : '') || '';
+    const k = nome + '|' + fim;
+    const g = grupos[k] = grupos[k] || {nome, fim, ini:'', linhas:[]};
+    g.linhas.push(h); if(!g.ini && ini) g.ini = ini;
+  });
+  const cs = [], ps = [];
+  Object.keys(grupos).forEach(k=>{
+    const g = grupos[k], id = 'hist:' + hashTxt(k);
+    const fimISO = g.fim ? g.fim + 'T23:59' : '', iniISO = (g.ini || g.fim) ? (g.ini || g.fim) + 'T00:00' : '';
+    const ganhadores = g.linhas.filter(h=>String(h.ganhador).toLowerCase() === 'sim').map(h=>({nome:h.nome, matricula:String(h.matricula || ''), setor:h.setor || '', filial:h.filial || '', funcao:h.funcao || '', premio:h.premio || ''}));
+    cs.push({id, nome:g.nome, descricao:'Campanha anterior ao sistema (importada)', objetivo:'', inicio:iniISO, fim:fimISO, status:'finalizada', premio:(ganhadores.find(w=>w.premio) || {}).premio || '', qtdGanhadores:ganhadores.length, criterios:'', questoes:[], ganhadores, importada:true, arquivo:g.linhas[0].origemArquivo || '', importadoEm:g.linhas[0].importadoEm || ''});
+    const dt = fimISO ? new Date(fimISO) : new Date(g.linhas[0].importadoEm || Date.now());
+    g.linhas.forEach(h=>{
+      const n = (h.percentualAcertos === '' || h.percentualAcertos == null) ? null : Number(h.percentualAcertos);
+      ps.push({campaignId:id, matricula:String(h.matricula || ''), nome:h.nome || '', setor:h.setor || '', filial:h.filial || '', funcao:h.funcao || '', cargo:h.funcao || '', pct:(n == null || isNaN(n)) ? null : n, acertosQtd:null, totalQuestoes:null, data:dt, dataInicio:null, dataFim:dt, importada:true});
+    });
+  });
+  return {campanhas:cs, participantes:ps};
+}
+
+/* ======================= CARREGAMENTO RÁPIDO E CONFIÁVEL ======================= */
+let _ultimoSyncOk = 0, _dadosCarregados = false, _snapPendente = null, _rosterEm = 0, _aplicouNoLogin = false;
+const CACHE_SNAP = 'ppg_snap_v1';
+function salvarCacheSnapshot(resp){
+  try{ if(!currentUser) return; localStorage.setItem(CACHE_SNAP, JSON.stringify({mat:currentUser.matricula, em:Date.now(), snap:{campanhas:resp.campanhas, respostas:resp.respostas, historico:resp.historico, perguntas:resp.perguntas || null}})); }
+  catch(e){ try{ localStorage.removeItem(CACHE_SNAP); }catch(_){} }
+}
+function limparCacheSnapshot(){ try{ localStorage.removeItem(CACHE_SNAP); }catch(e){} }
+/* Reabre o app com os últimos dados já na tela (e atualiza por trás) — sem tela vazia esperando o servidor. */
+function carregarCacheSnapshot(){
+  try{
+    const c = JSON.parse(localStorage.getItem(CACHE_SNAP) || 'null');
+    if(!c || !currentUser || c.mat !== currentUser.matricula || Date.now() - c.em > 12*3600*1000) return false;
+    aplicarSnapshot(Object.assign({ok:true}, c.snap)); _ultimoSyncOk = c.em;
+    return true;
+  }catch(e){ return false; }
+}
+function esqueletoHtml(){ return `<div class="skel-wrap"><div class="skel skel-l1"></div><div class="skel skel-l2"></div><div class="skel skel-card"></div></div>`; }
+
+function aplicarSnapshot(resp){
+  _ultimoSyncOk = Date.now(); _falhasSync = 0;
+  if(resp.colaboradores){
+    EMPRESA.colaboradores = resp.colaboradores.map(c=>({matricula:String(c.matricula), nome:c.nome, setor:c.setor, filial:c.filial, funcao:c.funcao, qualidade:!!c.qualidade, temEmail:!!c.temEmail}));
+    _rosterEm = Date.now(); _renderPendente = true;
+  }
+  const primeira = !_dadosCarregados;
+  _dadosCarregados = true;
+  const assinatura = JSON.stringify([resp.campanhas, resp.respostas, resp.historico, resp.perguntas || null]);
+  if(assinatura === _ultimaAssinatura && !primeira){ atualizarIndicadorSync(); return false; }
+  _ultimaAssinatura = assinatura;
+
+  campaigns = (resp.campanhas || []).map(c=>({...c, id: String(c.id)}));
+  campaigns.forEach(c=>{ try{ c.status = calcularStatusPorData(c); }catch(e){} });   // programada → andamento → encerrada (só exibição)
+  if(resp.perguntas) questionBank = resp.perguntas.map(q=>({...q, codigo: String(q.codigo)}));
+  participants = (resp.respostas || []).map(r=>({
+    ...r, matricula: String(r.matricula), campaignId: String(r.campaignId),
+    data: r.dataFim ? new Date(r.dataFim) : new Date(),
+    dataInicio: r.dataInicio ? new Date(r.dataInicio) : null, dataFim: r.dataFim ? new Date(r.dataFim) : null
+  }));
+  historicoServidor = resp.historico || [];
+  const antigas = construirAntigas(historicoServidor);
+  campanhasAntigas = antigas.campanhas; participantesAntigos = antigas.participantes;
+  const ganhosImportados = historicoServidor
+    .filter(h => String(h.ganhador).toLowerCase() === 'sim')
+    .map(h => ({matricula: String(h.matricula), data: new Date(h.periodoFim || h.importadoEm || Date.now())}));
+  const ganhosAoVivo = [];
+  campaigns.forEach(c=>{ if(c.ganhadores && c.ganhadores.length) c.ganhadores.forEach(g => ganhosAoVivo.push({matricula: String(g.matricula), data: new Date(c.fim)})); });
+  wonHistory = [...ganhosImportados, ...ganhosAoVivo];
+  salvarCacheSnapshot(resp);
+  atualizarIndicadorSync();
+  return true;
+}
+async function sincronizarDadosDoServidor(){
+  if(sincronizando || !currentUser || !currentUser.token) return;
+  sincronizando = true; atualizarIndicadorSync();
+  try{
+    const precisaQuadro = currentRole === 'qualidade' && (!(EMPRESA.colaboradores || []).length || Date.now() - _rosterEm > 300000);
+    const resp = await backendCall('getSnapshot', {comColaboradores: precisaQuadro});
+    if(!resp.ok){ if(!resp.sessaoExpirada) _falhasSync++; return; }
+    if(aplicarSnapshot(resp)) renderSilencioso();
+  }catch(e){
+    _falhasSync++; console.warn("Não foi possível sincronizar com o servidor agora:", e);
+  }finally{
+    sincronizando = false; atualizarIndicadorSync();
+  }
+}
+function iniciarSincronizacao(){
+  _falhasSync = 0;
+  if(_aplicouNoLogin) _aplicouNoLogin = false;   // os dados já vieram junto com o login
+  else sincronizarDadosDoServidor();
+  if(window._syncAtivo) return;
+  window._syncAtivo = true;
+  const ciclo = async ()=>{
+    try{ if(currentUser && document.visibilityState === 'visible') await sincronizarDadosDoServidor(); }catch(e){}
+    const base = currentRole === 'qualidade' ? 20000 : 30000;
+    setTimeout(ciclo, base * Math.min(4, 1 + _falhasSync));   // servidor instável: espaça as tentativas
+  };
+  setTimeout(ciclo, 20000);
+  document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState === 'visible' && currentUser) sincronizarDadosDoServidor(); });
+}
+function atualizarIndicadorSync(){
+  const chip = document.getElementById('syncChip'), txt = document.getElementById('syncTxt'); if(!chip || !txt) return;
+  let estado = 'ok', t;
+  if(sincronizando){ estado = 'sync'; t = 'Atualizando…'; }
+  else if(_falhasSync >= 2){ estado = 'erro'; t = _ultimoSyncOk ? 'Sem conexão · dados das ' + pad(new Date(_ultimoSyncOk).getHours()) + ':' + pad(new Date(_ultimoSyncOk).getMinutes()) : 'Sem conexão com o servidor'; }
+  else if(!_ultimoSyncOk){ estado = 'sync'; t = 'Carregando…'; }
+  else { const s = Math.round((Date.now() - _ultimoSyncOk) / 1000); t = s < 10 ? 'Atualizado agora' : s < 60 ? `Atualizado há ${s}s` : `Atualizado há ${Math.round(s/60)} min`; }
+  chip.dataset.estado = estado; txt.textContent = t; chip.title = t + ' — clique para atualizar agora';
+}
+setInterval(atualizarIndicadorSync, 10000);
+document.getElementById('syncChip')?.addEventListener('click', ()=>{ if(!currentUser) return; _ultimaAssinatura = null; sincronizarDadosDoServidor(); });
+
+/* ======================= HISTÓRICO: campanhas antigas na linha do tempo ======================= */
+function renderTimeline(){
+  const el = document.getElementById('timeline'); if(!el) return;
+  const reais = renderTimelineReais();
+  const antigas = ordenarPorFim(campanhasAntigas).reverse();
+  const htmlAnt = antigas.map(c=>{
+    const ps = participantesAntigos.filter(p=>p.campaignId === c.id), gan = c.ganhadores || [];
+    return `<div class="tl-item"><div class="tl-dot"></div><div class="tl-body">
+      <h4>${escH(c.nome)} <span class="badge antiga" style="vertical-align:2px;">Campanha anterior</span></h4>
+      <p>${c.fim ? escH(fmtPeriodoValor(c.fim)) : 'data não informada'}${c.arquivo ? ' · origem: ' + escH(c.arquivo) : ''}</p>
+      <div class="tl-meta"><span><i data-lucide="users"></i> ${ps.length} participante(s)</span><span><i data-lucide="trophy"></i> ${gan.length} ganhador(es)</span></div>
+      ${gan.length ? `<div class="tl-winners">${gan.slice(0,12).map(w=>`<span class="chip">🏆 ${escH(w.nome)}${w.setor ? ' · ' + escH(w.setor) : ''}</span>`).join('')}${gan.length > 12 ? `<span class="chip">+${gan.length - 12}</span>` : ''}</div>` : '<div class="hint" style="margin-top:6px;">Ganhadores não informados na planilha.</div>'}
+      <button type="button" class="btn btn-ghost btn-sm" style="margin-top:8px;" onclick="abrirHistoricoCampanha('${c.id}')"><i data-lucide="eye"></i> Ver detalhes</button>
+    </div></div>`;
+  }).join('');
+  el.innerHTML = (reais ? `<h4 class="tl-grupo">Rodadas no sistema</h4>${reais}` : '') + (htmlAnt ? `<h4 class="tl-grupo">Campanhas anteriores ao sistema (importadas)</h4>${htmlAnt}` : '')
+    || `<p style="color:var(--ink-soft); font-size:13px;">Nenhuma campanha encerrada ainda. As campanhas antigas que você importar aparecem aqui.</p>`;
+}
+window.abrirHistoricoCampanha = function(id){
+  const c = campanhasAntigas.find(x=>x.id === id); if(!c) return;
+  const ps = participantesAntigos.filter(p=>p.campaignId === id), gan = c.ganhadores || [];
+  const perguntas = questionBank.filter(q=> String(q.origem || '').indexOf(c.nome) !== -1);
+  const corpo = `<div class="imp-pills"><span class="imp-pill"><b>${ps.length}</b> participante(s)</span><span class="imp-pill ok"><b>${gan.length}</b> ganhador(es)</span><span class="imp-pill"><b>${perguntas.length}</b> pergunta(s) no banco</span></div>
+    <p class="hint">${c.fim ? 'Terminou em ' + escH(fmtPeriodoValor(c.fim)) : 'Data de término não informada'}${c.arquivo ? ' · arquivo: ' + escH(c.arquivo) : ''}${c.premio ? ' · prêmio: ' + escH(c.premio) : ''}</p>
+    <h4 class="pop-sub">Ganhadores</h4>${tabelaHtml(['Nome','Matrícula','Setor','Filial','Prêmio'], gan.map(w=>[escH(w.nome), escH(w.matricula), escH(w.setor), escH(w.filial), escH(w.premio)]), 'Ganhadores não informados.')}
+    <h4 class="pop-sub">Participantes</h4>${tabelaHtml(['Nome','Matrícula','Setor','Filial','% acertos'], ps.slice(0,300).map(p=>[escH(p.nome), escH(p.matricula), escH(p.setor), escH(p.filial), pctTxt(p.pct)]), 'Sem participantes.')}${ps.length > 300 ? `<p class="hint">Mostrando 300 de ${ps.length}.</p>` : ''}`;
+  const rodape = `<div class="pop-actions"><span class="hint">Campanha anterior ao sistema — importada de planilha</span><button type="button" class="btn btn-outline btn-sm" id="histCsv"><i data-lucide="download"></i> Baixar .csv</button></div>`;
+  const b = abrirMiniPagina({titulo:c.nome, subtitulo:'Campanha anterior ao sistema', corpo, rodape, largura:860});
+  b.querySelector('#histCsv').addEventListener('click', ()=> downloadCSV('campanha_antiga.csv', ['Nome','Matrícula','Setor','Filial','% acertos','Ganhador'], ps.map(p=>[p.nome, p.matricula, p.setor, p.filial, p.pct == null ? '' : p.pct, gan.some(w=>matK(w.matricula) && matK(w.matricula) === matK(p.matricula)) || gan.some(w=>w.nome === p.nome && !w.matricula) ? 'Sim' : 'Não'])));
+};
+
+/* ======================= BANCO DE PERGUNTAS INTELIGENTE ======================= */
+const PREV = {lista:[], categoria:'', tema:'', avisos:[], usada:false, campanhaUso:'', dataUso:'', arquivo:''};
+async function bqImportarArquivo(file, preset){
+  if(!file) return;
+  showToast('Lendo "'+file.name+'"…');
+  try{
+    const doc = await PPGImport.lerArquivoUniversal(file);
+    const r = PPGImport.parsearPerguntas(doc);
+    if(!r.perguntas.length){ showToast('Não consegui identificar perguntas nesse arquivo. Confira se há enunciados seguidos de alternativas (a, b, c…).', 'warning'); return; }
+    abrirPreviaPerguntas(r, doc, preset);
+  }catch(e){ showToast(e.message || 'Não foi possível ler o arquivo.', 'warning'); }
+}
+function abrirPreviaPerguntas(r, doc, preset){
+  PREV.lista = r.perguntas.map(p=>({texto:p.texto, categoria:p.categoria || '', options:p.options.map(o=>({text:o.text, correct:!!o.correct}))}));
+  PREV.categoria = ''; PREV.tema = ''; PREV.arquivo = doc.nome; PREV.avisos = [].concat(r.avisos || [], doc.avisos || []);
+  const p = preset || {};
+  PREV.usada = !!p.usada; PREV.campanhaUso = p.campanha || ''; PREV.dataUso = p.data || '';
+  const corpo = document.createElement('div'); corpo.id = 'prevCorpo';
+  const rodape = document.createElement('div'); rodape.className = 'pop-actions';
+  rodape.innerHTML = `<span class="hint" id="prevResumo"></span><div style="display:flex;gap:8px;"><button type="button" class="btn btn-outline" id="prevCancelar">Cancelar</button><button type="button" class="btn btn-primary" id="prevSalvar"><i data-lucide="check"></i> Salvar no banco</button></div>`;
+  abrirMiniPagina({titulo:'Conferir as perguntas encontradas', subtitulo:`${PREV.lista.length} pergunta(s) em “${doc.nome}” · leitura: ${r.estrategia}. Ajuste o que precisar — nada é salvo antes de você confirmar.`, corpo, rodape, largura:900});
+  corpo.addEventListener('input', prevOnInput); corpo.addEventListener('click', prevOnClick); corpo.addEventListener('change', prevOnChange);
+  rodape.querySelector('#prevCancelar').addEventListener('click', fecharMiniPagina);
+  rodape.querySelector('#prevSalvar').addEventListener('click', prevSalvar);
+  prevRender();
+}
+function impPerguntasDoArquivo(){
+  if(!IMP.doc) return;
+  const r = PPGImport.parsearPerguntas(IMP.doc);
+  if(!r.perguntas.length){ showToast('Não encontrei perguntas neste arquivo. Se elas estão em outro arquivo, use “Importar perguntas” no Banco de Perguntas e marque que já foram usadas.', 'warning'); return; }
+  abrirPreviaPerguntas(r, IMP.doc, {usada:true, campanha:IMP.nome, data:IMP.fim});
+}
+function prevResumo(){
+  const sem = PREV.lista.filter(p=>!p.options.some(o=>o.correct)).length;
+  const el = document.getElementById('prevResumo');
+  if(el) el.innerHTML = `<b>${PREV.lista.length}</b> pergunta(s)${sem ? ` · <span style="color:var(--warning)"><b>${sem}</b> sem gabarito (serão salvas como inativas)</span>` : ''}`;
+}
+function prevRender(){
+  const c = document.getElementById('prevCorpo'); if(!c) return;
+  const sc = c.parentElement ? c.parentElement.scrollTop : 0;
+  c.innerHTML = (PREV.avisos.length ? `<div class="imp-aviso"><i data-lucide="alert-triangle"></i> ${PREV.avisos.slice(0,4).map(escH).join('<br>')}</div>` : '') +
+    `<div class="form-grid" style="margin-bottom:12px;"><div class="field"><label>Categoria para todas (opcional)</label><input type="text" data-prev="cat" value="${escH(PREV.categoria)}" placeholder="Ex: Segurança"></div><div class="field"><label>Tema para todas (opcional)</label><input type="text" data-prev="tema" value="${escH(PREV.tema)}" placeholder="Ex: Segurança da Informação"></div></div>` +
+    `<div class="prev-uso"><label class="imp-chip"><input type="checkbox" data-prev="usada" ${PREV.usada ? 'checked' : ''}> Estas perguntas já foram usadas em uma campanha antiga (método anterior)</label>` +
+    (PREV.usada ? `<div class="form-grid" style="margin-top:10px;"><div class="field"><label>Nome da campanha antiga</label><input type="text" data-prev="campuso" value="${escH(PREV.campanhaUso)}" placeholder="Ex: PPG 2023.1"></div><div class="field"><label>Quando terminou <span style="color:var(--error)">*</span></label><input type="date" data-prev="datauso" value="${escH(PREV.dataUso)}"></div></div><p class="hint" style="margin:8px 0 0;">Entram no banco como <b>já utilizadas</b> (1 vez, nessa data). Se alguém tentar reaproveitar dentro de 2 anos, o sistema avisa.</p>` : '') + `</div>` +
+    PREV.lista.map((p,i)=>{
+      const n = p.options.filter(o=>o.correct).length;
+      return `<div class="prev-q${n===0?' sem-gab':''}">
+        <div class="prev-q-head"><b>${i+1}.</b><span class="badge ${n>1?'finalizada':'andamento'}">${n>1?'Múltipla escolha':'Resposta única'}</span>${n===0?'<span class="badge programada">sem gabarito — marque a correta</span>':''}<span style="flex:1"></span><button type="button" class="icon-btn" data-prev="delq" data-i="${i}" title="Remover pergunta"><i data-lucide="trash-2"></i></button></div>
+        <textarea rows="2" data-prev="qtexto" data-i="${i}">${escH(p.texto)}</textarea>
+        ${p.options.map((o,j)=>`<div class="prev-alt"><input type="checkbox" title="Marque se for a correta" data-prev="ok" data-i="${i}" data-j="${j}" ${o.correct?'checked':''}><input type="text" data-prev="atexto" data-i="${i}" data-j="${j}" value="${escH(o.text)}"><button type="button" class="icon-btn" data-prev="delalt" data-i="${i}" data-j="${j}" title="Remover alternativa"><i data-lucide="x"></i></button></div>`).join('')}
+        <button type="button" class="btn btn-ghost btn-sm" data-prev="addalt" data-i="${i}"><i data-lucide="plus"></i> alternativa</button>
+      </div>`;
+    }).join('');
+  if(c.parentElement) c.parentElement.scrollTop = sc;
+  prevResumo();
+  if(window.lucide) lucide.createIcons();
+}
+function prevOnInput(e){
+  const t = e.target, k = t.dataset.prev; if(!k) return;
+  if(k === 'cat') PREV.categoria = t.value; else if(k === 'tema') PREV.tema = t.value;
+  else if(k === 'campuso') PREV.campanhaUso = t.value; else if(k === 'datauso') PREV.dataUso = t.value;
+  else if(k === 'qtexto') PREV.lista[+t.dataset.i].texto = t.value;
+  else if(k === 'atexto') PREV.lista[+t.dataset.i].options[+t.dataset.j].text = t.value;
+}
+function prevOnChange(e){
+  const t = e.target;
+  if(t.dataset.prev === 'ok'){ PREV.lista[+t.dataset.i].options[+t.dataset.j].correct = t.checked; prevRender(); }
+  else if(t.dataset.prev === 'usada'){ PREV.usada = t.checked; prevRender(); }
+  else if(t.dataset.prev === 'datauso'){ PREV.dataUso = t.value; }
+}
+function prevOnClick(e){
+  const b = e.target.closest('button[data-prev]'); if(!b) return;
+  const i = +b.dataset.i, j = +b.dataset.j, k = b.dataset.prev;
+  if(k === 'delq') PREV.lista.splice(i, 1);
+  else if(k === 'delalt') PREV.lista[i].options.splice(j, 1);
+  else if(k === 'addalt') PREV.lista[i].options.push({text:'', correct:false});
+  else return;
+  prevRender();
+}
+async function prevSalvar(){
+  const validas = PREV.lista.filter(p=>p.texto.trim() && p.options.filter(o=>o.text.trim()).length >= 2);
+  if(!validas.length){ showToast('Nenhuma pergunta válida para salvar (cada uma precisa de enunciado e 2+ alternativas).', 'warning'); return; }
+  if(PREV.usada && !PPGImport.normalizarData(PREV.dataUso)){ showToast('Informe quando a campanha antiga terminou — é assim que o sistema sabe há quanto tempo a pergunta foi usada.', 'warning'); return; }
+  const uso = PREV.usada
+    ? {ultimaUtilizacao:PPGImport.normalizarData(PREV.dataUso), qtdUtilizacoes:1, origem:`Campanha antiga: ${PREV.campanhaUso.trim() || 'sem nome'} (método anterior)`}
+    : {origem:`Importada de ${PREV.arquivo}`};
+  const payload = validas.map(p=>{
+    const opts = p.options.filter(o=>o.text.trim()).map(o=>({text:o.text.trim(), correct:!!o.correct}));
+    const n = opts.filter(o=>o.correct).length;
+    return Object.assign({texto:p.texto.trim(), type:n>1?'multiplas_respostas':'unica', options:opts, categoria:PREV.categoria.trim() || p.categoria || (PREV.usada ? 'Campanhas antigas' : 'Importada'), tema:PREV.tema.trim(), status:n===0?'inativa':'ativa'}, uso);
+  });
+  const btn = document.getElementById('prevSalvar'); btn.disabled = true; btn.textContent = 'Salvando…';
+  const resp = await backendCall('salvarPerguntasLote', {perguntas: payload});
+  if(!resp.ok){ btn.disabled = false; btn.innerHTML = '<i data-lucide="check"></i> Salvar no banco'; showToast(resp.erro || 'Não foi possível salvar as perguntas.', 'warning'); return; }
+  const sem = payload.filter(p=>p.status === 'inativa').length;
+  fecharMiniPagina();
+  logAction('Importação de perguntas', `${resp.salvas} pergunta(s)${PREV.usada ? ' (já usadas em ' + PREV.campanhaUso + ')' : ''}`);
+  showToast(`${resp.salvas} pergunta(s) salva(s) no banco${PREV.usada ? ' como já utilizadas' : ''}${sem ? ` — ${sem} sem gabarito ficaram inativas` : ''}.`, 'success');
+  _ultimaAssinatura = null; sincronizarDadosDoServidor();
+}
+
+/* ======================= LEMBRETE POR E-MAIL ======================= */
+async function lembrarQuemFalta(c, btn){
+  const st = statusRodada(c);
+  if(!confirm(`Enviar um lembrete por e-mail para quem ainda não respondeu “${c.nome}”?\n\nFaltam ${st.faltam.length} pessoa(s).`)) return;
+  btn.disabled = true; const rot = btn.innerHTML; btn.textContent = 'Enviando…';
+  const resp = await backendCall('enviarLembretes', {campaignId: c.id});
+  btn.disabled = false; btn.innerHTML = rot;
+  if(!resp.ok){ showToast(resp.erro || 'Não foi possível enviar o lembrete.', 'warning'); return; }
+  logAction('Lembrete enviado', `${resp.enviados} e-mail(s) — ${c.nome}`);
+  showToast(resp.modoTeste
+    ? `Modo teste: simulei o lembrete para ${resp.enviados} pessoa(s) e enviei só um e-mail de exemplo para o endereço de teste.`
+    : `Lembrete enviado para ${resp.enviados} pessoa(s)${resp.semEmail ? ` (${resp.semEmail} sem e-mail cadastrado)` : ''}.`, 'success');
+}
+
+/* ======================= VERIFICAÇÃO DO QUADRO DE COLABORADORES (Configurações) ======================= */
+function renderQuadro(){
+  const el = document.getElementById('painelQuadroBody'); if(!el) return;
+  const r = EMPRESA.colaboradores || [];
+  if(!r.length){ el.innerHTML = '<p class="hint">Carregando o quadro de colaboradores…</p>'; return; }
+  const part = r.filter(c=>!c.qualidade);
+  const cont = {}; r.forEach(c=>{ const k = matK(c.matricula); cont[k] = (cont[k] || 0) + 1; });
+  const dups = Object.keys(cont).filter(k=>cont[k] > 1);
+  const semSetor = r.filter(c=>!String(c.setor || '').trim()).length, semFilial = r.filter(c=>!String(c.filial || '').trim()).length;
+  const semEmail = part.filter(c=>!c.temEmail).length;
+  const pill = (n, txt, aviso)=> `<span class="imp-pill${n && aviso ? ' warn' : ''}"><b>${n}</b> ${txt}</span>`;
+  el.innerHTML = `<div class="imp-pills">${pill(r.length, 'pessoa(s) no quadro')}${pill(part.length, 'participam das rodadas')}${pill(r.length - part.length, 'da Qualidade (não participam)')}${pill(semEmail, 'participante(s) sem e-mail — não recebem lembrete', true)}${pill(semSetor, 'sem setor', true)}${pill(semFilial, 'sem filial', true)}${pill(dups.length, 'matrícula(s) repetida(s)', true)}</div>` +
+    (dups.length ? `<p class="hint" style="color:var(--error);">Matrículas repetidas na planilha: ${dups.slice(0,8).map(escH).join(', ')}${dups.length > 8 ? '…' : ''} — corrija na aba “Colaboradores”.</p>` : '<p class="hint">Dados do quadro conferidos: sem matrículas repetidas.</p>');
+}
+
+/* ======================= JANELAS (pop-ups): ESC fecha, rolagem do fundo travada ======================= */
+document.addEventListener('keydown', e=>{
+  if(e.key !== 'Escape') return;
+  const abertos = [...document.querySelectorAll('.pop-backdrop, .share-backdrop, .celebrate-backdrop')];
+  const topo = abertos[abertos.length - 1];
+  if(!topo || topo.dataset.fixo) return;
+  if(topo.id === 'miniPagina') fecharMiniPagina(); else topo.remove();
+});
+new MutationObserver(()=>{ document.body.classList.toggle('modal-aberto', !!document.querySelector('.pop-backdrop, .share-backdrop, .celebrate-backdrop')); }).observe(document.body, {childList:true});
+
+
 /* ======================= INIT ======================= */
 const _hadSavedState = loadState();
 aplicarTema(window.themePreference || 'auto');
@@ -2917,6 +3107,7 @@ try{
   if(_hadSavedState && currentUser && currentUser.matricula && currentUser.token){
     document.getElementById('loginScreen').style.display = "none";
     document.getElementById('appRoot').style.display = "flex";
+    carregarCacheSnapshot();
     applyRole(currentUser.role);
     showToast(`Sessão restaurada — bem-vindo(a) de volta, ${currentUser.nome}.`, "");
     iniciarSincronizacao();

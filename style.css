@@ -1133,3 +1133,42 @@ button.atalho:hover{ transform:translateY(-2px); box-shadow:var(--shadow); borde
 /* ---------- Ícones pequenos dentro de linhas de informação (o Lucide troca <i> por <svg>) ---------- */
 .meta svg, .tl-meta svg, .chip svg, .participou-banner span svg{ width:15px; height:15px; vertical-align:-2px; margin-right:3px; flex-shrink:0; }
 .meta > span{ display:inline-flex; align-items:center; gap:2px; }
+
+
+/* =====================================================================
+   v10 — carregamento rápido, indicador de atualização e janelas
+   ===================================================================== */
+.sync-chip{ display:inline-flex; align-items:center; gap:7px; padding:6px 12px; border:0; border-radius:100px; font:inherit; font-size:11.5px; color:var(--ink-soft); background:rgba(2,163,157,.09); cursor:pointer; transition:background .2s; }
+.sync-chip:hover{ background:rgba(2,163,157,.18); }
+.sync-dot{ width:8px; height:8px; border-radius:50%; background:var(--success); flex-shrink:0; }
+.sync-chip[data-estado=sync] .sync-dot{ background:var(--warning); animation:pulsoSync 1s ease-in-out infinite; }
+.sync-chip[data-estado=erro]{ background:rgba(211,47,47,.1); color:var(--error); }
+.sync-chip[data-estado=erro] .sync-dot{ background:var(--error); }
+@keyframes pulsoSync{ 50%{ opacity:.35; transform:scale(.8); } }
+@media(max-width:760px){ #syncTxt{ display:none; } .sync-chip{ padding:9px; } }
+.skel-wrap{ padding:6px 0; }
+.skel{ border-radius:12px; background:linear-gradient(90deg, rgba(2,163,157,.08), rgba(2,163,157,.2), rgba(2,163,157,.08)); background-size:220% 100%; animation:skelBrilho 1.3s ease-in-out infinite; }
+.skel-l1{ height:20px; width:55%; margin-bottom:12px; } .skel-l2{ height:14px; width:34%; margin-bottom:12px; }
+.skel-bar{ height:12px; border-radius:100px; margin:16px 0; } .skel-card{ height:150px; border-radius:24px; }
+@keyframes skelBrilho{ 0%{ background-position:220% 0; } 100%{ background-position:-220% 0; } }
+body.modal-aberto{ overflow:hidden; }
+.pop-card:focus, .pop-close:focus-visible{ outline:2px solid var(--primary); outline-offset:2px; }
+.tl-grupo{ font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); margin:18px 0 8px; }
+.tl-grupo:first-child{ margin-top:0; }
+.urgente{ background:#FFF3DC; color:#8A6600; padding:4px 10px; border-radius:100px; font-weight:700; font-size:12px; }
+.prev-uso{ border:1.5px dashed var(--border); border-radius:16px; padding:12px 14px; margin-bottom:14px; }
+@media(max-width:640px){
+  .pop-backdrop{ align-items:flex-end; padding:0; }
+  .pop-card{ border-radius:24px 24px 0 0; max-height:92vh; }
+}
+
+/* ---------- Banco de perguntas: enunciado + respostas visíveis ---------- */
+.bq-q{ min-width:260px; max-width:520px; }
+.bq-enun{ font-weight:600; font-size:13.5px; margin-bottom:6px; }
+.bq-alts{ list-style:none; margin:0 0 6px; padding:0; display:flex; flex-direction:column; gap:3px; font-size:12.5px; color:var(--ink-soft); }
+.bq-alts li.ok{ color:var(--success); font-weight:600; }
+.bq-cod{ font-size:11px; }
+.bq-badge{ white-space:normal !important; display:inline-block; max-width:240px; line-height:1.35; margin-top:4px; }
+.badge.antiga{ background:rgba(96,125,139,.16); color:#455A64; }
+body.dark .badge.antiga{ background:rgba(176,190,197,.18); color:#CFD8DC; }
+.pop-card .hint{ font-size:13px; color:var(--ink-soft); }

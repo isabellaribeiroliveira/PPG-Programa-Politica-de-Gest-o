@@ -58,8 +58,9 @@
       if (!root.document) return reject(new Error('Biblioteca ' + nome + ' indisponível neste ambiente.'));
       const s = root.document.createElement('script');
       s.src = L.url; s.async = true;
-      s.onload = () => { if (L.depois) try { L.depois(); } catch (e) {} resolve(root[L.global]); };
-      s.onerror = () => { delete _promessas[nome]; reject(new Error('Não foi possível carregar o leitor de ' + nome + '. Verifique a internet.')); };
+      const limite = setTimeout(() => { delete _promessas[nome]; reject(new Error('O leitor de ' + nome + ' demorou demais para carregar. Verifique a internet e tente de novo.')); }, 20000);
+      s.onload = () => { clearTimeout(limite); if (L.depois) try { L.depois(); } catch (e) {} resolve(root[L.global]); };
+      s.onerror = () => { clearTimeout(limite); delete _promessas[nome]; reject(new Error('Não foi possível carregar o leitor de ' + nome + '. Verifique a internet.')); };
       root.document.head.appendChild(s);
     });
     return _promessas[nome];
