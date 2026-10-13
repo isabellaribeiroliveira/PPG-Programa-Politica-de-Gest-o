@@ -137,11 +137,13 @@ function bqUsageStatus(q){
 /* ======================= AUDITORIA (log de ações) ======================= */
 let actionLog = [];
 let ruleChangeLog = []; // histórico de alterações/exceções às regras de elegibilidade, por campanha
+/* O registro de atividades agora é gravado no SERVIDOR (aba "Log" da planilha) — o servidor anota senhas, acessos,
+   campanhas, sorteios, importações, banco e mensagens. Daqui só seguem os eventos que apenas o navegador conhece. */
+const EVENTOS_DO_NAVEGADOR = {'Relatório exportado':'exportacao', 'Relatório oficial gerado':'exportacao', 'Campanha divulgada':'divulgacao', 'Arte de divulgação gerada':'divulgacao', 'Banner de ganhadores gerado':'divulgacao'};
 function logAction(acao, detalhe){
-  actionLog.unshift({acao, detalhe: detalhe||"", usuario: currentUser ? currentUser.nome : "Sistema", data:new Date()});
-  const sec = document.getElementById('sec-auditoria');
-  if(sec && sec.classList.contains('active')) renderAuditoria();
-  saveState();
+  const tipo = EVENTOS_DO_NAVEGADOR[acao];
+  if(!tipo || !currentUser || !currentUser.token || currentRole !== 'qualidade') return;
+  backendCall('registrarEvento', {tipo, acao, detalhe: String(detalhe || '')});
 }
 function renderAuditoria(){
   const tbody = document.getElementById('tblAuditoria');
@@ -274,7 +276,7 @@ window.audVerDetalhe = function(campaignId, matricula){
     const selTexts = Array.isArray(ans) ? ans.map(a=> (q.options[a]||{}).text).join(', ') : (ans!==undefined && ans!==null && q.options[ans] ? q.options[ans].text : 'Não disponível (registro histórico)');
     const correctTexts = q.options.filter(o=>o.correct).map(o=>o.text).join(', ');
     const ok = p.respostasCorretas ? p.respostasCorretas[i] : null;
-    return `<tr><td>${q.texto}</td><td>${selTexts||'—'}</td><td>${correctTexts}</td><td>${ok===null?'—':(ok?'<span class="pct100">✓ Correta</span>':'<span style="color:var(--error);">✕ Incorreta</span>')}</td></tr>`;
+    return `<tr><td>${q.texto}</td><td>${selTexts||'—'}</td><td>${correctTexts}</td><td>${ok===null?'—':(ok?'<span class="pct100"><i data-lucide="check"></i> Correta</span>':'<span style="color:var(--error);"><i data-lucide="x"></i> Incorreta</span>')}</td></tr>`;
   }).join('');
   const backdrop = document.createElement('div');
   backdrop.className = 'share-backdrop';
@@ -487,7 +489,7 @@ document.querySelectorAll('.menu-group-header').forEach(btn=>{
 });
 let currentSectionId = "inicio";
 /* Telas que foram juntadas em outras (links antigos continuam funcionando). */
-const ALIAS_SECOES = {'meu-resultado':'historico-colab', 'auditoria':'historico#auditoria', 'importar-historico':'historico#importar', 'regras-excecoes':'config'};
+const ALIAS_SECOES = {'meu-resultado':'historico-colab', 'auditoria':'historico#auditoria', 'importar-historico':'historico#importar', 'regras-excecoes':'config', 'log':'historico#log'};
 let abaHistoricoAtual = 'rodadas';
 function mostrarAbaHistorico(pane){
   abaHistoricoAtual = pane;
@@ -499,6 +501,7 @@ function renderPaneHistorico(){
   if(abaHistoricoAtual === 'rodadas') renderTimeline();
   else if(abaHistoricoAtual === 'auditoria'){ renderAuditoria(); renderAuditoriaDetalhe(); }
   else if(abaHistoricoAtual === 'importar'){ if(!IMP.doc) impInicio(); renderHistoricoImportado(); }
+  else if(abaHistoricoAtual === 'log') logMostrar();
 }
 document.querySelectorAll('#histTabs .hist-tab').forEach(b=> b.addEventListener('click', ()=> mostrarAbaHistorico(b.dataset.pane)));
 function goToSection(target){
@@ -606,7 +609,7 @@ const deepLinkCampaignId = urlParams.get('campanha');
 /* ======================= LOGIN ======================= */
 /* A autenticação de verdade agora mora na planilha (via Google Apps Script).
    Não existe mais senha nenhuma escrita aqui no código. */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwqcJZUiL9D7t5AS9y8WLSQ6hIjRU9V5Ic20SJ6Db3QoJXl9nxSn3n0kV1YkUrUl7Selw/exec";
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwfKlz_TuxeCNl2F21M4_ebtnHy2lMn-ppggOXU5kjZwDoNQaoTv1E0DLYSvBcyQK_x9Q/exec";
 
 function urlDoApp(){ try{ return location.href.split('#')[0].split('?')[0]; }catch(e){ return ''; } }
 
@@ -676,11 +679,11 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
   const errEl = document.getElementById('loginError');
   const btnEntrar = this.querySelector('button[type="submit"]');
   errEl.style.display = "none";
-  btnEntrar.disabled = true; btnEntrar.textContent = "Entrando...";
+  btnEntrar.disabled = true; btnEntrar.innerHTML = '<span class="spinner-w"></span><span>Entrando…</span>';
 
   const resp = await backendCall('login', {matricula: mat, senha});
 
-  btnEntrar.disabled = false; btnEntrar.textContent = "Entrar";
+  btnEntrar.disabled = false; btnEntrar.innerHTML = '<span>Entrar</span><i data-lucide="arrow-right"></i>'; if(window.lucide) lucide.createIcons();
 
   if(!resp.ok){
     errEl.textContent = resp.erro || "Matrícula ou senha inválida.";
@@ -733,7 +736,7 @@ function abrirModalTrocaSenha(opts){
   if(opts && opts.obrigatoria) backdrop.dataset.fixo = '1';   // criação obrigatória da senha: ESC não fecha
   backdrop.innerHTML = `
     <div class="share-card" style="max-width:380px; text-align:left;">
-      <h3>${opts.primeiroAcesso ? '👋 Bem-vindo(a)! Crie sua senha' : '🔒 Trocar senha'}</h3>
+      <h3>${opts.primeiroAcesso ? '<i data-lucide="sparkles"></i> Bem-vindo(a)! Crie sua senha' : '<i data-lucide="lock-keyhole"></i> Trocar senha'}</h3>
       <p class="hint" style="margin-bottom:16px;">${opts.primeiroAcesso
         ? 'Este é seu primeiro acesso. Por segurança, defina uma senha só sua antes de continuar.'
         : 'Defina uma nova senha de acesso.'}</p>
@@ -802,7 +805,7 @@ document.getElementById('btnEsqueciSenha').addEventListener('click', ()=>{
     btn.disabled = false; btn.textContent = "Redefinir minha senha";
     if(!resp.ok){ erroEl.textContent = resp.erro || "Não foi possível registrar o pedido."; erroEl.style.display = "block"; return; }
     const card = backdrop.querySelector('.share-card');
-    card.innerHTML = `<h3>✅ Senha redefinida</h3><p class="hint" style="margin-bottom:16px;">Pronto! Sua senha voltou a ser a <b>sua própria matrícula</b>. Entre usando a matrícula no lugar da senha e crie uma senha nova.</p><button class="btn btn-primary btn-block" id="esqIrLogin">Ir para o login</button>`;
+    card.innerHTML = `<h3><i data-lucide="check-circle-2"></i> Senha redefinida</h3><p class="hint" style="margin-bottom:16px;">Pronto! Sua senha voltou a ser a <b>sua própria matrícula</b>. Entre usando a matrícula no lugar da senha e crie uma senha nova.</p><button class="btn btn-primary btn-block" id="esqIrLogin">Ir para o login</button>`;
     document.getElementById('esqIrLogin').addEventListener('click', ()=>{ backdrop.remove(); const m = document.getElementById('loginMatricula'); m.value = matricula; document.getElementById('loginSenha').value = ''; document.getElementById('loginSenha').focus(); });
   });
 });
@@ -998,6 +1001,7 @@ function sairDoApp(msg){
   currentUser = null; _ultimaAssinatura = null; quizState = null;
   campaigns = []; participants = []; questionBank = []; wonHistory = []; historicoServidor = []; EMPRESA.colaboradores = [];
   campanhasAntigas = []; participantesAntigos = []; _dadosCarregados = false; _ultimoSyncOk = 0; _snapPendente = null; limparCacheSnapshot();
+  LOG.itens = []; LOG.resumo = null; LOG.contagem = {}; ruleChangeLog = []; _excTs = 0;
   saveState();
   document.getElementById('appRoot').style.display = "none";
   document.getElementById('loginScreen').style.display = "";
@@ -1062,7 +1066,7 @@ function showToast(msg, type=""){
 }
 /* Pop-up de celebração — para momentos que merecem mais destaque que um
    toast rápido (campanha criada, sorteio oficializado, etc). */
-function showCelebrationPopup(titulo, mensagem, emoji){
+function showCelebrationPopup(titulo, mensagem, icone){
   const antigo = document.getElementById('celebratePopup');
   if(antigo) antigo.remove();
   const backdrop = document.createElement('div');
@@ -1070,7 +1074,7 @@ function showCelebrationPopup(titulo, mensagem, emoji){
   backdrop.id = 'celebratePopup';
   backdrop.innerHTML = `
     <div class="celebrate-card">
-      <div class="celebrate-emoji">${emoji || '🎉'}</div>
+      <div class="celebrate-icon"><i data-lucide="${icone || 'party-popper'}"></i></div>
       <h3>${titulo}</h3>
       <p>${mensagem}</p>
       <button class="btn btn-primary" id="btnFecharCelebracao">Continuar</button>
@@ -1449,7 +1453,7 @@ document.getElementById('formCampanha').addEventListener('submit', async functio
     btnSubmit.disabled = false; btnSubmit.textContent = textoOriginal;
     if(!resp.ok){ showToast(resp.erro || "Não foi possível salvar a campanha.", "warning"); return; }
     campaigns.unshift({id: resp.id, ganhadores:null, ...payload});
-    showCelebrationPopup("Campanha criada!", `"${payload.nome}" já está pronta e visível para os colaboradores dentro do período configurado.`, "🚀");
+    showCelebrationPopup("Campanha criada!", `"${payload.nome}" já está pronta e visível para os colaboradores dentro do período configurado.`, 'rocket');
     logAction("Nova campanha cadastrada", payload.nome);
   }
   fillCampaignSelects();
@@ -1493,7 +1497,7 @@ function renderBanco(){
   if(!tbody) return;
   tbody.innerHTML = questionBank.map(q=>{
     const u = bqUsageStatus(q);
-    const opts = (q.options || []).map(o=>`<li class="${o.correct ? 'ok' : ''}">${o.correct ? '✓' : '○'} ${escH(o.text)}</li>`).join('');
+    const opts = (q.options || []).map(o=>`<li class="${o.correct ? 'ok' : ''}">${o.correct ? '<i data-lucide="check-circle-2"></i>' : '<i data-lucide="circle"></i>'} ${escH(o.text)}</li>`).join('');
     return `<tr>
       <td class="bq-q"><div class="bq-enun">${escH(q.texto)}</div><ul class="bq-alts">${opts}</ul><span class="hint bq-cod">${escH(q.codigo)}${q.type === 'multiplas_respostas' ? ' · múltipla escolha' : ''}</span></td>
       <td>${escH(q.categoria || '—')}${q.tema ? `<div class="hint">${escH(q.tema)}</div>` : ''}${q.procedimento ? `<div class="hint">${escH(q.procedimento)}</div>` : ''}</td>
@@ -1625,7 +1629,7 @@ window.openQuiz = async function(campaignId){
     body.innerHTML = `<div class="duo-done"><span class="mascot-figure mascot-figure-emoji">${MASCOT_SVG}</span><h2>Carregando...</h2></div>`;
     const check = await backendCall('jaRespondeu', {campaignId, matricula: currentUser.matricula});
     if(check.ok && check.jaRespondeu){
-      body.innerHTML = `<div class="duo-done"><span class="mascot-figure mascot-figure-emoji">🔒</span><h2>Você já respondeu esta campanha</h2><p>O registro já existe — feito neste ou em outro dispositivo.</p></div>`;
+      body.innerHTML = `<div class="duo-done"><span class="mascot-figure mascot-figure-emoji"><i data-lucide="lock-keyhole"></i></span><h2>Você já respondeu esta campanha</h2><p>O registro já existe — feito neste ou em outro dispositivo.</p></div>`;
       return;
     }
   }
@@ -1649,7 +1653,7 @@ function startQuizFlow(c){
   if(access !== 'aberta'){
     body.innerHTML = mascotBubble(access==='nao_iniciada' ? "Ainda não é hoje! Essa campanha abre em breve." : "Essa campanha já encerrou — mas fica de olho na próxima!") +
       `<div class="lock-banner">
-      <div style="font-size:26px;">⏳</div>
+      <div class="duo-wait"><i data-lucide="hourglass"></i></div>
       <div>${access==='nao_iniciada' ? 'Esta campanha ainda não está aberta para respostas.' : 'O prazo para responder esta campanha já foi encerrado.'}</div>
       <div class="hint">Período: ${fmtPeriodoValor(c.inicio)} até ${fmtPeriodoValor(c.fim)}</div>
     </div>`;
@@ -1757,13 +1761,13 @@ async function finalizeQuiz(){
   if(!resp.ok){
     if(resp.sessaoExpirada) return;
     if(resp.jaRespondida){
-      container.innerHTML = `<div class="duo-done"><span class="mascot-figure mascot-figure-emoji">🔒</span><h2>Você já respondeu esta campanha</h2><p>Encontramos um registro seu para <b>${campaign.nome}</b> — feito neste ou em outro dispositivo. Cada matrícula só pode responder uma vez, para manter tudo justo.</p></div>`;
+      container.innerHTML = `<div class="duo-done"><span class="mascot-figure mascot-figure-emoji"><i data-lucide="lock-keyhole"></i></span><h2>Você já respondeu esta campanha</h2><p>Encontramos um registro seu para <b>${campaign.nome}</b> — feito neste ou em outro dispositivo. Cada matrícula só pode responder uma vez, para manter tudo justo.</p></div>`;
       quizState = null; _ultimaAssinatura = null; sincronizarDadosDoServidor(true);
       return;
     }
     if(typeof resp.faltando === 'number'){ quizState.index = resp.faltando; showToast(resp.erro, "warning"); renderQuizStep(); return; }
     // Qualquer outro erro: mantém as respostas na tela para tentar de novo sem perder nada.
-    container.innerHTML = `<div class="duo-done"><span class="mascot-figure mascot-figure-emoji">⚠️</span><h2>Não foi possível enviar sua resposta</h2><p>${resp.erro || 'Verifique sua internet e tente novamente.'}</p><p class="hint">Suas respostas continuam aqui — é só tentar de novo.</p><button class="btn btn-primary" onclick="finalizeQuiz()" style="margin-top:12px;">Tentar novamente</button></div>`;
+    container.innerHTML = `<div class="duo-done"><span class="mascot-figure mascot-figure-emoji"><i data-lucide="alert-triangle"></i></span><h2>Não foi possível enviar sua resposta</h2><p>${resp.erro || 'Verifique sua internet e tente novamente.'}</p><p class="hint">Suas respostas continuam aqui — é só tentar de novo.</p><button class="btn btn-primary" onclick="finalizeQuiz()" style="margin-top:12px;">Tentar novamente</button></div>`;
     return;
   }
 
@@ -1784,11 +1788,13 @@ async function finalizeQuiz(){
 
 /* Univaldo, o mascote oficial da Univale Transportes — representado por emoji,
    sempre com as animações (respirar, balançar, "piscar") aplicadas via CSS. */
-const MASCOT_EMOJI = "🎯";
+const MASCOT_EMOJI = '';
 /* Versão em SVG (Twemoji oficial) do mascote — nítida em qualquer aparelho,
    sem depender da fonte de emoji do sistema operacional (que varia e pode
    ficar com baixa qualidade em alguns dispositivos). */
-const MASCOT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" width="100%" height="100%"><circle fill="#DD2E44" cx="18" cy="18" r="18"/><circle fill="#FFF" cx="18" cy="18" r="13.5"/><circle fill="#DD2E44" cx="18" cy="18" r="10"/><circle fill="#FFF" cx="18" cy="18" r="6"/><circle fill="#DD2E44" cx="18" cy="18" r="3"/><path opacity=".2" d="M18.24 18.282l13.144 11.754s-2.647 3.376-7.89 5.109L17.579 18.42l.661-.138z"/><path fill="#FFAC33" d="M18.294 19c-.255 0-.509-.097-.704-.292-.389-.389-.389-1.018 0-1.407l.563-.563c.389-.389 1.018-.389 1.408 0 .388.389.388 1.018 0 1.407l-.564.563c-.194.195-.448.292-.703.292z"/><path fill="#55ACEE" d="M24.016 6.981c-.403 2.079 0 4.691 0 4.691l7.054-7.388c.291-1.454-.528-3.932-1.718-4.238-1.19-.306-4.079.803-5.336 6.935zm5.003 5.003c-2.079.403-4.691 0-4.691 0l7.388-7.054c1.454-.291 3.932.528 4.238 1.718.306 1.19-.803 4.079-6.935 5.336z"/><path fill="#3A87C2" d="M32.798 4.485L21.176 17.587c-.362.362-1.673.882-2.51.046-.836-.836-.419-2.08-.057-2.443L31.815 3.501s.676-.635 1.159-.152-.176 1.136-.176 1.136z"/></svg>`;
+/* Mascote da marca: mira em traço (mesmo estilo dos ícones Lucide) com o centro vermelho da logo. */
+function mascotSvg(cor){ return `<svg viewBox="0 0 48 48" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="24" cy="24" r="18.5" stroke="${cor}" stroke-width="2.6"/><circle cx="24" cy="24" r="11" stroke="${cor}" stroke-width="2.6" opacity=".72"/><circle cx="24" cy="24" r="4.6" fill="#E2082D"/><path d="M24 2.5v8M24 37.5v8M2.5 24h8M37.5 24h8" stroke="${cor}" stroke-width="2.6" stroke-linecap="round"/></svg>`; }
+const MASCOT_SVG = mascotSvg('currentColor');
 const MASCOT_NOME = "Univaldo";
 function mascotBubble(texto, opts){
   const pro = opts && opts.pro;
@@ -1824,13 +1830,12 @@ function renderQualidadeTip(){
 }
 
 function confettiHTML(){
-  const emojis = ["🎉","🎊","⭐","✨","🏆"];
+  const cores = ['#0EB6B0','#02A39D','#E2082D','#F9A825','#00695C'];
   let spans = "";
-  for(let i=0;i<14;i++){
-    const left = Math.round(Math.random()*100);
-    const delay = (Math.random()*0.6).toFixed(2);
-    const size = 14 + Math.round(Math.random()*10);
-    spans += `<span style="left:${left}%; animation-delay:${delay}s; font-size:${size}px;">${randomFrom(emojis)}</span>`;
+  for(let i=0;i<24;i++){
+    const left = Math.round(Math.random()*100), delay = (Math.random()*0.7).toFixed(2), w = 6 + Math.round(Math.random()*6);
+    const h = Math.random() > .5 ? Math.round(w*2.2) : w, rot = Math.round(Math.random()*360), raio = Math.random() > .6 ? '50%' : '2px';
+    spans += `<span style="left:${left}%; animation-delay:${delay}s; width:${w}px; height:${h}px; background:${randomFrom(cores)}; transform:rotate(${rot}deg); border-radius:${raio};"></span>`;
   }
   return `<div class="duo-confetti">${spans}</div>`;
 }
@@ -1850,16 +1855,16 @@ function renderQuizDoneInto(container, c, participant){
         <p>Sua participação em <b>${c.nome}</b> foi registrada com sucesso.</p>
         <p class="hint">Por transparência com todos os participantes, o resultado só é liberado depois que a rodada encerrar, em <b>${fmtDateTime(new Date(c.fim))}</b>. Volte aqui depois desse prazo para ver seu desempenho.</p>
       </div>
-      ${mascotBubble("Sua resposta está registrada e segura. Assim que a rodada encerrar, você vê aqui quantas você acertou. Até lá! 🤝")}`;
+      ${mascotBubble("Sua resposta está registrada e segura. Assim que a rodada encerrar, você vê aqui quantas você acertou. Até lá!")}`;
     return;
   }
 
   const correctCount = participant.respostasCorretas ? participant.respostasCorretas.filter(Boolean).length : Math.round(participant.pct/100*c.questoes.length);
   const perfeito = participant.pct === 100;
-  const mascotEmoji = perfeito ? "🎉" : MASCOT_EMOJI;
+  const mascotEmoji = perfeito ? '<i data-lucide="trophy"></i>' : MASCOT_SVG;
   const mascotMsg = perfeito
-    ? "Mandou muito bem! 100% de acertos — boa sorte no sorteio! 🍀"
-    : "Valeu por participar! Continue de olho nas próximas campanhas. 💪";
+    ? "Mandou muito bem! 100% de acertos — boa sorte no sorteio!"
+    : "Valeu por participar! Continue de olho nas próximas campanhas.";
   container.innerHTML = `
     <div class="duo-done">
       ${perfeito ? confettiHTML() : ''}
@@ -1902,8 +1907,8 @@ function colaboradorStreakStrip(){
   const premios = wonHistory.filter(w=>w.matricula===currentUser.matricula).length;
   return `<div class="streak-strip">
     <div class="streak-chip fire"><div class="si"><i data-lucide="flame"></i></div><div><b>${mine.length}</b><span>Campanhas respondidas</span></div></div>
-    <div class="streak-chip star"><div class="si">⭐</div><div><b>${media == null ? '—' : media + '%'}</b><span>Média (rodadas encerradas)</span></div></div>
-    <div class="streak-chip trophy"><div class="si">🏆</div><div><b>${premios}</b><span>Vezes premiado(a)</span></div></div>
+    <div class="streak-chip star"><div class="si"><i data-lucide="star"></i></div><div><b>${media == null ? '—' : media + '%'}</b><span>Média (rodadas encerradas)</span></div></div>
+    <div class="streak-chip trophy"><div class="si"><i data-lucide="trophy"></i></div><div><b>${premios}</b><span>Vezes premiado(a)</span></div></div>
   </div>`;
 }
 function renderCampanhaAtual(){
@@ -1915,8 +1920,8 @@ function renderCampanhaAtual(){
   const pendentes = open.filter(c=>!respondida(c));
   const primeiro = currentUser.nome.split(' ')[0];
   const msg = !open.length ? `Oi, ${primeiro}! Nenhuma campanha aberta agora, mas fica de olho — aviso assim que abrir uma nova!`
-    : !pendentes.length ? `Oi, ${primeiro}! Você já participou da rodada atual — sua resposta está computada. Obrigado! 🎉`
-    : `Oi, ${primeiro}! Tem campanha nova esperando por você aqui embaixo 👇`;
+    : !pendentes.length ? `Oi, ${primeiro}! Você já participou da rodada atual — sua resposta está computada. Obrigado!`
+    : `Oi, ${primeiro}! Tem campanha nova esperando por você aqui embaixo`;
   let html = mascotBubble(msg) + colaboradorStreakStrip();
   if(!open.length){
     html += `<div class="panel fun-empty">
@@ -1937,8 +1942,8 @@ function renderCampanhaAtual(){
       <div class="meta" style="margin:14px 0;">
         <span><i data-lucide="calendar"></i> Responda até ${fmtPeriodoValor(c.fim)}</span>
         <span><i data-lucide="hourglass"></i> Encerra em ${tempoRestanteTexto(c.fim)}</span>
-        ${(!ja && (new Date(c.fim) - new Date()) < 86400000) ? '<span class="urgente">⏰ Últimas horas — responda hoje!</span>' : ''}
-        <span>🎁 Prêmio: ${c.premio || 'a definir'}</span>
+        ${(!ja && (new Date(c.fim) - new Date()) < 86400000) ? '<span class="urgente"><i data-lucide="alarm-clock"></i> Últimas horas — responda hoje!</span>' : ''}
+        <span><i data-lucide="gift"></i> Prêmio: ${c.premio || 'a definir'}</span>
       </div>
       ${ja
         ? `<div class="participou-banner"><i data-lucide="check-circle-2"></i><div><b>Participação computada</b><span>Você já respondeu esta rodada. O resultado é liberado em ${fmtDateTime(new Date(c.fim))}.</span></div></div>
@@ -1954,8 +1959,8 @@ function painelElegibilidadeHtml(p){
   const souElegivel = eligible.some(e=>e.matricula===currentUser.matricula);
   const meuExcluido = excluded.find(e=>e.matricula===currentUser.matricula);
   if(souElegivel) return `<div class="panel eleg-panel eleg-ok">
-      <h3>✅ Você está elegível para o sorteio desta rodada</h3>
-      <p>Você atingiu 100% de acertos e atende aos critérios do programa para concorrer. Boa sorte! 🍀</p>
+      <h3><i data-lucide="check-circle-2"></i> Você está elegível para o sorteio desta rodada</h3>
+      <p>Você atingiu 100% de acertos e atende aos critérios do programa para concorrer. Boa sorte!</p>
     </div>`;
   if(!meuExcluido) return '';
   // Só o critério de "100% de acertos" fica explícito (é sobre o próprio desempenho).
@@ -1964,7 +1969,7 @@ function painelElegibilidadeHtml(p){
   const temOutros = meuExcluido.motivos.some(m => !m.includes('100%'));
   const texto = motivoDesempenho && !temOutros ? motivoDesempenho : 'Você não atende a um ou mais critérios de elegibilidade desta rodada.';
   return `<div class="panel eleg-panel eleg-excluded">
-      <h3>🔒 Você não está elegível para o sorteio desta rodada</h3>
+      <h3><i data-lucide="lock-keyhole"></i> Você não está elegível para o sorteio desta rodada</h3>
       <p><b>Motivo:</b> ${texto}</p>
       <p class="hint">A elegibilidade é calculada automaticamente, seguindo os critérios oficiais do programa. Veja mais em "Regulamento".</p>
       <button class="btn btn-outline btn-sm" id="btnVerRegrasElegibilidade"><i data-lucide="scroll-text"></i> Ver regulamento</button>
@@ -1978,7 +1983,7 @@ function renderHistoricoColaborador(){
   if(!body) return;
   if(!_dadosCarregados){ body.innerHTML = esqueletoHtml(); return; }
   const mine = todosParticipantes().filter(p=>p.matricula===currentUser.matricula).sort((a,b)=>b.data-a.data);
-  let html = mascotBubble(mine.length ? "Aqui estão todas as suas participações. O resultado de cada rodada aparece assim que ela encerra. 📋" : "Você ainda não participou de nenhuma campanha — que tal começar agora?");
+  let html = mascotBubble(mine.length ? "Aqui estão todas as suas participações. O resultado de cada rodada aparece assim que ela encerra." : "Você ainda não participou de nenhuma campanha — que tal começar agora?");
   html += colaboradorStreakStrip();
   if(!mine.length){
     html += `<div class="panel fun-empty"><div class="fe-icon"><i data-lucide="inbox"></i></div>Assim que você responder, sua participação aparece aqui.</div>`;
@@ -1991,12 +1996,12 @@ function renderHistoricoColaborador(){
     const quando = `Respondido em ${fmtDateTime(p.data)}`;
     if(c && c.importada){
       const ganhou = (c.ganhadores||[]).some(g=>matK(g.matricula) && matK(g.matricula) === matK(currentUser.matricula));
-      return `<div class="panel part-card"><div><h3 style="font-size:14.5px;">${escH(nome)} <span class="badge antiga">Campanha anterior</span></h3><p class="hint" style="margin-top:4px;">${c.fim ? escH(fmtPeriodoValor(c.fim)) : ''}</p></div><div class="part-status">${p.pct != null ? `<span class="part-pct">${p.pct}%</span>` : ''}${ganhou ? '<span class="badge programada">🏆 Você foi premiado(a)</span>' : ''}</div></div>`;
+      return `<div class="panel part-card"><div><h3 style="font-size:14.5px;">${escH(nome)} <span class="badge antiga">Campanha anterior</span></h3><p class="hint" style="margin-top:4px;">${c.fim ? escH(fmtPeriodoValor(c.fim)) : ''}</p></div><div class="part-status">${p.pct != null ? `<span class="part-pct">${p.pct}%</span>` : ''}${ganhou ? '<span class="badge programada"><i data-lucide="trophy"></i> Você foi premiado(a)</span>' : ''}</div></div>`;
     }
     if(!(c ? rodadaFechada(c, p) : p.pct != null)){
       return `<div class="panel part-card">
         <div><h3 style="font-size:14.5px;">${nome}</h3><p class="hint" style="margin-top:4px;">${quando}</p></div>
-        <div class="part-status"><span class="badge finalizada"><i data-lucide="check" style="width:12px;height:12px;vertical-align:-2px;"></i> Resposta computada</span><span class="hint">🔒 Resultado liberado em ${c ? fmtDateTime(new Date(c.fim)) : 'breve'}</span></div>
+        <div class="part-status"><span class="badge finalizada"><i data-lucide="check" style="width:12px;height:12px;vertical-align:-2px;"></i> Resposta computada</span><span class="hint"><i data-lucide="lock-keyhole"></i> Resultado liberado em ${c ? fmtDateTime(new Date(c.fim)) : 'breve'}</span></div>
       </div>`;
     }
     const total = p.totalQuestoes || (c && c.questoes ? c.questoes.length : 0);
@@ -2093,7 +2098,7 @@ function revealWinners(slotEls, winners, campaignId, seed, fair, distinctSetores
         const justBox = document.getElementById('justificationBox');
         if(!fair){
           justBox.style.display = "block";
-          justBox.textContent = `⚠ Distribuição justa parcial: havia apenas ${distinctSetores || new Set(eligible.map(e=>e.setor)).size} setor(es) distinto(s) entre os elegíveis, portanto não foi possível garantir total diversidade. Justificativa registrada no histórico para auditoria.`;
+          justBox.textContent = `Distribuição justa parcial: havia apenas ${distinctSetores || new Set(eligible.map(e=>e.setor)).size} setor(es) distinto(s) entre os elegíveis, portanto não foi possível garantir total diversidade. Justificativa registrada no histórico para auditoria.`;
         } else justBox.style.display = "none";
         window._lastSorteio = {campaignId, winners, seed, fair, distinctSetores, eligibleCount: eligible.length};
         showToast(`Sorteio concluído! ${winners.length} ganhador(es) selecionado(s).`,"success");
@@ -2139,7 +2144,7 @@ document.getElementById('btnRegistrarHistorico').addEventListener('click', async
   historyLog.unshift({campaignId, data:new Date(), texto:`Sorteio realizado para a campanha ${c.nome}.`});
   logAction("Sorteio registrado no histórico", c.nome);
   fillCampaignSelects();
-  showCelebrationPopup("Sorteio oficializado!", "Os ganhadores já estão registrados. Agora você pode gerar o banner de divulgação em \"Divulgação\".", "🏆");
+  showCelebrationPopup("Sorteio oficializado!", "Os ganhadores já estão registrados. Agora você pode gerar o banner de divulgação em \"Divulgação\".", 'trophy');
   window._lastSorteio = null;
   document.querySelector('[data-target="historico"]').click();
 });
@@ -2277,7 +2282,7 @@ document.querySelectorAll('.report-btn').forEach(btn=>{
 function renderTimelineReais(){
   return campaigns.filter(c=>c.status==="finalizada" || c.status==="encerrada").map(c=>{
     const {eligible} = evaluateEligibility(c.id);
-    const winnersHtml = c.ganhadores ? `<div class="tl-winners">${c.ganhadores.map(w=>`<span class="chip">🏆 ${w.nome} · ${w.setor}</span>`).join('')}</div>` : `<div class="tl-winners"><span class="chip">Sorteio pendente de execução</span></div>`;
+    const winnersHtml = c.ganhadores ? `<div class="tl-winners">${c.ganhadores.map(w=>`<span class="chip"><i data-lucide="trophy"></i> ${w.nome} · ${w.setor}</span>`).join('')}</div>` : `<div class="tl-winners"><span class="chip">Sorteio pendente de execução</span></div>`;
     const metaHtml = c.ganhadores ? `
       <div class="tl-meta"><span><i data-lucide="users"></i> ${campaignParticipants(c.id).length} participantes</span><span><i data-lucide="check-circle-2"></i> ${eligible.length} elegíveis avaliados</span><span><i data-lucide="dices"></i> nº aleatório: ${c.randomSeed || "—"}</span><span><i data-lucide="user"></i> responsável: ${c.responsavel || "—"}</span></div>
       <div class="hint" style="margin-top:6px;">${c.justificativa || ""}</div>` : "";
@@ -2286,35 +2291,6 @@ function renderTimelineReais(){
 }
 
 /* ======================= REGRAS & EXCEÇÕES ======================= */
-function renderRegrasExcecoes(){
-  const sel = document.getElementById('excCampanha');
-  if(sel && sel.options.length !== campaigns.length){
-    sel.innerHTML = campaigns.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
-  }
-  const tbody = document.getElementById('tblExcecoes');
-  if(!tbody) return;
-  tbody.innerHTML = ruleChangeLog.map(r=>{
-    const c = campaigns.find(x=>x.id===r.campaignId);
-    return `<tr><td>${fmtDateTime(r.data)}</td><td>${r.responsavel}</td><td>${c?c.nome:r.campaignId}</td><td>${r.regraOriginal}</td><td>${r.alteracao}</td><td>${r.justificativa}</td></tr>`;
-  }).join('') || `<tr><td colspan="6" style="text-align:center; color:var(--ink-soft); padding:20px;">Nenhuma exceção registrada até o momento.</td></tr>`;
-}
-document.getElementById('formExcecao').addEventListener('submit', function(e){
-  e.preventDefault();
-  const campaignId = document.getElementById('excCampanha').value;
-  const regraOriginal = document.getElementById('excRegraOriginal').value.trim();
-  const alteracao = document.getElementById('excAlteracao').value.trim();
-  const justificativa = document.getElementById('excJustificativa').value.trim();
-  if(!campaignId || !regraOriginal || !alteracao || !justificativa) return;
-  const entry = {campaignId, regraOriginal, alteracao, justificativa, responsavel: currentUser ? currentUser.nome : "Qualidade", data: new Date()};
-  ruleChangeLog.unshift(entry);
-  const c = campaigns.find(x=>x.id===campaignId);
-  logAction("Exceção registrada", `${c?c.nome:campaignId} — ${alteracao}`);
-  this.reset();
-  renderRegrasExcecoes();
-  saveState();
-  showToast("Exceção registrada e disponível para auditoria.","success");
-});
-
 /* ======================= DIVULGAÇÃO (banners) ======================= */
 function renderDivulgacao(){
   const selDiv = document.getElementById('divCampanha');
@@ -2355,14 +2331,14 @@ document.getElementById('btnGerarDivulgacao').addEventListener('click', ()=>{
   wrap.innerHTML = `
     <div id="divBannerArt" style="background:linear-gradient(135deg, var(--primary), var(--secondary)); border-radius:20px; padding:36px; color:#fff; text-align:center; max-width:520px; margin:0 auto;">
       <div style="font-size:13px; letter-spacing:2px; opacity:.85; text-transform:uppercase;">Programa Política de Gestão</div>
-      <div style="width:64px; height:64px; margin:14px auto; animation:mascotBob 3s ease-in-out infinite;">${MASCOT_SVG}</div>
-      <h2 style="margin:6px 0; font-family:'Manrope',sans-serif;">${c.nome}</h2>
+      <div style="width:64px; height:64px; margin:14px auto; animation:mascotBob 3s ease-in-out infinite;">${mascotSvg('#ffffff')}</div>
+      <h2 style="margin:6px 0; font-family:'Manrope',sans-serif;">${escH(c.nome)}</h2>
       <p style="opacity:.95; margin-bottom:18px;">Participe respondendo o questionário e concorra aos prêmios!</p>
       <div style="background:#fff; display:inline-block; padding:10px; border-radius:12px;"><img src="${qrUrl}" alt="QR Code" onerror="this.parentElement.innerHTML='<span style=\\'font-size:11px;color:#333;\\'>QR indisponível offline</span>'"></div>
       <p style="font-size:11px; margin-top:12px; opacity:.85;">Período: ${fmtPeriodoValor(c.inicio)} até ${fmtPeriodoValor(c.fim)}</p>
     </div>
     <div style="text-align:center; margin-top:16px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
-      <button class="btn btn-primary btn-sm" id="btnBaixarDivulgacao">⬇️ Baixar como imagem (PNG)</button>
+      <button class="btn btn-primary btn-sm" id="btnBaixarDivulgacao"><i data-lucide="download"></i> Baixar como imagem (PNG)</button>
       <button class="btn btn-outline btn-sm" onclick="openShareModal('${c.id}')"><i data-lucide="share-2"></i> Ver link e copiar</button>
     </div>`;
   document.getElementById('btnBaixarDivulgacao').addEventListener('click', ()=> baixarComoImagem('divBannerArt', `divulgacao-${c.id}.png`));
@@ -2379,8 +2355,8 @@ document.getElementById('btnGerarBannerGanhadores').addEventListener('click', ()
   wrap.innerHTML = `
     <div id="bannerGanhadoresArt" style="position:relative; background:linear-gradient(135deg, var(--secondary), var(--primary)); border-radius:20px; padding:36px; color:#fff; text-align:center; max-width:560px; margin:0 auto; overflow:hidden;">
       <div style="font-size:13px; letter-spacing:2px; opacity:.85; text-transform:uppercase;">Resultado oficial</div>
-      <div style="font-size:70px; margin:10px auto; animation:celebrateBounce .8s ease;">🎉</div>
-      <h2 style="margin:4px 0 18px; font-family:'Manrope',sans-serif;">🎉 Ganhadores — ${c.nome}</h2>
+      <div style="width:76px; height:76px; margin:12px auto;"><svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg></div>
+      <h2 style="margin:4px 0 18px; font-family:'Manrope',sans-serif;">Ganhadores — ${escH(c.nome)}</h2>
       <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; text-align:left;">
         ${c.ganhadores.map((w,i)=>`
           <div style="background:rgba(255,255,255,.15); border-radius:14px; padding:14px;">
@@ -2392,7 +2368,7 @@ document.getElementById('btnGerarBannerGanhadores').addEventListener('click', ()
       <p style="font-size:11px; margin-top:18px; opacity:.85;">Sorteio realizado com número aleatório auditável: ${c.randomSeed || '—'}</p>
     </div>
     <div style="text-align:center; margin-top:16px;">
-      <button class="btn btn-primary btn-sm" id="btnBaixarBannerGanhadores">⬇️ Baixar banner (PNG)</button>
+      <button class="btn btn-primary btn-sm" id="btnBaixarBannerGanhadores"><i data-lucide="download"></i> Baixar banner (PNG)</button>
     </div>`;
   document.getElementById('btnBaixarBannerGanhadores').addEventListener('click', ()=> baixarComoImagem('bannerGanhadoresArt', `ganhadores-${c.id}.png`));
   logAction("Banner de ganhadores gerado", c.nome);
@@ -2637,7 +2613,7 @@ async function impConfirmar(){
   IMP.enviando = false;
   logAction('Histórico importado', `${enviadas} linha(s) de "${IMP.doc.nome}"`);
   const gan = regs.filter(r=>r.ganhador).length;
-  showCelebrationPopup('Histórico importado!', `${enviadas} participação(ões) de “${escH(regs[0].campanha)}” foram guardadas${gan ? `, com ${gan} ganhador(es) que já contam na regra dos 2 anos` : ''}.`, '📚');
+  showCelebrationPopup('Histórico importado!', `${enviadas} participação(ões) de “${escH(regs[0].campanha)}” foram guardadas${gan ? `, com ${gan} ganhador(es) que já contam na regra dos 2 anos` : ''}.`, 'archive');
   _ultimaAssinatura = null; sincronizarDadosDoServidor(true);
   impInicio(); renderHistoricoImportado();
 }
@@ -2743,7 +2719,7 @@ window.abrirQuemFalta = function(){
   const aplicar = ()=>{
     const f = {setor: corpo.querySelector('[data-qf=setor]').value, filial: corpo.querySelector('[data-qf=filial]').value, busca: PPGImport.norm(corpo.querySelector('[data-qf=busca]').value)};
     filtrados = st.faltam.filter(r=> (!f.setor || r.setor === f.setor) && (!f.filial || r.filial === f.filial) && (!f.busca || PPGImport.norm(r.nome).includes(f.busca) || String(r.matricula).includes(f.busca)));
-    corpo.querySelector('#qfLista').innerHTML = tabelaHtml(['Nome','Matrícula','Setor','Filial'], filtrados.slice(0,300).map(r=>[escH(r.nome), escH(r.matricula), escH(r.setor||''), escH(r.filial||'')]), 'Ninguém falta neste filtro 🎉') + (filtrados.length > 300 ? `<p class="hint">Mostrando 300 de ${filtrados.length} — use os filtros ou baixe o .csv completo.</p>` : '');
+    corpo.querySelector('#qfLista').innerHTML = tabelaHtml(['Nome','Matrícula','Setor','Filial'], filtrados.slice(0,300).map(r=>[escH(r.nome), escH(r.matricula), escH(r.setor||''), escH(r.filial||'')]), 'Ninguém falta neste filtro') + (filtrados.length > 300 ? `<p class="hint">Mostrando 300 de ${filtrados.length} — use os filtros ou baixe o .csv completo.</p>` : '');
     rodape.querySelector('#qfContagem').innerHTML = `<b>${filtrados.length}</b> de ${st.faltam.length} que faltam responder`;
   };
   corpo.addEventListener('input', aplicar); corpo.addEventListener('change', aplicar);
@@ -2759,7 +2735,7 @@ window.popGrupo = function(campo, kEnc){
   const ja = st.respondeu.filter(val), falta = st.faltam.filter(val);
   const lin = r=>[escH(r.nome), escH(r.matricula), escH(r.setor||''), escH(r.filial||'')];
   abrirMiniPagina({titulo:`${campo === 'setor' ? 'Setor' : 'Filial'}: ${k}`, subtitulo:`${c.nome} · ${ja.length} de ${ja.length + falta.length} responderam`, largura:760,
-    corpo:`<h4 class="pop-sub">Ainda faltam (${falta.length})</h4>${tabelaHtml(['Nome','Matrícula','Setor','Filial'], falta.map(lin), 'Todos já responderam 🎉')}<h4 class="pop-sub">Já responderam (${ja.length})</h4>${tabelaHtml(['Nome','Matrícula','Setor','Filial'], ja.map(lin), 'Ninguém respondeu ainda.')}`});
+    corpo:`<h4 class="pop-sub">Ainda faltam (${falta.length})</h4>${tabelaHtml(['Nome','Matrícula','Setor','Filial'], falta.map(lin), 'Todos já responderam')}<h4 class="pop-sub">Já responderam (${ja.length})</h4>${tabelaHtml(['Nome','Matrícula','Setor','Filial'], ja.map(lin), 'Ninguém respondeu ainda.')}`});
 };
 window.kpiPopup = function(tipo){
   const c = rodadaDestaque();
@@ -2918,7 +2894,7 @@ function renderTimeline(){
       <h4>${escH(c.nome)} <span class="badge antiga" style="vertical-align:2px;">Campanha anterior</span></h4>
       <p>${c.fim ? escH(fmtPeriodoValor(c.fim)) : 'data não informada'}${c.arquivo ? ' · origem: ' + escH(c.arquivo) : ''}</p>
       <div class="tl-meta"><span><i data-lucide="users"></i> ${ps.length} participante(s)</span><span><i data-lucide="trophy"></i> ${gan.length} ganhador(es)</span></div>
-      ${gan.length ? `<div class="tl-winners">${gan.slice(0,12).map(w=>`<span class="chip">🏆 ${escH(w.nome)}${w.setor ? ' · ' + escH(w.setor) : ''}</span>`).join('')}${gan.length > 12 ? `<span class="chip">+${gan.length - 12}</span>` : ''}</div>` : '<div class="hint" style="margin-top:6px;">Ganhadores não informados na planilha.</div>'}
+      ${gan.length ? `<div class="tl-winners">${gan.slice(0,12).map(w=>`<span class="chip"><i data-lucide="trophy"></i> ${escH(w.nome)}${w.setor ? ' · ' + escH(w.setor) : ''}</span>`).join('')}${gan.length > 12 ? `<span class="chip">+${gan.length - 12}</span>` : ''}</div>` : '<div class="hint" style="margin-top:6px;">Ganhadores não informados na planilha.</div>'}
       <button type="button" class="btn btn-ghost btn-sm" style="margin-top:8px;" onclick="abrirHistoricoCampanha('${c.id}')"><i data-lucide="eye"></i> Ver detalhes</button>
     </div></div>`;
   }).join('');
@@ -3077,6 +3053,205 @@ document.addEventListener('keydown', e=>{
   if(topo.id === 'miniPagina') fecharMiniPagina(); else topo.remove();
 });
 new MutationObserver(()=>{ document.body.classList.toggle('modal-aberto', !!document.querySelector('.pop-backdrop, .share-backdrop, .celebrate-backdrop')); }).observe(document.body, {childList:true});
+
+
+/* ======================= REGISTRO DE ATIVIDADES (gravado no servidor) ======================= */
+const LOG = {tipo:'', busca:'', dias:7, limite:300, itens:[], total:0, contagem:{}, resumo:null, carregando:false, ultimo:0, erro:''};
+const LOG_TIPOS = [
+  ['','Tudo','layers'], ['senha','Senhas','key-round'], ['acesso','Acessos','log-in'], ['campanha','Campanhas','folder-kanban'],
+  ['sorteio','Sorteios','dices'], ['participacao','Participações','clipboard-check'], ['importacao','Importações','upload-cloud'],
+  ['banco','Banco de perguntas','database'], ['mensagem','Mensagens','message-circle'], ['regra','Regras e exceções','scale'],
+  ['exportacao','Exportações','download'], ['divulgacao','Divulgação','megaphone']
+];
+const LOG_ICONE = Object.fromEntries(LOG_TIPOS.filter(t=>t[0]).map(t=>[t[0], t[2]]));
+
+function logRelativo(d){
+  const s = Math.round((Date.now() - d.getTime()) / 1000);
+  if(s < 45) return 'agora há pouco';
+  if(s < 3600) return `há ${Math.round(s/60)} min`;
+  if(s < 86400) return `há ${Math.round(s/3600)} h`;
+  return `há ${Math.round(s/86400)} dia(s)`;
+}
+function logDiaRotulo(d){
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const alvo = new Date(d); alvo.setHours(0,0,0,0);
+  const diff = Math.round((hoje - alvo) / 86400000);
+  return diff === 0 ? 'Hoje' : diff === 1 ? 'Ontem' : `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`;
+}
+async function logCarregar(silencioso){
+  if(LOG.carregando || !currentUser || currentRole !== 'qualidade') return;
+  LOG.carregando = true;
+  const lista = document.getElementById('logLista');
+  if(!silencioso && lista && !LOG.itens.length) lista.innerHTML = '<div class="skel-wrap"><div class="skel skel-l1"></div><div class="skel skel-l2"></div><div class="skel skel-card"></div></div>';
+  try{
+    const resp = await backendCall('listarLog', {filtro:{tipos: LOG.tipo ? [LOG.tipo] : [], busca: LOG.busca, dias: LOG.dias, limite: LOG.limite}});
+    if(resp.ok){ LOG.itens = resp.itens || []; LOG.total = resp.total || 0; LOG.contagem = resp.contagem || {}; LOG.resumo = resp.resumo || null; LOG.erro = ''; LOG.ultimo = Date.now(); }
+    else LOG.erro = resp.erro || 'Não foi possível carregar o registro.';
+  }finally{ LOG.carregando = false; }
+  renderLog();
+}
+function logMostrar(){ renderLog(); logCarregar(false); }
+function renderLog(){
+  const lista = document.getElementById('logLista'); if(!lista) return;
+  const r = LOG.resumo || {acessosHoje:0, senhas7d:0, acoesQualidade7d:0, falhas7d:0};
+  const stat = (ico, n, txt, cls)=> `<div class="log-stat ${cls||''}"><span class="log-stat-ico"><i data-lucide="${ico}"></i></span><div><b>${n}</b><span>${txt}</span></div></div>`;
+  document.getElementById('logResumo').innerHTML = stat('log-in', r.acessosHoje, 'acessos nas últimas 24 h') + stat('key-round', r.senhas7d, 'senhas criadas ou trocadas (7 dias)') + stat('shield-check', r.acoesQualidade7d, 'ações da Qualidade (7 dias)') + stat('alert-octagon', r.falhas7d, 'falhas de acesso (7 dias)', r.falhas7d ? 'alerta' : '');
+  document.getElementById('logChips').innerHTML = LOG_TIPOS.map(([k, rot, ico])=>{
+    const n = k ? (LOG.contagem[k] || 0) : Object.values(LOG.contagem).reduce((a,b)=>a+b, 0);
+    return `<button type="button" class="log-chip${LOG.tipo === k ? ' ativo' : ''}" data-logtipo="${k}"><i data-lucide="${ico}"></i> ${rot}${n ? ` <em>${n}</em>` : ''}</button>`;
+  }).join('');
+  if(LOG.erro){ lista.innerHTML = `<div class="imp-aviso"><i data-lucide="alert-triangle"></i> ${escH(LOG.erro)}</div>`; if(window.lucide) lucide.createIcons(); return; }
+  if(!LOG.itens.length){
+    lista.innerHTML = `<div class="panel fun-empty"><div class="fe-icon"><i data-lucide="activity"></i></div>${LOG.carregando ? 'Carregando…' : 'Nenhuma atividade encontrada neste filtro.'}</div>`;
+    document.getElementById('logMais').style.display = 'none'; if(window.lucide) lucide.createIcons(); return;
+  }
+  let html = '', dia = '';
+  LOG.itens.forEach(x=>{
+    const d = new Date(x.dataHora), rot = logDiaRotulo(d);
+    if(rot !== dia){ dia = rot; html += `<div class="log-dia">${escH(rot)}</div>`; }
+    const quem = x.usuarioNome ? `<b>${escH(x.usuarioNome)}</b> <span class="log-mat">${escH(x.usuarioMat)}</span>` : '<b>Sistema</b>';
+    const alvo = x.alvoNome ? ` <i data-lucide="arrow-right" class="log-seta"></i> <b>${escH(x.alvoNome)}</b> <span class="log-mat">${escH(x.alvoMat)}</span>` : '';
+    html += `<div class="log-item t-${escH(x.tipo)}${x.resultado === 'falha' ? ' falha' : ''}">
+      <span class="log-ico"><i data-lucide="${LOG_ICONE[x.tipo] || 'activity'}"></i></span>
+      <div class="log-main">
+        <div class="log-acao">${escH(x.acao)}${x.resultado === 'falha' ? ' <span class="badge excluido">falha</span>' : ''}${x.perfil === 'Qualidade' ? ' <span class="badge andamento">Qualidade</span>' : ''}</div>
+        <div class="log-quem">${quem}${alvo}</div>
+        ${x.detalhe ? `<div class="log-det">${escH(x.detalhe)}</div>` : ''}
+      </div>
+      <div class="log-quando" title="${escH(fmtDateTime(d))}"><b>${pad(d.getHours())}:${pad(d.getMinutes())}</b><span>${escH(logRelativo(d))}</span></div>
+    </div>`;
+  });
+  lista.innerHTML = html;
+  const mais = document.getElementById('logMais');
+  mais.style.display = LOG.total > LOG.itens.length ? '' : 'none';
+  mais.textContent = `Mostrar mais (${LOG.total - LOG.itens.length} restantes)`;
+  if(window.lucide) lucide.createIcons();
+}
+(function ligarLog(){
+  const q = id => document.getElementById(id);
+  if(!q('logChips')) return;
+  q('logChips').addEventListener('click', e=>{ const b = e.target.closest('[data-logtipo]'); if(!b) return; LOG.tipo = b.dataset.logtipo; LOG.limite = 300; logCarregar(false); });
+  let t = null;
+  q('logBusca').addEventListener('input', e=>{ clearTimeout(t); t = setTimeout(()=>{ LOG.busca = e.target.value.trim(); LOG.limite = 300; logCarregar(false); }, 350); });
+  q('logPeriodo').addEventListener('change', e=>{ LOG.dias = +e.target.value; LOG.limite = 300; logCarregar(false); });
+  q('logAtualizar').addEventListener('click', ()=> logCarregar(false));
+  q('logMais').addEventListener('click', ()=>{ LOG.limite += 300; logCarregar(false); });
+  q('logSenhas').addEventListener('click', abrirSituacaoSenhas);
+  q('logCsv').addEventListener('click', ()=>{
+    downloadCSV('registro_atividades.csv', ['Data/hora','Tipo','Ação','Quem','Matrícula','Perfil','Alvo','Matrícula do alvo','Detalhe','Resultado'],
+      LOG.itens.map(x=>[fmtDateTime(new Date(x.dataHora)), x.tipo, x.acao, x.usuarioNome, x.usuarioMat, x.perfil, x.alvoNome, x.alvoMat, x.detalhe, x.resultado]));
+    logAction('Relatório exportado', 'Registro de atividades (CSV)');
+  });
+  document.querySelectorAll('[data-pane-link]').forEach(b=> b.addEventListener('click', ()=> mostrarAbaHistorico(b.dataset.paneLink)));
+  setInterval(()=>{ if(currentUser && currentRole === 'qualidade' && currentSectionId === 'historico' && abaHistoricoAtual === 'log' && !usuarioOcupado() && document.visibilityState === 'visible') logCarregar(true); }, 45000);
+})();
+
+/* Situação das senhas: quem nunca acessou, quem está com senha provisória e quem já criou a própria. */
+async function abrirSituacaoSenhas(){
+  const corpo = document.createElement('div'); corpo.innerHTML = '<div class="skel-wrap"><div class="skel skel-l1"></div><div class="skel skel-card"></div></div>';
+  abrirMiniPagina({titulo:'Situação das senhas', subtitulo:'Quem já criou a própria senha e quem ainda não acessou o PPG', corpo, largura:960});
+  const resp = await backendCall('situacaoSenhas');
+  if(!resp.ok){ corpo.innerHTML = `<div class="imp-aviso"><i data-lucide="alert-triangle"></i> ${escH(resp.erro || 'Não foi possível carregar.')}</div>`; return; }
+  const S = {filtro:'', busca:'', pessoas: resp.pessoas || []};
+  const cls = {'nunca acessou':'excluido', 'senha provisória':'programada', 'senha própria':'finalizada'};
+  const pintar = ()=>{
+    const cont = {'nunca acessou':0, 'senha provisória':0, 'senha própria':0}; S.pessoas.forEach(p=>{ cont[p.estado]++; });
+    const b = PPGImport.norm(S.busca);
+    const lista = S.pessoas.filter(p=> (!S.filtro || p.estado === S.filtro) && (!b || PPGImport.norm(p.nome).includes(b) || String(p.matricula).includes(b)));
+    corpo.innerHTML = `<div class="log-chips" style="margin-bottom:12px;">
+        ${[['', 'Todos', S.pessoas.length], ['nunca acessou', 'Nunca acessou', cont['nunca acessou']], ['senha provisória', 'Senha provisória', cont['senha provisória']], ['senha própria', 'Senha própria', cont['senha própria']]].map(([k, rot, n])=>`<button type="button" class="log-chip${S.filtro === k ? ' ativo' : ''}" data-sf="${k}">${rot} <em>${n}</em></button>`).join('')}
+      </div>
+      <div class="field" style="margin-bottom:12px;"><input type="text" id="sfBusca" placeholder="Buscar por nome ou matrícula…" value="${escH(S.busca)}"></div>
+      ${tabelaHtml(['Nome','Matrícula','Setor','Situação','Última troca','Ação'], lista.slice(0,400).map(p=>[
+        escH(p.nome) + (p.qualidade ? ' <span class="badge andamento">Qualidade</span>' : ''), escH(p.matricula), escH(p.setor || ''),
+        `<span class="badge ${cls[p.estado]}">${escH(p.estado)}</span>`, p.atualizadoEm ? escH(fmtPeriodoValor(p.atualizadoEm)) : '—',
+        p.matricula === currentUser.matricula ? '' : `<button type="button" class="btn btn-outline btn-sm" data-redef="${escH(p.matricula)}"><i data-lucide="rotate-ccw"></i> Redefinir</button>`
+      ]), 'Ninguém neste filtro.')}${lista.length > 400 ? `<p class="hint">Mostrando 400 de ${lista.length}. Use a busca.</p>` : ''}`;
+    const inp = corpo.querySelector('#sfBusca'); if(S.busca){ inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
+    if(window.lucide) lucide.createIcons();
+  };
+  corpo.addEventListener('click', async e=>{
+    const f = e.target.closest('[data-sf]'); if(f){ S.filtro = f.dataset.sf; pintar(); return; }
+    const r = e.target.closest('[data-redef]'); if(!r) return;
+    const p = S.pessoas.find(x=>x.matricula === r.dataset.redef); if(!p) return;
+    if(!confirm(`Redefinir a senha de ${p.nome}?\n\nA senha volta a ser a matrícula (${p.matricula}) e a pessoa cria uma nova no próximo acesso. Isso fica registrado.`)) return;
+    r.disabled = true;
+    const rr = await backendCall('resolveReset', {matricula: p.matricula, atendidoPor: currentUser.nome});
+    if(!rr.ok){ showToast(rr.erro || 'Não foi possível redefinir.', 'warning'); r.disabled = false; return; }
+    p.estado = 'senha provisória'; p.atualizadoEm = ''; showToast(`Senha de ${p.nome} redefinida.`, 'success'); LOG.ultimo = 0; pintar();
+  });
+  corpo.addEventListener('input', e=>{ if(e.target.id === 'sfBusca'){ S.busca = e.target.value; clearTimeout(S._t); S._t = setTimeout(pintar, 250); } });
+  pintar();
+}
+window.abrirSituacaoSenhas = abrirSituacaoSenhas;
+
+/* ======================= EXCEÇÕES ÀS REGRAS (agora gravadas no servidor, visíveis em qualquer aparelho) ======================= */
+let _excTs = 0;
+function pintarExcecoes(){
+  const tbody = document.getElementById('tblExcecoes'); if(!tbody) return;
+  tbody.innerHTML = ruleChangeLog.map(r=>`<tr><td>${escH(fmtDateTime(r.data))}</td><td>${escH(r.responsavel)}</td><td>${escH(r.campanha)}</td><td>${escH(r.regraOriginal)}</td><td>${escH(r.alteracao)}</td><td>${escH(r.justificativa)}</td></tr>`).join('')
+    || `<tr><td colspan="6" style="text-align:center; color:var(--ink-soft); padding:20px;">Nenhuma exceção registrada até o momento.</td></tr>`;
+}
+async function carregarExcecoes(){
+  _excTs = Date.now();
+  const resp = await backendCall('listarLog', {filtro:{tipos:['regra'], limite:200}});
+  if(resp.ok) ruleChangeLog = (resp.itens || []).map(x=>{ const e = x.extra || {}; return {data:new Date(x.dataHora), responsavel:x.usuarioNome, campaignId:e.campaignId, campanha:e.campanha || '', regraOriginal:e.regraOriginal || '', alteracao:e.alteracao || '', justificativa:e.justificativa || ''}; });
+  pintarExcecoes();
+}
+function renderRegrasExcecoes(){
+  const sel = document.getElementById('excCampanha');
+  if(sel){
+    const assinatura = campaigns.map(c=>c.id).join('|');
+    if(sel.dataset.sig !== assinatura){ sel.innerHTML = campaigns.map(c=>`<option value="${escH(c.id)}">${escH(c.nome)}</option>`).join(''); sel.dataset.sig = assinatura; }
+  }
+  pintarExcecoes();
+  if(Date.now() - _excTs > 20000) carregarExcecoes();
+}
+document.getElementById('formExcecao')?.addEventListener('submit', async function(e){
+  e.preventDefault();
+  const campaignId = document.getElementById('excCampanha').value;
+  const regraOriginal = document.getElementById('excRegraOriginal').value.trim();
+  const alteracao = document.getElementById('excAlteracao').value.trim();
+  const justificativa = document.getElementById('excJustificativa').value.trim();
+  if(!campaignId || !regraOriginal || !alteracao || !justificativa) return;
+  const c = campaigns.find(x=>x.id === campaignId);
+  const btn = this.querySelector('button[type="submit"]'); btn.disabled = true;
+  const resp = await backendCall('registrarEvento', {tipo:'regra', acao:'Exceção às regras registrada', detalhe:`${c ? c.nome : campaignId} — ${alteracao}`, extra:{campaignId, campanha: c ? c.nome : '', regraOriginal, alteracao, justificativa}});
+  btn.disabled = false;
+  if(!resp.ok){ showToast(resp.erro || 'Não foi possível registrar a exceção.', 'warning'); return; }
+  this.reset(); LOG.ultimo = 0;
+  showToast('Exceção registrada e gravada no registro de atividades.', 'success');
+  carregarExcecoes();
+});
+
+/* ======================= MENU RECOLHIDO: todos os botões funcionam, com dica ao passar o mouse ======================= */
+(function menuRecolhido(){
+  const sb = document.getElementById('sidebar'); if(!sb) return;
+  const rotular = ()=> sb.querySelectorAll('.menu-item, .menu-group-header').forEach(b=>{ const l = b.querySelector('.label'); if(l) b.dataset.tip = l.textContent.trim(); });
+  rotular();
+  let dica = document.getElementById('navTip');
+  if(!dica){ dica = document.createElement('div'); dica.id = 'navTip'; dica.className = 'nav-tip'; document.body.appendChild(dica); }
+  const esconder = ()=> dica.classList.remove('show');
+  sb.addEventListener('mouseover', e=>{
+    const b = e.target.closest('.menu-item'); if(!b || !sb.classList.contains('collapsed') || !b.dataset.tip) return esconder();
+    const r = b.getBoundingClientRect();
+    dica.textContent = b.dataset.tip; dica.style.left = (r.right + 12) + 'px'; dica.style.top = (r.top + r.height / 2) + 'px'; dica.classList.add('show');
+  });
+  sb.addEventListener('mouseleave', esconder); sb.addEventListener('scroll', esconder); sb.addEventListener('click', esconder);
+  // lembra a escolha (recolhido / aberto) neste aparelho
+  const KEY = 'ppg_menu_recolhido';
+  try{ const salvo = localStorage.getItem(KEY); if(window.innerWidth > 880){ if(salvo === '1') sb.classList.add('collapsed'); else if(salvo === '0') sb.classList.remove('collapsed'); } }catch(e){}   // respeita a escolha da pessoa (em telas médias o app já nasce recolhido)
+  document.getElementById('btnCollapseSidebar')?.addEventListener('click', ()=>{ setTimeout(()=>{ try{ localStorage.setItem(KEY, sb.classList.contains('collapsed') ? '1' : '0'); }catch(e){} esconder(); }, 0); });
+})();
+
+/* ======================= LOGIN: mostrar/ocultar senha ======================= */
+document.getElementById('btnVerSenha')?.addEventListener('click', ()=>{
+  const inp = document.getElementById('loginSenha'), btn = document.getElementById('btnVerSenha');
+  const mostrar = inp.type === 'password';
+  inp.type = mostrar ? 'text' : 'password';
+  btn.innerHTML = `<i data-lucide="${mostrar ? 'eye-off' : 'eye'}"></i>`; btn.setAttribute('aria-label', mostrar ? 'Ocultar senha' : 'Mostrar senha');
+  if(window.lucide) lucide.createIcons(); inp.focus();
+});
 
 
 /* ======================= INIT ======================= */
