@@ -17,6 +17,11 @@ const UNIDADES = EMPRESA.filiais;
 const FUNCOES = [...new Set(EMPRESA.setores.flatMap(s => s.funcoes))];
 const CARGOS_IMPEDIDOS = EMPRESA.cargosImpedidos;
 const CARGOS_PERMITIDOS = FUNCOES.filter(f => !CARGOS_IMPEDIDOS.includes(f));
+/* Cargos de liderança são reconhecidos por PALAVRA-CHAVE no cargo/função real da planilha (ex.: "Gerente de Operações", "Coordenadora de RH"). */
+const CARGOS_PALAVRAS = (EMPRESA.cargosImpedidosPalavras && EMPRESA.cargosImpedidosPalavras.length ? EMPRESA.cargosImpedidosPalavras : ['gerente','coordenador','encarregado','assessor']).map(w => String(w).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase());
+function cargoImpedido(p){
+  return [p.cargo, p.funcao].filter(Boolean).some(a => CARGOS_IMPEDIDOS.includes(a) || CARGOS_PALAVRAS.some(w => String(a).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().includes(w)));
+}
 
 const NOMES = []; // não é mais usado — participantes agora vêm do quadro real (EMPRESA.colaboradores)
 
@@ -30,12 +35,13 @@ function fmtDateTime(d){return pad(d.getDate())+"/"+pad(d.getMonth()+1)+"/"+d.ge
 function fmtPeriodoValor(valor){
   if(!valor) return '—';
   if(valor instanceof Date) return fmtDateTime(valor);
-  const s = String(valor);
-  if(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(s)){
-    const d = new Date(s);
+  const t = String(valor);
+  if(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(t)){
+    const d = new Date(t);
     if(!isNaN(d.getTime())) return fmtDateTime(d);
   }
-  return s.replace('T',' ');
+  if(/^\d{4}-\d{2}-\d{2}$/.test(t)){ const [y,m,d] = t.split('-'); return `${d}/${m}/${y}`; }
+  return t.replace('T',' ');
 }
 function opt(text, correct){ return {text, correct: !!correct}; }
 
@@ -89,7 +95,7 @@ function buildParticipants(campaignId, count, pct100Count){
     const dataFim = new Date(2026, 5, 10 + Math.floor(i/4), 8 + (i%9), (i*7)%60);
     const dataInicio = new Date(dataFim.getTime() - (3 + Math.floor(Math.random()*9)) * 60000);
     list.push({
-      campaignId, nome: colab.nome, matricula: colab.matricula, cpf: EMPRESA.cpfFicticio(colab.matricula),
+      campaignId, nome: colab.nome, matricula: colab.matricula,
       setor: colab.setor, filial: colab.filial, funcao: colab.funcao, cargo: colab.funcao,
       data: dataFim, dataInicio, dataFim, pct: acertos, respostasCorretas: null,
       acertosQtd: Math.round(acertos/100*totalQuestoes), totalQuestoes,
@@ -115,24 +121,7 @@ let participants = [];
 let wonHistory = [];
 
 /* ======================= BANCO DE PERGUNTAS ======================= */
-let questionBank = [
-  {codigo:"BQ-001", categoria:"Segurança", tema:"Segurança da Informação", procedimento:"POL-SEG-01",
-   texto:"Qual é a prática recomendada ao identificar um e-mail suspeito?", type:"unica",
-   options:[opt("Clicar no link para verificar a origem"),opt("Reportar ao canal de segurança e não interagir com o e-mail",true),opt("Responder pedindo mais informações ao remetente"),opt("Encaminhar para colegas avaliarem")],
-   autor:"Mariana Queiroz", dataCriacao:new Date(2026,4,20), ultimaUtilizacao:new Date(2026,5,15), qtdUtilizacoes:1, status:"ativa"},
-  {codigo:"BQ-002", categoria:"Qualidade", tema:"ISO 9001", procedimento:"POL-QUA-04",
-   texto:"O que é uma não conformidade?", type:"unica",
-   options:[opt("Um elogio do cliente"),opt("Um desvio em relação a um requisito estabelecido",true),opt("Uma sugestão de melhoria qualquer"),opt("Um novo processo criado")],
-   autor:"Mariana Queiroz", dataCriacao:new Date(2025,9,10), ultimaUtilizacao:new Date(2025,10,5), qtdUtilizacoes:2, status:"ativa"},
-  {codigo:"BQ-003", categoria:"Ética", tema:"Compliance", procedimento:"COD-ETI-01",
-   texto:"O que é conflito de interesses?", type:"unica",
-   options:[opt("Quando interesses pessoais podem influenciar decisões profissionais",true),opt("Uma discordância entre colegas de equipe"),opt("Um erro de sistema"),opt("Uma reunião com clientes")],
-   autor:"Mariana Queiroz", dataCriacao:new Date(2025,6,2), ultimaUtilizacao:new Date(2025,7,10), qtdUtilizacoes:1, status:"ativa"},
-  {codigo:"BQ-004", categoria:"Segurança", tema:"Proteção de Dados", procedimento:"POL-SEG-02",
-   texto:"O uso de pen drives pessoais em computadores corporativos é permitido sem autorização?", type:"vf",
-   options:[opt("Verdadeiro"),opt("Falso",true)],
-   autor:"Mariana Queiroz", dataCriacao:new Date(2024,2,1), ultimaUtilizacao:new Date(2024,2,20), qtdUtilizacoes:1, status:"ativa"}
-];
+let questionBank = [];
 function bqUsageStatus(q){
   if(!q.ultimaUtilizacao) return {label:"Nunca utilizada", cls:"nunca"};
   const twoYearsMs = 2*365*24*60*60*1000;
@@ -164,15 +153,14 @@ function renderAuditoria(){
 function audFillFilterSelects(){
   const camp = document.getElementById('audFiltroCampanha');
   if(!camp) return;
+  const distintos = campo => [...new Set([...(EMPRESA.colaboradores||[]).map(c=>c[campo]), ...participants.map(p=>p[campo]), ...(historicoServidor||[]).map(h=>h[campo])].filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'pt-BR'));
+  const preencher = (id, rotuloTodos, valores) => { const el = document.getElementById(id); if(!el) return; const atual = el.value; el.innerHTML = `<option value="">${rotuloTodos}</option>` + valores.map(v=>`<option value="${escH(v)}">${escH(v)}</option>`).join(''); el.value = atual; };
   const prevCamp = camp.value;
-  camp.innerHTML = '<option value="">Todas</option>' + campaigns.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
+  camp.innerHTML = '<option value="">Todas</option>' + campaigns.map(c=>`<option value="${escH(c.id)}">${escH(c.nome)}</option>`).join('');
   camp.value = prevCamp;
-  const setor = document.getElementById('audFiltroSetor');
-  if(setor.options.length <= 1) setor.innerHTML = '<option value="">Todos</option>' + [...SETORES].sort().map(s=>`<option value="${s}">${s}</option>`).join('');
-  const filial = document.getElementById('audFiltroFilial');
-  if(filial.options.length <= 1) filial.innerHTML = '<option value="">Todas</option>' + UNIDADES.map(f=>`<option value="${f}">${f}</option>`).join('');
-  const funcao = document.getElementById('audFiltroFuncao');
-  if(funcao.options.length <= 1) funcao.innerHTML = '<option value="">Todas</option>' + [...FUNCOES].sort().map(f=>`<option value="${f}">${f}</option>`).join('');
+  preencher('audFiltroSetor', 'Todos', distintos('setor'));
+  preencher('audFiltroFilial', 'Todas', distintos('filial'));
+  preencher('audFiltroFuncao', 'Todas', distintos('funcao'));
 }
 function audGetFilteredParticipants(){
   const campId = document.getElementById('audFiltroCampanha').value;
@@ -222,7 +210,7 @@ function renderAuditoriaBarChart(elId, dataObj){
   if(!entries.length){ el.innerHTML = '<p class="hint">Sem dados para os filtros atuais.</p>'; return; }
   const max = Math.max(...entries.map(([,v])=>v));
   el.innerHTML = entries.map(([k,v])=>`
-    <div class="hbar-row"><div class="hbar-label">${k}</div><div class="hbar-track"><div class="hbar-fill" style="width:0%" data-w="${(v/max*100)}"></div></div><div class="hbar-value">${v}</div></div>`).join('');
+    <div class="hbar-row"><div class="hbar-label">${k}</div><div class="hbar-track"><div class="hbar-fill" style="width:${window.__renderSilencioso ? (v/max*100) : 0}%" data-w="${(v/max*100)}"></div></div><div class="hbar-value">${v}</div></div>`).join('');
   requestAnimationFrame(()=> el.querySelectorAll('.hbar-fill').forEach(f=> f.style.width = f.dataset.w + "%"));
 }
 function renderAuditoriaDetalhe(){
@@ -233,13 +221,13 @@ function renderAuditoriaDetalhe(){
   tbody.innerHTML = list.map(p=>{
     const c = campaigns.find(x=>x.id===p.campaignId);
     return `<tr>
-      <td>${p.nome}</td><td>${p.matricula}</td><td style="font-family:monospace; font-size:11px;">${p.cpf||'—'}</td><td>${p.funcao||p.cargo}</td><td>${p.setor}</td><td>${p.filial}</td>
+      <td>${p.nome}</td><td>${p.matricula}</td><td>${p.funcao||p.cargo}</td><td>${p.setor}</td><td>${p.filial}</td>
       <td>${c?c.nome:p.campaignId}</td><td style="font-family:monospace; font-size:11px;">${p.codigoResposta||'—'}</td>
       <td>${p.dataInicio?fmtDateTime(p.dataInicio):'—'}</td><td>${p.dataFim?fmtDateTime(p.dataFim):fmtDateTime(p.data)}</td>
       <td>${duracaoLabel(p.dataInicio, p.dataFim||p.data)}</td>
       <td>${p.acertosQtd!=null && p.totalQuestoes ? `${p.acertosQtd}/${p.totalQuestoes}` : '—'}</td>
       <td><span class="${p.pct===100?'pct100':'pctless'}">${p.pct}%</span></td>
-      <td style="font-size:11px;">${p.dispositivo||'—'}<br><span style="font-family:monospace; color:var(--ink-soft); font-size:10px;">${p.sessaoId||''}</span></td>
+      <td style="font-size:11px;">${escH(p.dispositivo||'—')}<br><span style="font-family:monospace; color:var(--ink-soft); font-size:10px;">${escH(p.sessaoId||'')}</span></td>
       <td>${audEligLabel(p)}</td>
       <td style="display:flex; gap:6px; flex-wrap:wrap;">
         <button class="btn btn-outline btn-sm" onclick="audVerDetalhe('${p.campaignId}','${p.matricula}')">Respostas</button>
@@ -327,7 +315,7 @@ window.audVerPerfil = function(matricula){
   backdrop.innerHTML = `
     <div class="share-card" style="max-width:720px; text-align:left;">
       <h3 style="margin-bottom:2px;">${ref.nome}</h3>
-      <p class="hint" style="margin-bottom:2px;">${matricula} · CPF ${ref.cpf||'—'} · ${ref.funcao||ref.cargo} · ${ref.setor} · ${ref.filial}</p>
+      <p class="hint" style="margin-bottom:2px;">${matricula} · ${ref.funcao||ref.cargo} · ${ref.setor} · ${ref.filial}</p>
       <p class="hint" style="margin-bottom:14px;">${historico.length} participação(ões) registrada(s) no total, em ${new Set(historico.map(p=>p.campaignId)).size} campanha(s) distinta(s).</p>
       <div class="table-wrap" style="max-height:280px; overflow-y:auto;">
         <table><thead><tr><th>Campanha</th><th>Código</th><th>Data</th><th>Duração</th><th>%</th><th>Elegibilidade</th><th>Sorteio</th></tr></thead>
@@ -350,13 +338,13 @@ document.getElementById('audLimparFiltros')?.addEventListener('click', ()=>{
 document.getElementById('audExportXlsx')?.addEventListener('click', ()=>{
   const list = audGetFilteredParticipants();
   if(!list.length){ showToast("Não há dados para exportar com os filtros atuais.","warning"); return; }
-  const headers = ["Nome","Matrícula","CPF","Função","Setor","Filial","Campanha","Código","Início","Fim","Duração","Acertos","% Acertos","Dispositivo","Sessão","Elegibilidade"];
+  const headers = ["Nome","Matrícula","Função","Setor","Filial","Campanha","Código","Início","Fim","Duração","Acertos","% Acertos","Dispositivo","Sessão","Elegibilidade"];
   const rows = list.map(p=>{
     const c = campaigns.find(x=>x.id===p.campaignId);
     const {eligible, excluded} = evaluateEligibility(p.campaignId);
     const ex = excluded.find(e=>e.matricula===p.matricula);
     const elegStr = ex ? `Excluído — ${ex.motivo}` : 'Elegível';
-    return [p.nome,p.matricula,p.cpf||'',p.funcao||p.cargo,p.setor,p.filial,c?c.nome:p.campaignId,p.codigoResposta||'',
+    return [p.nome,p.matricula,p.funcao||p.cargo,p.setor,p.filial,c?c.nome:p.campaignId,p.codigoResposta||'',
       p.dataInicio?fmtDateTime(p.dataInicio):'', p.dataFim?fmtDateTime(p.dataFim):fmtDateTime(p.data),
       duracaoLabel(p.dataInicio, p.dataFim||p.data), p.acertosQtd!=null?`${p.acertosQtd}/${p.totalQuestoes}`:'', p.pct+'%',
       p.dispositivo||'', p.sessaoId||'', elegStr];
@@ -405,8 +393,7 @@ function saveState(){
   try{
     const state = {
       version: STATE_VERSION,
-      campaigns, participants, wonHistory, questionBank, actionLog, ruleChangeLog,
-      responseSeqCounter, currentUser, currentRole,
+      actionLog, ruleChangeLog, currentUser, currentRole,
       themePreference: window.themePreference || 'auto',
       savedAt: new Date()
     };
@@ -423,13 +410,8 @@ function loadState(){
       localStorage.removeItem(STORAGE_KEY);
       return false;
     }
-    if(state.campaigns) campaigns = state.campaigns;
-    if(state.participants) participants = state.participants;
-    if(state.wonHistory) wonHistory = state.wonHistory;
-    if(state.questionBank) questionBank = state.questionBank;
     if(state.actionLog) actionLog = state.actionLog;
     if(state.ruleChangeLog) ruleChangeLog = state.ruleChangeLog;
-    if(typeof state.responseSeqCounter === 'number') responseSeqCounter = state.responseSeqCounter;
     currentUser = state.currentUser || null;
     currentRole = state.currentRole || "qualidade";
     window.themePreference = state.themePreference || 'auto';
@@ -450,7 +432,7 @@ function evaluateEligibility(campaignId){
   all.forEach(p=>{
     const motivos = [];
     if(p.pct !== 100) motivos.push(`Não atingiu 100% de acertos no questionário (fez ${p.pct}%)`);
-    if(CARGOS_IMPEDIDOS.includes(p.cargo)) motivos.push(`Ocupa cargo de liderança impedido de participar (${p.cargo})`);
+    if(cargoImpedido(p)) motivos.push(`Ocupa cargo de liderança impedido de participar (${p.cargo || p.funcao})`);
     if(isWithinTwoYears(p.matricula, now)) motivos.push("Já foi premiado(a) em uma campanha do PPG nos últimos 2 anos");
     if(motivos.length) excluded.push({...p, motivo: motivos.join(" · "), motivos});
     else eligible.push(p);
@@ -484,7 +466,7 @@ const titles = {
   elegiveis:"Elegíveis", sorteio:"Sorteio", relatorios:"Relatórios", historico:"Histórico",
   banco:"Banco de Perguntas", auditoria:"Auditoria", config:"Configurações", responder:"Questionário",
   "regras-excecoes":"Regras & Exceções", "divulgacao":"Divulgação", "fale-conosco":"Fale com a Qualidade", "importar-historico":"Importar Histórico",
-  "campanha-atual":"Campanha Atual", "historico-colab":"Histórico", "meu-resultado":"Meu Resultado", regulamento:"Regulamento"
+  "campanha-atual":"Campanha Atual", "historico-colab":"Minhas participações", regulamento:"Regulamento"
 };
 
 document.querySelectorAll('.menu-item').forEach(btn=>{
@@ -501,32 +483,49 @@ document.querySelectorAll('.menu-group-header').forEach(btn=>{
   });
 });
 let currentSectionId = "inicio";
+/* Telas que foram juntadas em outras (links antigos continuam funcionando). */
+const ALIAS_SECOES = {'meu-resultado':'historico-colab', 'auditoria':'historico#auditoria', 'importar-historico':'historico#importar', 'regras-excecoes':'config'};
+let abaHistoricoAtual = 'rodadas';
+function mostrarAbaHistorico(pane){
+  abaHistoricoAtual = pane;
+  document.querySelectorAll('#histTabs .hist-tab').forEach(b=>b.classList.toggle('active', b.dataset.pane === pane));
+  document.querySelectorAll('#sec-historico .hist-pane').forEach(p=>{ p.style.display = (p.id === 'histPane-'+pane) ? 'block' : 'none'; });
+  renderPaneHistorico();
+}
+function renderPaneHistorico(){
+  if(abaHistoricoAtual === 'rodadas') renderTimeline();
+  else if(abaHistoricoAtual === 'auditoria'){ renderAuditoria(); renderAuditoriaDetalhe(); }
+  else if(abaHistoricoAtual === 'importar'){ if(!IMP.doc) impInicio(); renderHistoricoImportado(); }
+}
+document.querySelectorAll('#histTabs .hist-tab').forEach(b=> b.addEventListener('click', ()=> mostrarAbaHistorico(b.dataset.pane)));
 function goToSection(target){
+  let aba = null;
+  if(ALIAS_SECOES[target]){ const [t, a] = ALIAS_SECOES[target].split('#'); target = t; aba = a || null; }
+  document.body.classList.add('anim-entrada');
+  clearTimeout(window._animEntradaT);
+  window._animEntradaT = setTimeout(()=> document.body.classList.remove('anim-entrada'), 900);
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   const sec = document.getElementById('sec-'+target);
   if(sec) sec.classList.add('active');
   document.getElementById('pageTitle').textContent = titles[target] || target;
   closeSidebarMobile();
   currentSectionId = target;
-  renderSectionContent(target);
+  if(target === 'historico' && aba) mostrarAbaHistorico(aba);
+  else renderSectionContent(target);
 }
 function renderSectionContent(target){
   if(target==="inicio") renderDashboard();
   if(target==="campanhas") renderCampaignGrid();
-  if(target==="historico") renderTimeline();
+  if(target==="historico") renderPaneHistorico();
   if(target==="participantes") renderParticipantsTable();
   if(target==="elegiveis") renderEligibleTable();
   if(target==="banco") renderBanco();
-  if(target==="auditoria"){ renderAuditoria(); renderAuditoriaDetalhe(); }
-  if(target==="regras-excecoes") renderRegrasExcecoes();
   if(target==="divulgacao") renderDivulgacao();
   if(target==="fale-conosco" && currentRole==="qualidade") renderDuvidas();
   if(target==="fale-conosco" && currentRole==="colaborador") renderMinhasDuvidas();
-  if(target==="importar-historico") renderHistoricoImportado();
-  if(target==="config" && currentRole==="qualidade") renderPedidosSenha();
+  if(target==="config" && currentRole==="qualidade"){ renderPedidosSenha(); renderRegrasExcecoes(); renderInfoPlanilha(); }
   if(target==="campanha-atual") renderCampanhaAtual();
   if(target==="historico-colab") renderHistoricoColaborador();
-  if(target==="meu-resultado") renderMeuResultado();
   if(target==="regulamento") renderRegulamentoStats();
 }
 
@@ -606,6 +605,17 @@ const deepLinkCampaignId = urlParams.get('campanha');
    Não existe mais senha nenhuma escrita aqui no código. */
 const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwfKlz_TuxeCNl2F21M4_ebtnHy2lMn-ppggOXU5kjZwDoNQaoTv1E0DLYSvBcyQK_x9Q/exec";
 
+function urlDoApp(){ try{ return location.href.split('#')[0].split('?')[0]; }catch(e){ return ''; } }
+
+/* QR Code gerado aqui mesmo (data URL): por ser da própria página, sai na imagem baixada do banner. */
+function gerarQrDataUrl(texto, px){
+  try{
+    const qr = qrcode(0, 'M'); qr.addData(texto); qr.make();
+    const cell = Math.max(2, Math.floor((px || 180) / (qr.getModuleCount() + 8)));
+    return qr.createDataURL(cell, cell * 4);
+  }catch(e){ console.warn('Falha ao gerar o QR Code', e); return ''; }
+}
+
 async function backendCall(action, payload){
   try{
     const controller = new AbortController();
@@ -615,7 +625,7 @@ async function backendCall(action, payload){
       res = await fetch(BACKEND_URL, {
         method: "POST",
         headers: {"Content-Type": "text/plain;charset=utf-8"}, // evita pre-flight de CORS no Apps Script
-        body: JSON.stringify({action, solicitante: (typeof currentUser !== 'undefined' && currentUser) ? currentUser.matricula : null, ...(payload||{})}),
+        body: JSON.stringify({action, token: (typeof currentUser !== 'undefined' && currentUser) ? currentUser.token : undefined, appUrl: urlDoApp(), ...(payload||{})}),
         signal: controller.signal
       });
     } finally {
@@ -627,7 +637,9 @@ async function backendCall(action, payload){
       return {ok:false, erro:`O servidor respondeu com erro ${res.status}. Veja o Console (F12) para detalhes.`};
     }
     try{
-      return JSON.parse(textoCru);
+      const r = JSON.parse(textoCru);
+      if(r && r.sessaoExpirada && typeof currentUser !== 'undefined' && currentUser){ sairDoApp("Sua sessão expirou. Entre novamente."); }
+      return r;
     }catch(parseErr){
       console.error(`A resposta da ação "${action}" não veio em JSON. Isso geralmente acontece quando a implantação do Apps Script não está com acesso "Qualquer pessoa", ou quando houve um erro dentro do próprio script. Resposta recebida:`, textoCru);
       return {ok:false, erro:"O servidor respondeu algo inesperado (não era JSON). Veja o Console (F12) — provavelmente a implantação do Apps Script precisa ser revisada."};
@@ -643,10 +655,10 @@ function normalizarTextoCliente(s){
   return String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
 }
 const PAPEIS_QUALIDADE = ["qualidade", "admin", "administrador", "gestao", "gestor", "coordenacao", "coordenador"];
-function mapColaboradorParaUser(colab){
+function mapColaboradorParaUser(colab, roleServidor){
   const papelNorm = normalizarTextoCliente(colab.papel);
   const setorNorm = normalizarTextoCliente(colab.setor);
-  const role = (PAPEIS_QUALIDADE.some(p => papelNorm.includes(p)) || setorNorm.includes("qualidade")) ? "qualidade" : "colaborador";
+  const role = roleServidor || ((PAPEIS_QUALIDADE.some(p => papelNorm.includes(p)) || setorNorm.includes("qualidade")) ? "qualidade" : "colaborador");
   return {
     matricula: String(colab.matricula), nome: colab.nome, role,
     setor: colab.setor, filial: colab.filial, funcao: colab.funcao, cargo: colab.cargo || colab.funcao,
@@ -674,7 +686,8 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
   }
 
   try{
-    currentUser = mapColaboradorParaUser(resp.colaborador);
+    currentUser = mapColaboradorParaUser(resp.colaborador, resp.role);
+    if(resp.token) currentUser.token = resp.token;
     if(resp.precisaTrocarSenha){
       abrirModalTrocaSenha({obrigatoria: true, primeiroAcesso: !!resp.primeiroAcesso, senhaAtual: senha});
       return; // só entra de fato no app depois de trocar a senha
@@ -702,11 +715,7 @@ function entrarNoApp(){
   applyRole(currentUser.role);
   saveState();
   showToast(`Bem-vindo(a), ${currentUser.nome}.`, "success");
-  sincronizarDadosDoServidor(true);
-  if(!window._syncIntervalIniciado){
-    window._syncIntervalIniciado = true;
-    setInterval(()=> sincronizarDadosDoServidor(true), 20 * 1000); // a cada 20s, em segundo plano
-  }
+  iniciarSincronizacao();
 }
 
 /* ======================= TROCA DE SENHA (obrigatória no 1º acesso, ou voluntária) ======================= */
@@ -751,6 +760,7 @@ function abrirModalTrocaSenha(opts){
     btn.disabled = false; btn.textContent = "Salvar nova senha";
     if(!resp.ok){ erroEl.textContent = resp.erro || "Não foi possível trocar a senha."; erroEl.style.display = "block"; return; }
     backdrop.remove();
+    if(resp.token){ currentUser.token = resp.token; if(resp.role) currentUser.role = resp.role; saveState(); }
     showToast("Senha atualizada com sucesso!", "success");
     if(obrigatoria) entrarNoApp();
   });
@@ -764,11 +774,11 @@ document.getElementById('btnEsqueciSenha').addEventListener('click', ()=>{
   backdrop.innerHTML = `
     <div class="share-card" style="max-width:380px; text-align:left;">
       <h3>Esqueci minha senha</h3>
-      <p class="hint" style="margin-bottom:16px;">Informe sua matrícula. A equipe de Qualidade vai receber um aviso por e-mail e liberar uma senha temporária para você.</p>
+      <p class="hint" style="margin-bottom:16px;">Informe sua matrícula. Sua senha volta a ser a própria matrícula na hora — depois é só entrar e criar uma senha nova. A equipe de Qualidade é avisada por e-mail.</p>
       <form id="formEsqueciSenha">
         <div class="field" style="margin-bottom:10px;"><label>Matrícula</label><input type="text" id="esqMatricula" required></div>
         <div class="login-error" id="esqErro"></div>
-        <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px;">Solicitar redefinição</button>
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px;">Redefinir minha senha</button>
       </form>
       <div class="share-actions" style="margin-top:12px;"><button class="btn btn-outline" id="esqCancelar">Fechar</button></div>
     </div>`;
@@ -783,109 +793,29 @@ document.getElementById('btnEsqueciSenha').addEventListener('click', ()=>{
     const btn = this.querySelector('button[type="submit"]');
     btn.disabled = true; btn.textContent = "Enviando...";
     const resp = await backendCall('requestReset', {matricula});
-    btn.disabled = false; btn.textContent = "Solicitar redefinição";
+    btn.disabled = false; btn.textContent = "Redefinir minha senha";
     if(!resp.ok){ erroEl.textContent = resp.erro || "Não foi possível registrar o pedido."; erroEl.style.display = "block"; return; }
-    backdrop.remove();
-    showToast("Pedido enviado! A Qualidade foi avisada por e-mail e vai liberar uma senha temporária.", "success");
+    const card = backdrop.querySelector('.share-card');
+    card.innerHTML = `<h3>✅ Senha redefinida</h3><p class="hint" style="margin-bottom:16px;">Pronto! Sua senha voltou a ser a <b>sua própria matrícula</b>. Entre usando a matrícula no lugar da senha e crie uma senha nova.</p><button class="btn btn-primary btn-block" id="esqIrLogin">Ir para o login</button>`;
+    document.getElementById('esqIrLogin').addEventListener('click', ()=>{ backdrop.remove(); const m = document.getElementById('loginMatricula'); m.value = matricula; document.getElementById('loginSenha').value = ''; document.getElementById('loginSenha').focus(); });
   });
 });
 
-/* ======================= IMPORTAR HISTÓRICO DE CAMPANHAS PASSADAS ======================= */
-let historicoParseado = null;
-
-document.getElementById('btnBaixarModeloHistorico')?.addEventListener('click', ()=>{
-  const headers = ["campanha","periodoInicio","periodoFim","matricula","nome","setor","filial","funcao","percentualAcertos","ganhador","premio"];
-  const rows = [["PPG 2023.2 – Ética","2023-08-01","2023-08-20","100234","Ana Souza","TI","Matriz","Analista","100","Sim","Vale-compras R$ 150,00"]];
-  downloadCSV('modelo_historico_ppg.csv', headers, rows);
-});
-
-document.getElementById('historicoImportFile')?.addEventListener('change', function(e){
-  const file = e.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = function(evt){
-    try{
-      const data = new Uint8Array(evt.target.result);
-      const wb = XLSX.read(data, {type:'array'});
-      const sheet = wb.Sheets[wb.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(sheet, {defval:""});
-      historicoParseado = rows.map(r=>({
-        campanha: String(r.campanha || r.Campanha || '').trim(),
-        periodoInicio: String(r.periodoInicio || r['Período Início'] || r.inicio || '').trim(),
-        periodoFim: String(r.periodoFim || r['Período Fim'] || r.fim || '').trim(),
-        matricula: String(r.matricula || r.Matricula || r['Matrícula'] || '').trim(),
-        nome: String(r.nome || r.Nome || '').trim(),
-        setor: String(r.setor || r.Setor || '').trim(),
-        filial: String(r.filial || r.Filial || '').trim(),
-        funcao: String(r.funcao || r.Funcao || r['Função'] || '').trim(),
-        percentualAcertos: Number(r.percentualAcertos || r['% Acertos'] || r.pct || 0),
-        ganhador: /sim|true|1/i.test(String(r.ganhador || r.Ganhador || '')),
-        premio: String(r.premio || r.Premio || r['Prêmio'] || '').trim()
-      })).filter(r=>r.campanha && r.matricula);
-
-      if(!historicoParseado.length){ showToast("Não encontrei linhas válidas nesse arquivo. Confira se as colunas 'campanha' e 'matricula' estão preenchidas.","warning"); return; }
-
-      const campanhasUnicas = new Set(historicoParseado.map(r=>r.campanha));
-      const ganhadoresCount = historicoParseado.filter(r=>r.ganhador).length;
-      document.getElementById('historicoResumoPreview').innerHTML = `
-        <div class="stat"><b>${campanhasUnicas.size}</b><span>Campanha(s) encontrada(s)</span></div>
-        <div class="stat"><b>${historicoParseado.length}</b><span>Participações no arquivo</span></div>
-        <div class="stat"><b>${ganhadoresCount}</b><span>Marcado(s) como ganhador</span></div>`;
-
-      document.getElementById('tblHistoricoPreview').innerHTML = historicoParseado.slice(0,200).map(r=>`
-        <tr><td>${r.campanha}</td><td>${r.matricula}</td><td>${r.nome}</td><td>${r.setor}</td><td>${r.percentualAcertos}%</td><td>${r.ganhador?'🏆 Sim':'—'}</td></tr>
-      `).join('');
-      document.getElementById('historicoPreviewWrap').style.display = "block";
-      if(window.lucide) lucide.createIcons();
-    }catch(err){
-      showToast("Não foi possível ler o arquivo. Verifique se é .xlsx ou .csv com as colunas esperadas.","warning");
-    }
-    e.target.value = "";
-  };
-  reader.readAsArrayBuffer(file);
-});
-
-document.getElementById('btnCancelarImportHistorico')?.addEventListener('click', ()=>{
-  historicoParseado = null;
-  document.getElementById('historicoPreviewWrap').style.display = "none";
-});
-
-document.getElementById('btnConfirmarImportHistorico')?.addEventListener('click', async ()=>{
-  if(!historicoParseado || !historicoParseado.length) return;
-  const btn = document.getElementById('btnConfirmarImportHistorico');
-  btn.disabled = true; btn.textContent = "Importando...";
-  const resp = await backendCall('importarHistorico', {linhas: historicoParseado, importadoPor: currentUser.nome});
-  btn.disabled = false; btn.innerHTML = '<i data-lucide="check"></i> Confirmar importação';
-  if(window.lucide) lucide.createIcons();
-  if(!resp.ok){ showToast(resp.erro || "Não foi possível importar.", "warning"); return; }
-  showToast(`${resp.importadas} linha(s) importada(s) com sucesso! Já fica visível para toda a equipe.`, "success");
-  logAction("Histórico importado", `${resp.importadas} linha(s) via arquivo`);
-  document.getElementById('historicoPreviewWrap').style.display = "none";
-  historicoParseado = null;
-  renderHistoricoImportado();
-});
-
-async function renderHistoricoImportado(){
+function renderHistoricoImportado(){
   const tbody = document.getElementById('tblHistoricoImportado');
   if(!tbody) return;
-  tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--ink-soft); padding:16px;">Carregando…</td></tr>`;
-  const resp = await backendCall('getHistorico');
-  if(!resp.ok){
-    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--error); padding:16px;">${resp.erro || 'Não foi possível carregar.'}</td></tr>`;
-    return;
-  }
-  const linhas = resp.historico || [];
   const porCampanha = {};
-  linhas.forEach(l=>{
-    if(!porCampanha[l.campanha]) porCampanha[l.campanha] = {periodo:`${l.periodoInicio} – ${l.periodoFim}`, total:0, ganhadores:0};
-    porCampanha[l.campanha].total++;
-    if(String(l.ganhador).toLowerCase() === 'sim') porCampanha[l.campanha].ganhadores++;
+  historicoServidor.forEach(l=>{
+    const k = l.campanha || '(sem nome)';
+    if(!porCampanha[k]) porCampanha[k] = {periodo: `${fmtPeriodoValor(l.periodoInicio)} – ${fmtPeriodoValor(l.periodoFim)}`, total:0, ganhadores:0, arquivo: l.origemArquivo || ''};
+    porCampanha[k].total++;
+    if(String(l.ganhador).toLowerCase() === 'sim') porCampanha[k].ganhadores++;
   });
   tbody.innerHTML = Object.entries(porCampanha).map(([nome, info])=>`
-    <tr><td>${nome}</td><td>${info.periodo}</td><td>${info.total}</td><td>${info.ganhadores}</td></tr>
+    <tr><td>${escH(nome)}</td><td>${escH(info.periodo)}</td><td>${info.total}</td><td>${info.ganhadores}</td></tr>
   `).join('') || `<tr><td colspan="4" style="text-align:center; color:var(--ink-soft); padding:16px;">Nenhum histórico importado ainda.</td></tr>`;
 }
-document.getElementById('btnAtualizarHistoricoImportado')?.addEventListener('click', renderHistoricoImportado);
+document.getElementById('btnAtualizarHistoricoImportado')?.addEventListener('click', ()=>{ _ultimaAssinatura = null; sincronizarDadosDoServidor(true); renderHistoricoImportado(); });
 
 /* ======================= FALE COM A QUALIDADE ======================= */
 document.getElementById('formFaleConosco')?.addEventListener('submit', async function(e){
@@ -896,12 +826,12 @@ document.getElementById('formFaleConosco')?.addEventListener('submit', async fun
   const mensagem = document.getElementById('fcMensagem').value.trim();
   const btn = this.querySelector('button[type="submit"]');
   btn.disabled = true; btn.textContent = "Enviando...";
-  const resp = await backendCall('enviarDuvida', {matricula: currentUser.matricula, assunto, mensagem});
+  const resp = await backendCall('enviarDuvida', {assunto, mensagem});
   btn.disabled = false; btn.innerHTML = '<i data-lucide="send"></i> Enviar para a Qualidade';
   if(window.lucide) lucide.createIcons();
   if(!resp.ok){ erroEl.textContent = resp.erro || "Não foi possível enviar sua mensagem."; erroEl.style.display = "block"; return; }
   this.reset();
-  showToast("Mensagem enviada! A equipe de Qualidade foi avisada por e-mail.", "success");
+  showToast(resp.avisouQualidade ? "Mensagem enviada! A equipe de Qualidade foi avisada por e-mail." : "Mensagem enviada! A Qualidade verá no painel.", "success");
   renderMinhasDuvidas();
 });
 
@@ -916,11 +846,11 @@ async function renderMinhasDuvidas(){
   lista.innerHTML = minhas.map(d=>`
     <div class="panel duvida-card">
       <div class="duvida-head">
-        <b>${d.assunto}</b>
+        <b>${escH(d.assunto)}</b>
         <span class="badge ${d.status==='pendente'?'programada':'finalizada'}">${d.status==='pendente'?'Aguardando resposta':'Respondida'}</span>
       </div>
-      <p class="hint" style="margin:8px 0 ${d.resposta?'12px':'0'};">${d.mensagem}</p>
-      ${d.resposta ? `<div class="duvida-resposta"><b>Resposta de ${d.respondidoPor} em ${fmtDateTime(new Date(d.respondidoEm))}:</b><p>${d.resposta}</p></div>` : ''}
+      <p class="hint" style="margin:8px 0 ${d.resposta?'12px':'0'};">${escH(d.mensagem)}</p>
+      ${d.resposta ? `<div class="duvida-resposta"><b>Resposta de ${escH(d.respondidoPor)} em ${fmtDateTime(new Date(d.respondidoEm))}:</b><p>${escH(d.resposta)}</p></div>` : ''}
     </div>
   `).join('');
 }
@@ -944,15 +874,15 @@ async function renderDuvidas(){
   lista.innerHTML = _duvidasAtuais.map((d,i)=>`
     <div class="panel duvida-card">
       <div class="duvida-head">
-        <div><b>${d.nome}</b> <span class="hint">· ${d.matricula} · ${fmtDateTime(new Date(d.dataHora))}</span></div>
+        <div><b>${escH(d.nome)}</b> <span class="hint">· ${escH(d.matricula)} · ${fmtDateTime(new Date(d.dataHora))}</span></div>
         <span class="badge ${d.status==='pendente'?'programada':'finalizada'}">${d.status==='pendente'?'Aguardando resposta':'Respondida'}</span>
       </div>
-      <p style="margin:10px 0 4px;"><b>${d.assunto}</b></p>
-      <p class="hint" style="margin:0 0 12px;">${d.mensagem}</p>
+      <p style="margin:10px 0 4px;"><b>${escH(d.assunto)}</b></p>
+      <p class="hint" style="margin:0 0 12px;">${escH(d.mensagem)}</p>
       ${d.resposta
-        ? `<div class="duvida-resposta"><b>Resposta de ${d.respondidoPor} em ${fmtDateTime(new Date(d.respondidoEm))}:</b><p>${d.resposta}</p></div>`
+        ? `<div class="duvida-resposta"><b>Resposta de ${escH(d.respondidoPor)} em ${fmtDateTime(new Date(d.respondidoEm))}:</b><p>${escH(d.resposta)}</p></div>`
         : `<div class="duvida-responder">
-            <textarea id="respTexto_${i}" rows="2" placeholder="Escreva uma resposta para ${d.nome.split(' ')[0]}..."></textarea>
+            <textarea id="respTexto_${i}" rows="2" placeholder="Escreva uma resposta para ${escH(d.nome.split(' ')[0])}..."></textarea>
             <button class="btn btn-primary btn-sm" onclick="enviarRespostaDuvida(${i})" style="margin-top:8px;"><i data-lucide="send"></i> Enviar resposta</button>
           </div>`
       }
@@ -967,7 +897,7 @@ window.enviarRespostaDuvida = async function(i){
   if(!resposta){ showToast("Escreva uma resposta antes de enviar.", "warning"); return; }
   const btn = textarea.nextElementSibling;
   btn.disabled = true; btn.textContent = "Enviando...";
-  const resp = await backendCall('responderDuvida', {matricula: d.matricula, dataHora: d.dataHora, resposta, respondidoPor: currentUser.nome});
+  const resp = await backendCall('responderDuvida', {id: d.id, resposta});
   if(!resp.ok){ showToast(resp.erro || "Não foi possível enviar a resposta.", "warning"); btn.disabled = false; btn.innerHTML = '<i data-lucide="send"></i> Enviar resposta'; return; }
   showToast("Resposta enviada! A pessoa também recebe um aviso por e-mail.", "success");
   renderDuvidas();
@@ -978,26 +908,37 @@ document.getElementById('btnAtualizarDuvidas')?.addEventListener('click', render
 async function renderPedidosSenha(){
   const tbody = document.getElementById('tblPedidosSenha');
   if(!tbody) return;
-  tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--ink-soft); padding:16px;">Carregando…</td></tr>`;
   const resp = await backendCall('listPasswordRequests');
   if(!resp.ok){
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--error); padding:16px;">${resp.erro || 'Não foi possível carregar os pedidos.'}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--error); padding:16px;">${resp.erro || 'Não foi possível carregar o histórico.'}</td></tr>`;
     return;
   }
   const pedidos = (resp.pedidos || []).sort((a,b)=> new Date(b.dataHora) - new Date(a.dataHora));
   tbody.innerHTML = pedidos.map(p=>`
-    <tr>
-      <td>${fmtDateTime(new Date(p.dataHora))}</td><td>${p.matricula}</td><td>${p.nome}</td>
-      <td><span class="badge ${p.status==='pendente'?'programada':'finalizada'}">${p.status}</span></td>
-      <td>${p.status==='pendente'
-        ? `<button class="btn btn-outline btn-sm" onclick="resolverPedidoSenha('${p.matricula}')">Redefinir senha</button>`
-        : `—`}</td>
-    </tr>`).join('') || `<tr><td colspan="5" style="text-align:center; color:var(--ink-soft); padding:16px;">Nenhum pedido registrado.</td></tr>`;
+    <tr><td>${fmtDateTime(new Date(p.dataHora))}</td><td>${p.matricula}</td><td>${p.nome}</td><td><span class="badge finalizada">${p.status}</span></td></tr>`
+  ).join('') || `<tr><td colspan="4" style="text-align:center; color:var(--ink-soft); padding:16px;">Nenhuma redefinição registrada.</td></tr>`;
+}
+document.getElementById('btnResetManual')?.addEventListener('click', ()=>{
+  const m = document.getElementById('resetMatriculaManual').value.trim();
+  if(!m){ showToast("Digite a matrícula.", "warning"); return; }
+  window.resolverPedidoSenha(m);
+});
+let _infoServidor = null;
+async function renderInfoPlanilha(){
+  const a = document.getElementById('linkPlanilha');
+  if(!a) return;
+  if(!_infoServidor){ const r = await backendCall('getInfo'); if(r.ok) _infoServidor = r; }
+  if(!_infoServidor) return;
+  a.href = _infoServidor.planilhaUrl; a.style.display = '';
+  const i = document.getElementById('infoEmailTeste');
+  if(i) i.textContent = _infoServidor.modoTesteEmail
+    ? `Modo teste de e-mail ativo: todos os e-mails do sistema estão indo somente para ${_infoServidor.emailTeste}.`
+    : 'E-mails sendo enviados para os destinatários reais.';
 }
 window.resolverPedidoSenha = function(matricula){
   if(!confirm(`Redefinir a senha da matrícula ${matricula}?\n\nA senha volta a ser a própria matrícula (igual ao primeiro acesso) — a pessoa será obrigada a criar uma senha nova no próximo login.`)) return;
   backendCall('resolveReset', {matricula, atendidoPor: currentUser.nome}).then(resp=>{
-    if(resp.ok){ showToast("Senha redefinida — a pessoa já pode entrar usando a matrícula como senha.", "success"); renderPedidosSenha(); }
+    if(resp.ok){ showToast("Senha redefinida — a pessoa já pode entrar usando a matrícula como senha.", "success"); const i = document.getElementById('resetMatriculaManual'); if(i) i.value = ''; renderPedidosSenha(); }
     else showToast(resp.erro || "Não foi possível concluir.", "warning");
   });
 };
@@ -1007,52 +948,68 @@ document.getElementById('btnTrocarMinhaSenha')?.addEventListener('click', ()=> a
 /* ======================= SINCRONIZAÇÃO DO QUADRO DE COLABORADORES ======================= */
 /* Busca o quadro real na planilha (em segundo plano, sem pedir nada a ninguém)
    e mantém a amostragem de participantes/sorteio coerente com dados reais. */
+/* ======================= SINCRONIZAÇÃO (silenciosa) ======================= */
+/* Uma única chamada (getSnapshot) traz tudo. Se nada mudou, NADA é redesenhado.
+   Se mudou, redesenha sem piscar: mantém a rolagem, não interrompe quem está
+   digitando e adia enquanto houver janela aberta ou prova em andamento. */
+let sincronizando = false, _ultimaAssinatura = null, _falhasSync = 0, _renderPendente = false;
+let historicoServidor = [];
+
 async function sincronizarColaboradores(){
+  if(!currentUser || currentRole !== 'qualidade') return; // só a Qualidade precisa (e só ela recebe) o quadro de pessoas
   const resp = await backendCall('getColaboradores');
-  if(resp.ok && Array.isArray(resp.colaboradores) && resp.colaboradores.length){
-    EMPRESA.colaboradores = resp.colaboradores.map(c=>({
-      matricula: String(c.matricula), nome: c.nome, setor: c.setor, filial: c.filial, funcao: c.funcao
-    }));
-    console.log(`Quadro de colaboradores sincronizado: ${EMPRESA.colaboradores.length} pessoa(s).`);
+  if(resp.ok && Array.isArray(resp.colaboradores)){
+    EMPRESA.colaboradores = resp.colaboradores.map(c=>({matricula:String(c.matricula), nome:c.nome, setor:c.setor, filial:c.filial, funcao:c.funcao}));
+    _renderPendente = true;
   }
 }
-sincronizarColaboradores();
-setInterval(sincronizarColaboradores, 5 * 60 * 1000); // a cada 5 minutos, em segundo plano
 
-/* ======================= SINCRONIZAÇÃO AO VIVO: campanhas, perguntas, respostas ======================= */
-/* A planilha é a única fonte de verdade — campanhas, banco de perguntas e
-   respostas nunca ficam "presas" num navegador. Toda tela relevante busca
-   os dados mais recentes nesta função, tanto ao entrar quanto em ciclos
-   automáticos em segundo plano. */
-let sincronizando = false;
+function capturarRolagem(){
+  return {y: window.scrollY, x: window.scrollX, els: [...document.querySelectorAll('.content, .main, .app, main')].map(e=>[e, e.scrollTop])};
+}
+function restaurarRolagem(s){
+  window.scrollTo(s.x, s.y);
+  s.els.forEach(([e,t])=>{ e.scrollTop = t; });
+}
+function usuarioOcupado(){
+  const a = document.activeElement;
+  const digitando = a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName);
+  const janela = document.querySelector('.share-backdrop, .celebrate-backdrop.show, .pop-backdrop');
+  return !!(digitando || janela || (typeof quizState !== 'undefined' && quizState));
+}
+function renderSilencioso(){
+  if(usuarioOcupado()){ _renderPendente = true; return; }
+  _renderPendente = false;
+  const sc = capturarRolagem();
+  window.__renderSilencioso = true;
+  try{ fillCampaignSelects(); renderSectionContent(currentSectionId); }
+  finally{ window.__renderSilencioso = false; }
+  restaurarRolagem(sc);
+}
+setInterval(()=>{ if(_renderPendente && currentUser) renderSilencioso(); }, 2500);
+
 async function sincronizarDadosDoServidor(silencioso){
-  if(sincronizando) return; // evita chamadas simultâneas empilhadas
+  if(sincronizando || !currentUser || !currentUser.token) return;
   sincronizando = true;
   try{
-    const [respCamp, respBanco, respRespostas, respHist] = await Promise.all([
-      backendCall('getCampanhas'),
-      backendCall('getBancoPerguntas'),
-      backendCall('getRespostas'),
-      backendCall('getHistorico')
-    ]);
-    if(respCamp.ok && Array.isArray(respCamp.campanhas)) campaigns = respCamp.campanhas.map(c=>({...c, id: String(c.id)}));
+    const resp = await backendCall('getSnapshot');
+    if(!resp.ok){ if(!resp.sessaoExpirada) _falhasSync++; return; }
+    _falhasSync = 0;
+    const assinatura = JSON.stringify([resp.campanhas, resp.respostas, resp.historico, resp.perguntas || null]);
+    if(assinatura === _ultimaAssinatura) return; // nada mudou: não redesenha nada
+    _ultimaAssinatura = assinatura;
 
-    // Corrige o status pela data (programada → andamento → encerrada), só
-    // para exibição — cada dispositivo calcula isso sozinho a partir das
-    // datas, sem escrever de volta no servidor a cada sincronização (evita
-    // conflito quando várias pessoas estão usando ao mesmo tempo).
-    // "Finalizada" nunca é sobrescrito aqui — só o registro oficial do sorteio muda isso.
-    campaigns.forEach(c=>{ try{ c.status = calcularStatusPorData(c); }catch(e){ console.warn(`Não foi possível calcular o status de "${c && c.nome}":`, e); } });
-    if(respBanco.ok && Array.isArray(respBanco.perguntas)) questionBank = respBanco.perguntas.map(q=>({...q, codigo: String(q.codigo)}));
-    if(respRespostas.ok && Array.isArray(respRespostas.respostas)){
-      participants = respRespostas.respostas.map(r=>({
-        ...r,
-        matricula: String(r.matricula), campaignId: String(r.campaignId),
-        data: r.dataFim ? new Date(r.dataFim) : new Date(), dataInicio: r.dataInicio ? new Date(r.dataInicio) : null, dataFim: r.dataFim ? new Date(r.dataFim) : null
-      }));
-    }
-    const historicoImportado = (respHist.ok && Array.isArray(respHist.historico)) ? respHist.historico : [];
-    const ganhosImportados = historicoImportado
+    campaigns = (resp.campanhas || []).map(c=>({...c, id: String(c.id)}));
+    // Status pela data (programada → andamento → encerrada), só para exibição.
+    campaigns.forEach(c=>{ try{ c.status = calcularStatusPorData(c); }catch(e){} });
+    if(resp.perguntas) questionBank = resp.perguntas.map(q=>({...q, codigo: String(q.codigo)}));
+    participants = (resp.respostas || []).map(r=>({
+      ...r, matricula: String(r.matricula), campaignId: String(r.campaignId),
+      data: r.dataFim ? new Date(r.dataFim) : new Date(),
+      dataInicio: r.dataInicio ? new Date(r.dataInicio) : null, dataFim: r.dataFim ? new Date(r.dataFim) : null
+    }));
+    historicoServidor = resp.historico || [];
+    const ganhosImportados = historicoServidor
       .filter(h => String(h.ganhador).toLowerCase() === 'sim')
       .map(h => ({matricula: String(h.matricula), data: new Date(h.periodoFim || h.importadoEm || Date.now())}));
     const ganhosAoVivo = [];
@@ -1060,23 +1017,40 @@ async function sincronizarDadosDoServidor(silencioso){
       if(c.ganhadores && c.ganhadores.length) c.ganhadores.forEach(g => ganhosAoVivo.push({matricula: String(g.matricula), data: new Date(c.fim)}));
     });
     wonHistory = [...ganhosImportados, ...ganhosAoVivo];
-
-    renderSectionContent(currentSectionId); // atualiza a tela que estiver aberta com os dados frescos
-    if(!silencioso) console.log("Dados sincronizados com o servidor.");
+    renderSilencioso();
   }catch(e){
-    console.warn("Não foi possível sincronizar com o servidor agora:", e);
+    _falhasSync++; console.warn("Não foi possível sincronizar com o servidor agora:", e);
   }finally{
     sincronizando = false;
   }
 }
-document.getElementById('btnLogout').addEventListener('click', ()=>{
-  currentUser = null;
+
+function iniciarSincronizacao(){
+  _ultimaAssinatura = null; _falhasSync = 0;
+  sincronizarDadosDoServidor(true);
+  sincronizarColaboradores();
+  if(window._syncAtivo) return;
+  window._syncAtivo = true;
+  const ciclo = async ()=>{
+    try{ if(currentUser && document.visibilityState === 'visible') await sincronizarDadosDoServidor(true); }catch(e){}
+    const base = currentRole === 'qualidade' ? 20000 : 30000;
+    setTimeout(ciclo, base * Math.min(4, 1 + _falhasSync)); // se o servidor estiver instável, espaça as tentativas
+  };
+  setTimeout(ciclo, 20000);
+  document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState === 'visible' && currentUser) sincronizarDadosDoServidor(true); });
+}
+
+function sairDoApp(msg){
+  currentUser = null; _ultimaAssinatura = null; quizState = null;
+  campaigns = []; participants = []; questionBank = []; wonHistory = []; historicoServidor = []; EMPRESA.colaboradores = [];
   saveState();
   document.getElementById('appRoot').style.display = "none";
   document.getElementById('loginScreen').style.display = "";
   document.getElementById('loginScreen').scrollTo(0, 0);
   document.getElementById('loginForm').reset();
-});
+  if(msg) showToast(msg, "warning");
+}
+document.getElementById('btnLogout').addEventListener('click', ()=> sairDoApp());
 function applyRole(role){
   currentRole = role;
   const isAdmin = role === "qualidade";
@@ -1164,17 +1138,20 @@ function statusBadge(status){
 function campaignParticipants(id){ return participants.filter(p=>p.campaignId===id); }
 function fillCampaignSelects(){
   const selects = [document.getElementById('selectCampanhaParticipantes'), document.getElementById('selectCampanhaElegiveis'), document.getElementById('selectCampanhaSorteio'), document.getElementById('selectCampanhaRelatorio')];
+  const assinatura = campaigns.map(c=>c.id+'|'+c.nome).join('¦');
   selects.forEach(sel=>{
-    if(!sel) return;
+    if(!sel || sel.dataset.sig === assinatura) return;
     const prev = sel.value;
     sel.innerHTML = campaigns.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
     if(prev) sel.value = prev;
+    sel.dataset.sig = assinatura;
   });
 }
 
 /* ======================= DASHBOARD (com drill-down) ======================= */
 function renderDashboard(){
   renderQualidadeTip();
+  renderHomeExtras();
   document.getElementById('kpiTotalCampanhas').textContent = campaigns.length;
   document.getElementById('kpiAndamento').textContent = campaigns.filter(c=>c.status==="andamento").length;
   document.getElementById('kpiProgramadas').textContent = campaigns.filter(c=>c.status==="programada").length;
@@ -1192,7 +1169,7 @@ function renderDashboard(){
     const n = campaignParticipants(c.id).length;
     const h = Math.max(8, Math.round((n/maxCount)*130));
     const shortName = c.nome.split('–')[0].trim();
-    return `<div class="bar-col"><div class="bar-value">${n}</div><div class="bar-shell"><div class="bar-fill" style="height:0px" data-h="${h}"></div></div><div class="bar-label">${shortName}</div></div>`;
+    return `<div class="bar-col"><div class="bar-value">${n}</div><div class="bar-shell"><div class="bar-fill" style="height:${window.__renderSilencioso ? h : 0}px" data-h="${h}"></div></div><div class="bar-label">${shortName}</div></div>`;
   }).join('');
   requestAnimationFrame(()=> document.querySelectorAll('#chartParticipacao .bar-fill').forEach(el=> el.style.height = el.dataset.h + "px"));
 
@@ -1212,8 +1189,8 @@ function renderDashboard(){
     <div class="donut-legend">${seg.map(s=>`<div><span class="legend-dot" style="background:${s.c}"></span>${s.label} — ${s.v}</div>`).join('')}</div>`;
 
   const allWinners = campaigns.filter(c=>c.ganhadores).flatMap(c=>c.ganhadores);
-  renderHBarChart('chartSetor', allWinners, 'setor', SETORES.filter(s=> allWinners.some(w=>w.setor===s)).length ? [...new Set(allWinners.map(w=>w.setor))] : SETORES.slice(0,8));
-  renderHBarChart('chartFilial', allWinners, 'filial', UNIDADES);
+  renderHBarChart('chartSetor', allWinners, 'setor', [...new Set(allWinners.map(w=>w.setor).filter(Boolean))]);
+  renderHBarChart('chartFilial', allWinners, 'filial', [...new Set(allWinners.map(w=>w.filial).filter(Boolean))]);
 
   document.getElementById('tblUltimasCampanhas').innerHTML = campaigns.map(c=>{
     const n = campaignParticipants(c.id).length;
@@ -1231,7 +1208,7 @@ function renderHBarChart(elId, winners, field, universe){
     return `<div>
       <div class="hbar-row clickable" onclick="toggleHbarDetail('${rowId}')">
         <div class="hbar-label">${k}</div>
-        <div class="hbar-track"><div class="hbar-fill" style="width:0%" data-w="${(v/max*100)}"></div></div>
+        <div class="hbar-track"><div class="hbar-fill" style="width:${window.__renderSilencioso ? (v/max*100) : 0}%" data-w="${(v/max*100)}"></div></div>
         <div class="hbar-value">${v}</div>
       </div>
       <div class="hbar-detail" id="${rowId}">${names.length ? names.map(n=>`<span>${n}</span>`).join('') : 'Nenhum ganhador ainda neste grupo.'}</div>
@@ -1243,11 +1220,11 @@ window.toggleHbarDetail = function(id){ document.getElementById(id).classList.to
 
 /* Drill-down dos KPIs do dashboard */
 window.goToRodadas = function(){ document.querySelector('[data-target="campanhas"]').click(); };
-window.goToResultadosLatest = function(){ if(campaigns[0]) goToParticipants(campaigns[0].id); };
+window.goToResultadosLatest = function(){ if(rodadaDestaque()) goToParticipants(rodadaDestaque().id); };
 window.goToElegiveisLatest = function(){
-  if(!campaigns[0]) return;
+  if(!rodadaDestaque()) return;
   document.querySelector('[data-target="elegiveis"]').click();
-  document.getElementById('selectCampanhaElegiveis').value = campaigns[0].id;
+  document.getElementById('selectCampanhaElegiveis').value = rodadaDestaque().id;
   renderEligibleTable();
 };
 window.goToHistoricoAdmin = function(){ document.querySelector('[data-target="historico"]').click(); };
@@ -1332,7 +1309,7 @@ window.openShareModal = function(campaignId){
   const c = campaigns.find(x=>x.id===campaignId);
   if(!c) return;
   const link = `${window.location.origin}${window.location.pathname}?campanha=${campaignId}`;
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(link)}`;
+  const qrUrl = gerarQrDataUrl(link, 200);
   const backdrop = document.createElement('div');
   backdrop.className = "share-backdrop";
   backdrop.id = "shareBackdrop";
@@ -1645,36 +1622,8 @@ if(bqForm){
     bqRenderOptions('unica', null);
   });
   document.getElementById('bqImportFile').addEventListener('change', function(e){
-    const file = e.target.files[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = function(evt){
-      try{
-        const data = new Uint8Array(evt.target.result);
-        const wb = XLSX.read(data, {type:'array'});
-        const sheet = wb.Sheets[wb.SheetNames[0]];
-        const rows = XLSX.utils.sheet_to_json(sheet, {defval:""});
-        let count = 0;
-        rows.forEach(r=>{
-          const opts = [1,2,3,4].map(i=>r['opcao'+i]).filter(v=>v!=="").map((t,i)=>opt(String(t), String(r.correta||"").split(',').map(s=>s.trim()).includes(String(i+1))));
-          questionBank.push({
-            codigo: r.codigo ? String(r.codigo) : ("BQ-"+String(questionBank.length+1).padStart(3,'0')),
-            categoria: r.categoria || "Importada", tema: r.tema || "", procedimento: r.procedimento || "",
-            texto: r.texto || r.pergunta || "Pergunta importada",
-            type: r.tipo || "unica", options: opts.length ? opts : [opt("Sim",true),opt("Não")],
-            autor: currentUser.nome, dataCriacao:new Date(), ultimaUtilizacao:null, qtdUtilizacoes:0, status:"ativa"
-          });
-          count++;
-        });
-        renderBanco();
-        logAction("Importação de perguntas", `${count} pergunta(s) via ${file.name}`);
-        showToast(`${count} pergunta(s) importada(s) com sucesso.`,"success");
-      }catch(err){
-        showToast("Não foi possível importar o arquivo. Verifique se é .xlsx ou .csv com as colunas esperadas.","warning");
-      }
-      e.target.value = "";
-    };
-    reader.readAsArrayBuffer(file);
+    const file = e.target.files[0]; e.target.value = '';
+    bqImportarArquivo(file);
   });
 }
 window.editBQ = function(codigo){
@@ -1829,51 +1778,48 @@ function isCorrect(q, ans){
 
 async function finalizeQuiz(){
   const {campaign, answers, dataInicio, sessaoId} = quizState;
-  const respostasCorretas = campaign.questoes.map((q,i)=> isCorrect(q, answers[i]));
-  const correctCount = respostasCorretas.filter(Boolean).length;
-  const pct = Math.round(correctCount / campaign.questoes.length * 100);
-  const dataFim = new Date();
-  const novoParticipante = {
-    campaignId: campaign.id, nome: currentUser.nome, matricula: currentUser.matricula,
-    cpf: EMPRESA.cpfFicticio(currentUser.matricula),
-    setor: currentUser.setor, filial: currentUser.filial, funcao: currentUser.funcao, cargo: currentUser.cargo,
-    data: dataFim, dataInicio: dataInicio || dataFim, dataFim, pct, respostasCorretas,
-    respostasSelecionadas: answers, acertosQtd: correctCount, totalQuestoes: campaign.questoes.length,
-    codigoResposta: gerarCodigoResposta(dataFim), sessaoId: sessaoId || gerarSessaoId(), dispositivo: dispositivoReal()
-  };
-
+  // Trava de segurança: nenhuma pergunta pode ficar em branco.
+  const faltando = campaign.questoes.findIndex((q,i)=>{ const x = answers[i]; return Array.isArray(x) ? x.length === 0 : (x === null || x === undefined); });
+  if(faltando !== -1){
+    quizState.index = faltando;
+    showToast(`Responda todas as perguntas antes de enviar — falta a pergunta ${faltando+1}.`, "warning");
+    renderQuizStep();
+    return;
+  }
   const container = document.getElementById('responderBody');
   container.innerHTML = `<div class="duo-done"><span class="mascot-figure mascot-figure-emoji">${MASCOT_SVG}</span><h2>Enviando sua resposta...</h2><p>Só um instante, isso é registrado direto no servidor.</p></div>`;
 
-  const resp = await backendCall('submeterResposta', {resposta: novoParticipante});
+  // O navegador só manda o que foi marcado — quem corrige a prova é o servidor.
+  const resp = await backendCall('submeterResposta', {resposta: {
+    campaignId: campaign.id, respostasSelecionadas: answers,
+    dataInicio: (dataInicio || new Date()).toISOString(), sessaoId, dispositivo: dispositivoReal()
+  }});
 
   if(!resp.ok){
+    if(resp.sessaoExpirada) return;
     if(resp.jaRespondida){
-      container.innerHTML = `
-        <div class="duo-done">
-          <span class="mascot-figure mascot-figure-emoji">🔒</span>
-          <h2>Você já respondeu esta campanha</h2>
-          <p>Encontramos um registro seu para <b>${campaign.nome}</b> — feito neste ou em outro dispositivo. Cada matrícula só pode responder uma vez, para manter tudo justo.</p>
-        </div>`;
-    } else {
-      container.innerHTML = `
-        <div class="duo-done">
-          <span class="mascot-figure mascot-figure-emoji">⚠️</span>
-          <h2>Não foi possível enviar sua resposta</h2>
-          <p>${resp.erro || 'Verifique sua internet e tente novamente.'}</p>
-          <button class="btn btn-primary" onclick="openQuiz('${campaign.id}')" style="margin-top:12px;">Tentar novamente</button>
-        </div>`;
+      container.innerHTML = `<div class="duo-done"><span class="mascot-figure mascot-figure-emoji">🔒</span><h2>Você já respondeu esta campanha</h2><p>Encontramos um registro seu para <b>${campaign.nome}</b> — feito neste ou em outro dispositivo. Cada matrícula só pode responder uma vez, para manter tudo justo.</p></div>`;
+      quizState = null; _ultimaAssinatura = null; sincronizarDadosDoServidor(true);
+      return;
     }
-    quizState = null;
+    if(typeof resp.faltando === 'number'){ quizState.index = resp.faltando; showToast(resp.erro, "warning"); renderQuizStep(); return; }
+    // Qualquer outro erro: mantém as respostas na tela para tentar de novo sem perder nada.
+    container.innerHTML = `<div class="duo-done"><span class="mascot-figure mascot-figure-emoji">⚠️</span><h2>Não foi possível enviar sua resposta</h2><p>${resp.erro || 'Verifique sua internet e tente novamente.'}</p><p class="hint">Suas respostas continuam aqui — é só tentar de novo.</p><button class="btn btn-primary" onclick="finalizeQuiz()" style="margin-top:12px;">Tentar novamente</button></div>`;
     return;
   }
 
+  const agora = new Date();
+  const novoParticipante = {
+    campaignId: campaign.id, nome: currentUser.nome, matricula: currentUser.matricula,
+    setor: currentUser.setor, filial: currentUser.filial, funcao: currentUser.funcao, cargo: currentUser.cargo,
+    data: agora, dataInicio: dataInicio || agora, dataFim: agora, pct: null, acertosQtd: null, totalQuestoes: campaign.questoes.length,
+    respostasCorretas: [], respostasSelecionadas: [], codigoResposta: resp.codigoResposta, resultadoOculto: true
+  };
   participants.push(novoParticipante);
+  _ultimaAssinatura = null; // o próximo ciclo traz a versão oficial do servidor
   logAction("Resposta registrada", `${novoParticipante.codigoResposta} — ${campaign.nome} — ${novoParticipante.nome}`);
   fillCampaignSelects();
-  renderDashboard(); renderParticipantsTable(); renderEligibleTable(); renderSorteioSetup();
   renderQuizDoneInto(container, campaign, novoParticipante);
-  saveState();
   quizState = null;
 }
 
@@ -1933,7 +1879,7 @@ function confettiHTML(){
 /* Tela final — exatamente o que o colaborador deve ver, nada de gabarito ou
    detalhamento de acertos/erros por pergunta (isso fica exclusivo da Qualidade). */
 function renderQuizDoneInto(container, c, participant){
-  const roundClosed = campaignAccessStatus(c) !== 'aberta';
+  const roundClosed = campaignAccessStatus(c) !== 'aberta' && participant.pct != null;
 
   if(!roundClosed){
     /* Rodada ainda aberta: o colaborador só sabe que a resposta foi registrada.
@@ -1970,28 +1916,34 @@ function renderQuizDoneInto(container, c, participant){
 function renderRegulamentoStats(){
   const el = document.getElementById('regulamentoStats');
   if(!el) return;
-  const totalCampanhas = campaigns.length;
+  // Só números que não revelam desempenho de ninguém: rodadas já encerradas e quantos já foram premiados.
+  const encerradas = campaigns.filter(c=> campaignAccessStatus(c) === 'encerrada').length;
   const totalPremiados = new Set(wonHistory.map(w=>w.matricula)).size;
-  const allParts = participants;
-  const media = allParts.length ? Math.round(allParts.reduce((a,p)=>a+p.pct,0)/allParts.length) : 0;
-  const totalElegiveisHoje = campaigns.reduce((a,c)=> a + evaluateEligibility(c.id).eligible.length, 0);
   el.innerHTML = `<div class="transp-stats">
-    <div class="transp-stat"><b>${totalCampanhas}</b><span>Campanhas realizadas</span></div>
+    <div class="transp-stat"><b>${encerradas}</b><span>Campanhas encerradas</span></div>
     <div class="transp-stat"><b>${totalPremiados}</b><span>Colaboradores já premiados</span></div>
-    <div class="transp-stat"><b>${media}%</b><span>Média geral de acertos</span></div>
-    <div class="transp-stat"><b>${totalElegiveisHoje}</b><span>Elegíveis somando as rodadas</span></div>
   </div>`;
 }
 
 /* ======================= PÁGINAS DO COLABORADOR ======================= */
+function tempoRestanteTexto(fim){
+  const ms = new Date(fim) - new Date();
+  if(!(ms > 0)) return 'encerrada';
+  const h = Math.floor(ms / 3600000), d = Math.floor(h / 24);
+  if(d >= 2) return `${d} dias`;
+  if(h >= 1) return `${h} h`;
+  return `${Math.max(1, Math.floor(ms / 60000))} min`;
+}
+function rodadaFechada(c, p){ return campaignAccessStatus(c) !== 'aberta' && (!p || p.pct != null); }
+
 function colaboradorStreakStrip(){
   const mine = participants.filter(p=>p.matricula===currentUser.matricula);
-  const total = mine.length;
-  const media = total ? Math.round(mine.reduce((a,p)=>a+p.pct,0)/total) : 0;
-  const premios = campaigns.filter(c=>c.ganhadores && c.ganhadores.some(w=>w.matricula===currentUser.matricula)).length;
+  const fechadas = mine.filter(p=>p.pct != null);   // média só das rodadas já encerradas (nunca antecipa resultado)
+  const media = fechadas.length ? Math.round(fechadas.reduce((a,p)=>a+p.pct,0)/fechadas.length) : null;
+  const premios = wonHistory.filter(w=>w.matricula===currentUser.matricula).length;
   return `<div class="streak-strip">
-    <div class="streak-chip fire"><div class="si"><i data-lucide="flame"></i></div><div><b>${total}</b><span>Campanhas respondidas</span></div></div>
-    <div class="streak-chip star"><div class="si">⭐</div><div><b>${media}%</b><span>Média de acertos</span></div></div>
+    <div class="streak-chip fire"><div class="si"><i data-lucide="flame"></i></div><div><b>${mine.length}</b><span>Campanhas respondidas</span></div></div>
+    <div class="streak-chip star"><div class="si">⭐</div><div><b>${media == null ? '—' : media + '%'}</b><span>Média (rodadas encerradas)</span></div></div>
     <div class="streak-chip trophy"><div class="si">🏆</div><div><b>${premios}</b><span>Vezes premiado(a)</span></div></div>
   </div>`;
 }
@@ -1999,8 +1951,13 @@ function renderCampanhaAtual(){
   const body = document.getElementById('campanhaAtualBody');
   if(!body) return;
   const open = campaigns.filter(c=>campaignAccessStatus(c)==='aberta');
-  let html = mascotBubble(`Oi, ${currentUser.nome.split(' ')[0]}! ${open.length ? 'Tem campanha nova esperando por você aqui embaixo 👇' : 'Nenhuma campanha aberta agora, mas fica de olho — aviso assim que abrir uma nova!'}`);
-  html += colaboradorStreakStrip();
+  const respondida = c => participants.some(p=>p.campaignId===c.id && p.matricula===currentUser.matricula);
+  const pendentes = open.filter(c=>!respondida(c));
+  const primeiro = currentUser.nome.split(' ')[0];
+  const msg = !open.length ? `Oi, ${primeiro}! Nenhuma campanha aberta agora, mas fica de olho — aviso assim que abrir uma nova!`
+    : !pendentes.length ? `Oi, ${primeiro}! Você já participou da rodada atual — sua resposta está computada. Obrigado! 🎉`
+    : `Oi, ${primeiro}! Tem campanha nova esperando por você aqui embaixo 👇`;
+  let html = mascotBubble(msg) + colaboradorStreakStrip();
   if(!open.length){
     html += `<div class="panel fun-empty">
       <div class="fe-icon"><i data-lucide="clock"></i></div>
@@ -2011,93 +1968,88 @@ function renderCampanhaAtual(){
     return;
   }
   html += open.map(c=>{
-    const answered = participants.some(p=>p.campaignId===c.id && p.matricula===currentUser.matricula);
+    const ja = respondida(c);
     return `<div class="panel">
       <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;">
-        <div><h3>${c.nome}</h3><p class="hint" style="margin-top:6px; max-width:480px;">${c.descricao}</p></div>
+        <div><h3>${c.nome}</h3><p class="hint" style="margin-top:6px; max-width:480px;">${c.descricao || ''}</p></div>
         ${statusBadge(c.status)}
       </div>
       <div class="meta" style="margin:14px 0;">
         <span><i data-lucide="calendar"></i> Responda até ${fmtPeriodoValor(c.fim)}</span>
+        <span><i data-lucide="hourglass"></i> Encerra em ${tempoRestanteTexto(c.fim)}</span>
         <span>🎁 Prêmio: ${c.premio || 'a definir'}</span>
       </div>
-      ${answered
-        ? `<button class="btn btn-ghost" onclick="openQuiz('${c.id}')">Ver meu resultado</button>`
+      ${ja
+        ? `<div class="participou-banner"><i data-lucide="check-circle-2"></i><div><b>Participação computada</b><span>Você já respondeu esta rodada. O resultado é liberado em ${fmtDateTime(new Date(c.fim))}.</span></div></div>
+           <button class="btn btn-ghost btn-sm" onclick="goToSection('historico-colab')">Ver minhas participações</button>`
         : `<button class="btn btn-primary" onclick="openQuiz('${c.id}')"><i data-lucide="rocket"></i> Responder agora</button>`}
     </div>`;
   }).join('');
   body.innerHTML = html;
 }
+
+function painelElegibilidadeHtml(p){
+  const {eligible, excluded} = evaluateEligibility(p.campaignId);
+  const souElegivel = eligible.some(e=>e.matricula===currentUser.matricula);
+  const meuExcluido = excluded.find(e=>e.matricula===currentUser.matricula);
+  if(souElegivel) return `<div class="panel eleg-panel eleg-ok">
+      <h3>✅ Você está elegível para o sorteio desta rodada</h3>
+      <p>Você atingiu 100% de acertos e atende aos critérios do programa para concorrer. Boa sorte! 🍀</p>
+    </div>`;
+  if(!meuExcluido) return '';
+  // Só o critério de "100% de acertos" fica explícito (é sobre o próprio desempenho).
+  // Os demais critérios internos ficam visíveis apenas para a equipe de Qualidade.
+  const motivoDesempenho = meuExcluido.motivos.find(m => m.includes('100%'));
+  const temOutros = meuExcluido.motivos.some(m => !m.includes('100%'));
+  const texto = motivoDesempenho && !temOutros ? motivoDesempenho : 'Você não atende a um ou mais critérios de elegibilidade desta rodada.';
+  return `<div class="panel eleg-panel eleg-excluded">
+      <h3>🔒 Você não está elegível para o sorteio desta rodada</h3>
+      <p><b>Motivo:</b> ${texto}</p>
+      <p class="hint">A elegibilidade é calculada automaticamente, seguindo os critérios oficiais do programa. Veja mais em "Regulamento".</p>
+      <button class="btn btn-outline btn-sm" id="btnVerRegrasElegibilidade"><i data-lucide="scroll-text"></i> Ver regulamento</button>
+    </div>`;
+}
+
+/* Histórico + Resultado numa tela só. Rodada aberta: só "resposta computada".
+   Rodada encerrada: percentual, acertos e elegibilidade. */
 function renderHistoricoColaborador(){
   const body = document.getElementById('historicoColabBody');
   if(!body) return;
   const mine = participants.filter(p=>p.matricula===currentUser.matricula).sort((a,b)=>b.data-a.data);
-  let html = mascotBubble("Aqui está tudo que você já respondeu até agora. Bora conferir? 📋");
-  html += mine.map(p=>{
-    const c = campaigns.find(x=>x.id===p.campaignId);
-    const roundClosed = c ? campaignAccessStatus(c) !== 'aberta' : true;
-    const resultadoHtml = roundClosed
-      ? `<span style="font-family:'Manrope'; font-weight:800; font-size:18px; color:var(--secondary);">${p.pct}%</span>`
-      : `<span class="badge programada" title="O resultado é liberado após o encerramento da rodada">🔒 Aguardando encerramento</span>`;
-    return `<div class="panel" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-      <div><h3 style="font-size:14.5px;">${c ? c.nome : p.campaignId}</h3><p class="hint" style="margin-top:4px;">Respondido em ${fmtDateTime(p.data)}</p></div>
-      <div style="display:flex; align-items:center; gap:12px;">
-        ${resultadoHtml}
-        <button class="btn btn-outline btn-sm" onclick="openQuiz('${p.campaignId}')">Ver resultado</button>
-      </div>
-    </div>`;
-  }).join('') || `<div class="panel fun-empty"><div class="fe-icon"><i data-lucide="inbox"></i></div>Você ainda não participou de nenhuma campanha.</div>`;
-  body.innerHTML = html;
-}
-function renderMeuResultado(){
-  const body = document.getElementById('meuResultadoBody');
-  if(!body) return;
-  const mine = participants.filter(p=>p.matricula===currentUser.matricula).sort((a,b)=>b.data-a.data);
+  let html = mascotBubble(mine.length ? "Aqui estão todas as suas participações. O resultado de cada rodada aparece assim que ela encerra. 📋" : "Você ainda não participou de nenhuma campanha — que tal começar agora?");
+  html += colaboradorStreakStrip();
   if(!mine.length){
-    body.innerHTML = mascotBubble("Você ainda não respondeu nenhuma campanha — que tal começar agora?") +
-      `<div class="panel fun-empty"><div class="fe-icon"><i data-lucide="hourglass"></i></div>Assim que você responder, seu resultado mais recente aparece aqui.</div>`;
+    html += `<div class="panel fun-empty"><div class="fe-icon"><i data-lucide="inbox"></i></div>Assim que você responder, sua participação aparece aqui.</div>`;
+    body.innerHTML = html;
     return;
   }
-  const latest = mine[0];
-  const c = campaigns.find(x=>x.id===latest.campaignId);
-  renderQuizDoneInto(body, c, latest);
-
-  const roundClosed = campaignAccessStatus(c) !== 'aberta';
-  if(!roundClosed) return; // nada de elegibilidade enquanto a rodada não encerra — isso revelaria o desempenho
-
-  /* Transparência total: o colaborador vê exatamente se está elegível ao
-     sorteio e, se não estiver, o(s) motivo(s) exato(s) — os mesmos critérios
-     aplicados a todo mundo, sem exceção. */
-  const {eligible, excluded} = evaluateEligibility(latest.campaignId);
-  const souElegivel = eligible.some(e=>e.matricula===currentUser.matricula);
-  const meuExcluido = excluded.find(e=>e.matricula===currentUser.matricula);
-  const elegHtml = souElegivel
-    ? `<div class="panel eleg-panel eleg-ok">
-        <h3>✅ Você está elegível para o sorteio desta rodada</h3>
-        <p>Você atingiu 100% de acertos e atende aos critérios do programa para concorrer. Boa sorte! 🍀</p>
-      </div>`
-    : meuExcluido
-      ? (()=>{
-          // Só o critério de "100% de acertos" fica explícito pro colaborador
-          // (é sobre o próprio desempenho). Os demais critérios internos do
-          // programa ficam visíveis apenas para a equipe de Qualidade.
-          const motivoDesempenho = meuExcluido.motivos.find(m => m.includes('100%'));
-          const temOutrosCriterios = meuExcluido.motivos.some(m => !m.includes('100%'));
-          const textoMotivo = motivoDesempenho && !temOutrosCriterios
-            ? motivoDesempenho
-            : 'Você não atende a um ou mais critérios de elegibilidade desta rodada.';
-          return `<div class="panel eleg-panel eleg-excluded">
-            <h3>🔒 Você não está elegível para o sorteio desta rodada</h3>
-            <p><b>Motivo:</b> ${textoMotivo}</p>
-            <p class="hint">A elegibilidade é calculada automaticamente pelo sistema, seguindo os critérios oficiais do programa. Veja mais em "Regras e Transparência".</p>
-            <button class="btn btn-outline btn-sm" id="btnVerRegrasElegibilidade"><i data-lucide="scroll-text"></i> Ver regras completas</button>
-          </div>`;
-        })()
-      : '';
-  body.insertAdjacentHTML('beforeend', elegHtml);
+  html += mine.map(p=>{
+    const c = campaigns.find(x=>x.id===p.campaignId);
+    const nome = c ? c.nome : p.campaignId;
+    const quando = `Respondido em ${fmtDateTime(p.data)}`;
+    if(!(c ? rodadaFechada(c, p) : p.pct != null)){
+      return `<div class="panel part-card">
+        <div><h3 style="font-size:14.5px;">${nome}</h3><p class="hint" style="margin-top:4px;">${quando}</p></div>
+        <div class="part-status"><span class="badge finalizada"><i data-lucide="check" style="width:12px;height:12px;vertical-align:-2px;"></i> Resposta computada</span><span class="hint">🔒 Resultado liberado em ${c ? fmtDateTime(new Date(c.fim)) : 'breve'}</span></div>
+      </div>`;
+    }
+    const total = p.totalQuestoes || (c && c.questoes ? c.questoes.length : 0);
+    const acertos = p.acertosQtd != null ? p.acertosQtd : Math.round(p.pct/100*total);
+    return `<div class="panel part-card">
+      <div><h3 style="font-size:14.5px;">${nome}</h3><p class="hint" style="margin-top:4px;">${quando}</p></div>
+      <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+        <div class="part-status"><span class="part-pct">${p.pct}%</span><span class="hint">${acertos} de ${total} perguntas</span></div>
+        <button class="btn btn-outline btn-sm" onclick="openQuiz('${p.campaignId}')">Ver resumo</button>
+      </div>
+    </div>`;
+  }).join('');
+  const ultimaFechada = mine.find(p=>{ const c = campaigns.find(x=>x.id===p.campaignId); return c && rodadaFechada(c, p); });
+  if(ultimaFechada) html += painelElegibilidadeHtml(ultimaFechada);
+  body.innerHTML = html;
   const btnRegras = document.getElementById('btnVerRegrasElegibilidade');
   if(btnRegras) btnRegras.addEventListener('click', ()=> document.querySelector('[data-target="regulamento"]').click());
 }
+function renderMeuResultado(){ renderHistoricoColaborador(); }
 
 /* ======================= SORTEIO ======================= */
 let sorteioRunning = false;
@@ -2431,7 +2383,7 @@ document.getElementById('btnGerarDivulgacao').addEventListener('click', ()=>{
   const c = campaigns.find(x=>x.id===document.getElementById('divCampanha').value);
   if(!c) return;
   const link = `${window.location.origin}${window.location.pathname}?campanha=${c.id}`;
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(link)}`;
+  const qrUrl = gerarQrDataUrl(link, 180);
   const wrap = document.getElementById('divPreviewWrap');
   wrap.style.display = "block";
   wrap.innerHTML = `
@@ -2480,6 +2432,463 @@ document.getElementById('btnGerarBannerGanhadores').addEventListener('click', ()
   logAction("Banner de ganhadores gerado", c.nome);
 });
 
+/* ======================= UTILITÁRIOS DE TELA: escape + mini páginas (pop-up) ======================= */
+function escH(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function matK(v){ return (window.PPGImport && PPGImport.matKey) ? PPGImport.matKey(v) : String(v==null?'':v).trim().replace(/^0+(?=\d)/,''); }
+
+function fecharMiniPagina(){
+  const b = document.getElementById('miniPagina'); if(!b) return;
+  b.classList.remove('show'); setTimeout(()=>{ if(b.parentNode) b.remove(); }, 220);
+  document.removeEventListener('keydown', _escMini);
+}
+function _escMini(e){ if(e.key === 'Escape') fecharMiniPagina(); }
+/* Janela flutuante ("mini página"): { titulo, subtitulo, corpo(html|Node), rodape(html|Node), largura } */
+function abrirMiniPagina(o){
+  const antigo = document.getElementById('miniPagina'); if(antigo) antigo.remove();
+  const b = document.createElement('div');
+  b.className = 'pop-backdrop'; b.id = 'miniPagina';
+  b.innerHTML = `<div class="pop-card" role="dialog" aria-modal="true" style="max-width:${o.largura||760}px">
+    <div class="pop-head"><div><h3>${escH(o.titulo||'')}</h3>${o.subtitulo?`<p class="hint">${escH(o.subtitulo)}</p>`:''}</div>
+    <button type="button" class="icon-btn pop-close" aria-label="Fechar"><i data-lucide="x"></i></button></div>
+    <div class="pop-body"></div>${o.rodape?'<div class="pop-foot"></div>':''}</div>`;
+  const corpo = b.querySelector('.pop-body');
+  if(typeof o.corpo === 'string') corpo.innerHTML = o.corpo; else if(o.corpo) corpo.appendChild(o.corpo);
+  if(o.rodape){ const f = b.querySelector('.pop-foot'); if(typeof o.rodape === 'string') f.innerHTML = o.rodape; else f.appendChild(o.rodape); }
+  document.body.appendChild(b);
+  b.addEventListener('click', e=>{ if(e.target === b) fecharMiniPagina(); });
+  b.querySelector('.pop-close').addEventListener('click', fecharMiniPagina);
+  document.addEventListener('keydown', _escMini);
+  requestAnimationFrame(()=> b.classList.add('show'));
+  if(window.lucide) lucide.createIcons();
+  return b;
+}
+function tabelaHtml(cabecalhos, linhas, vazio){
+  if(!linhas.length) return `<p class="hint" style="padding:10px 0;">${escH(vazio||'Nada para mostrar.')}</p>`;
+  return `<div class="table-wrap"><table><thead><tr>${cabecalhos.map(h=>`<th>${escH(h)}</th>`).join('')}</tr></thead><tbody>${linhas.map(l=>`<tr>${l.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+}
+
+/* ======================= IMPORTAR CAMPANHAS ANTIGAS (qualquer arquivo) ======================= */
+const IMP = {doc:null, fi:0, header:-1, mapa:{}, extras:new Set(), cores:new Set(), manual:{}, nome:'', ini:'', fim:'', premio:'', resolver:true, enviando:false};
+const IMP_PAPEIS = ['matricula','nome','setor','filial','funcao','percentual','ganhador','premio','campanha','periodoInicio','periodoFim'];
+const impRoot = ()=> document.getElementById('impHistRoot');
+function impLetra(c){ let s='', n=c+1; while(n>0){ const m=(n-1)%26; s=String.fromCharCode(65+m)+s; n=Math.floor((n-1)/26); } return s; }
+
+function impInicio(){
+  IMP.doc = null;
+  const r = impRoot(); if(!r) return;
+  r.innerHTML = `
+    <h3><i data-lucide="upload-cloud"></i> Subir campanha antiga</h3>
+    <p class="hint" style="margin-bottom:14px;">Aceito qualquer arquivo: Excel (.xlsx/.xls/.ods), CSV/TXT, Word (.docx), PDF e foto/print da lista. Depois você confere a prévia, escolhe a aba, as colunas e quem foram os ganhadores (inclusive por célula pintada). <b>Nada é salvo antes de você confirmar.</b></p>
+    <label class="imp-drop" id="impDrop">
+      <i data-lucide="file-up"></i><b>Arraste o arquivo aqui</b><span>ou clique para escolher</span>
+      <input type="file" data-imp="arquivo" accept=".xlsx,.xlsm,.xlsb,.xls,.ods,.csv,.tsv,.txt,.docx,.pdf,.html,.htm,.png,.jpg,.jpeg,.webp,.bmp,.gif,.tif,.tiff" style="display:none;">
+    </label>
+    <div id="impStatus" class="hint" style="margin-top:10px;"></div>`;
+  if(!r._impLigado){
+    r._impLigado = true;
+    r.addEventListener('change', impOnChange);
+    r.addEventListener('input', e=>{ if(e.target.dataset.imp === 'campo') impOnChange(e); });
+    r.addEventListener('click', e=>{ const b = e.target.closest('[data-impacao]'); if(b) impAcao(b.dataset.impacao); });
+    r.addEventListener('dragover', e=>{ const d = e.target.closest('#impDrop'); if(d){ e.preventDefault(); d.classList.add('over'); } });
+    r.addEventListener('dragleave', e=>{ const d = e.target.closest('#impDrop'); if(d) d.classList.remove('over'); });
+    r.addEventListener('drop', e=>{ const d = e.target.closest('#impDrop'); if(d){ e.preventDefault(); d.classList.remove('over'); if(e.dataTransfer.files[0]) impAbrir(e.dataTransfer.files[0]); } });
+  }
+  if(window.lucide) lucide.createIcons();
+}
+async function impAbrir(file){
+  const st = document.getElementById('impStatus');
+  const msg = t=>{ if(st) st.innerHTML = `<span class="spinner"></span> ${escH(t)}`; };
+  msg('Lendo "'+file.name+'"…');
+  try{
+    const doc = await PPGImport.lerArquivoUniversal(file, {onProgresso:(s,p)=> msg('Reconhecendo o texto da imagem… ' + (p!=null ? Math.round(p*100)+'%' : ''))});
+    if(!doc.folhas.length){ if(st) st.innerHTML = '<span style="color:var(--error)">Não encontrei dados nesse arquivo.</span>'; return; }
+    IMP.doc = doc;
+    IMP.fi = doc.folhas.reduce((b,f,i)=> f.linhas.length > doc.folhas[b].linhas.length ? i : b, 0);
+    IMP.ini = ''; IMP.fim = ''; IMP.premio = ''; IMP.resolver = true;
+    impPrepararFolha();
+    impForm();
+  }catch(e){ if(st) st.innerHTML = `<span style="color:var(--error)">${escH(e.message||'Não foi possível ler o arquivo.')}</span>`; }
+}
+function impPrepararFolha(){
+  const f = IMP.doc.folhas[IMP.fi];
+  IMP.header = PPGImport.sugerirCabecalho(f.linhas);
+  IMP.nome = PPGImport.nomeCampanhaSugerido(IMP.doc.nome, f.nome);
+  IMP.manual = {};
+  impRecalcular();
+}
+function impRecalcular(){
+  const f = IMP.doc.folhas[IMP.fi];
+  IMP.mapa = PPGImport.sugerirMapeamento(f.linhas, IMP.header);
+  IMP.extras = new Set();
+  const grupos = PPGImport.analisarCores(f, IMP.header);
+  IMP.cores = new Set(IMP.mapa.ganhador == null ? grupos.filter(g=>g.proporcao <= 0.35).map(g=>g.cor) : []);
+}
+function impAmostra(f, c){
+  for(let i = IMP.header + 1; i < f.linhas.length; i++){ const v = String(f.linhas[i][c] == null ? '' : f.linhas[i][c]).trim(); if(v) return v.length > 26 ? v.slice(0,26)+'…' : v; }
+  return '';
+}
+function impOpcoesColuna(f, sel){
+  const nCols = Math.max(0, ...f.linhas.map(r=>r.length));
+  let h = '<option value="">— não usar —</option>';
+  for(let c = 0; c < nCols; c++){
+    const cab = IMP.header >= 0 ? String(f.linhas[IMP.header][c] == null ? '' : f.linhas[IMP.header][c]).trim() : '';
+    const am = impAmostra(f, c);
+    h += `<option value="${c}"${sel === c ? ' selected' : ''}>${impLetra(c)} · ${escH(cab || '(sem título)')}${am ? ' — ex.: ' + escH(am) : ''}</option>`;
+  }
+  return h;
+}
+function impForm(){
+  const r = impRoot(); if(!r || !IMP.doc) return;
+  const f = IMP.doc.folhas[IMP.fi];
+  const nCols = Math.max(0, ...f.linhas.map(x=>x.length));
+  const usadas = new Set(Object.values(IMP.mapa));
+  const grupos = PPGImport.analisarCores(f, IMP.header);
+  const temRoster = EMPRESA.colaboradores && EMPRESA.colaboradores.length;
+  const optHeader = `<option value="-1"${IMP.header < 0 ? ' selected' : ''}>Sem cabeçalho (a primeira linha já é um participante)</option>` +
+    f.linhas.slice(0, 25).map((l,i)=>`<option value="${i}"${IMP.header === i ? ' selected' : ''}>Linha ${f.linhaOriginal ? f.linhaOriginal[i] : i+1} — ${escH(l.filter(x=>String(x).trim()).slice(0,4).join(' | ').slice(0,70))}</option>`).join('');
+  const coresHtml = grupos.length
+    ? grupos.map(g=>{
+        const nomes = g.linhas.slice(0,3).map(i=>{ const row = f.linhas[i]; return IMP.mapa.nome != null ? row[IMP.mapa.nome] : row.find(x=>String(x).trim()); }).filter(Boolean).join(', ');
+        return `<label class="imp-cor"><input type="checkbox" data-imp="cor" data-cor="${g.cor}" ${IMP.cores.has(g.cor)?'checked':''}><span class="imp-swatch" style="background:${g.cor}"></span><span><b>${g.qtd}</b> linha(s) com essa cor${nomes ? ' — ex.: ' + escH(nomes) : ''}</span></label>`;
+      }).join('')
+    : `<p class="hint" style="margin:0;">Nenhuma célula colorida encontrada nesta aba${IMP.doc.tipo === 'planilha' ? '' : ' (cores só existem em planilhas Excel .xlsx)'}.</p>`;
+  const extrasHtml = Array.from({length:nCols}, (_,c)=>c).filter(c=>!usadas.has(c)).map(c=>{
+    const cab = IMP.header >= 0 ? String(f.linhas[IMP.header][c] == null ? '' : f.linhas[IMP.header][c]).trim() : '';
+    return `<label class="imp-chip"><input type="checkbox" data-imp="extra" data-col="${c}" ${IMP.extras.has(c)?'checked':''}> ${impLetra(c)} · ${escH(cab || '(sem título)')}</label>`;
+  }).join('') || '<span class="hint">Todas as colunas já foram usadas acima.</span>';
+
+  r.innerHTML = `
+    <div class="imp-bar"><div><i data-lucide="file-check-2"></i> <b>${escH(IMP.doc.nome)}</b> <span class="hint">· ${IMP.doc.tipo} · ${f.linhas.length} linha(s) na aba</span></div>
+      <button type="button" class="btn btn-outline btn-sm" data-impacao="trocar"><i data-lucide="refresh-cw"></i> Trocar arquivo</button></div>
+    ${(IMP.doc.avisos||[]).map(a=>`<div class="imp-aviso"><i data-lucide="alert-triangle"></i> ${escH(a)}</div>`).join('')}
+
+    <div class="imp-passo"><span class="imp-num">1</span> Onde estão os dados?</div>
+    <div class="form-grid">
+      ${IMP.doc.folhas.length > 1 ? `<div class="field"><label>Aba a importar</label><select data-imp="folha">${IMP.doc.folhas.map((x,i)=>`<option value="${i}"${i===IMP.fi?' selected':''}>${escH(x.nome)} (${x.linhas.length} linhas)</option>`).join('')}</select></div>` : ''}
+      <div class="field${IMP.doc.folhas.length > 1 ? '' : ' full'}"><label>Linha dos títulos das colunas</label><select data-imp="header">${optHeader}</select></div>
+    </div>
+
+    <div class="imp-passo"><span class="imp-num">2</span> O que é cada coluna? <span class="hint">(já sugeri — corrija se precisar)</span></div>
+    <div class="form-grid">
+      ${IMP_PAPEIS.map(p=>`<div class="field"><label>${escH(PPGImport.ROTULOS[p])}</label><select data-imp="map" data-papel="${p}">${impOpcoesColuna(f, IMP.mapa[p])}</select></div>`).join('')}
+    </div>
+    <div class="field" style="margin-top:10px;"><label>Guardar também estas colunas (opcional)</label><div class="imp-chips">${extrasHtml}</div></div>
+
+    <div class="imp-passo"><span class="imp-num">3</span> Sobre a campanha</div>
+    <div class="form-grid">
+      <div class="field"><label>Nome da campanha</label><input type="text" data-imp="campo" data-campo="nome" value="${escH(IMP.nome)}" placeholder="Ex: PPG 2023.1 – Segurança da Informação"></div>
+      <div class="field"><label>Prêmio padrão dos ganhadores (opcional)</label><input type="text" data-imp="campo" data-campo="premio" value="${escH(IMP.premio)}" placeholder="Ex: Vale-compras R$ 150,00"></div>
+      <div class="field"><label>Início (opcional)</label><input type="date" data-imp="campo" data-campo="ini" value="${escH(IMP.ini)}"></div>
+      <div class="field"><label>Quando terminou <span style="color:var(--error)">*</span></label><input type="date" data-imp="campo" data-campo="fim" value="${escH(IMP.fim)}"><div class="hint">Obrigatório: a data é usada na regra de quem ganhou nos últimos 2 anos.</div></div>
+    </div>
+
+    <div class="imp-passo"><span class="imp-num">4</span> Quem foram os ganhadores?</div>
+    <p class="hint" style="margin:0 0 8px;">${IMP.mapa.ganhador != null ? 'Estou usando a coluna “Ganhador” (Sim/Não). ' : ''}Se os ganhadores estão <b>pintados</b> na planilha, marque a cor abaixo. Você também pode ajustar linha a linha na prévia.</p>
+    <div class="imp-cores">${coresHtml}</div>
+    ${temRoster ? `<label class="imp-chip" style="margin-top:12px;"><input type="checkbox" data-imp="resolver" ${IMP.resolver?'checked':''}> Completar a matrícula pelo nome quando a planilha não tiver (compara com o quadro atual de colaboradores)</label>` : ''}
+
+    <div class="imp-passo"><span class="imp-num">5</span> Prévia — confira antes de salvar</div>
+    <div id="impPrevia"></div>
+    <div class="imp-acoes"><button type="button" class="btn btn-primary" id="impBtnConfirmar" data-impacao="confirmar"><i data-lucide="check"></i> Importar para o histórico</button>
+      <button type="button" class="btn btn-outline" data-impacao="trocar">Cancelar</button></div>`;
+  impPrevia();
+  if(window.lucide) lucide.createIcons();
+}
+function impRegistros(){
+  const f = IMP.doc.folhas[IMP.fi];
+  const regs = PPGImport.montarRegistros(f, {headerIdx: IMP.header, mapa: IMP.mapa, campanhaNome: IMP.nome, periodoInicio: IMP.ini, periodoFim: IMP.fim, premioPadrao: IMP.premio, coresGanhador: [...IMP.cores], colunasExtras: [...IMP.extras], manual: IMP.manual});
+  let resolvidos = 0;
+  if(IMP.resolver && EMPRESA.colaboradores && EMPRESA.colaboradores.length) resolvidos = PPGImport.resolverMatriculasPorNome(regs, EMPRESA.colaboradores);
+  return {regs, resolvidos};
+}
+function impResumoHtml(regs, resolvidos){
+  const gan = regs.filter(r=>r.ganhador).length, semMat = regs.filter(r=>!r.matricula).length;
+  return `<div class="imp-pills"><span class="imp-pill"><b>${regs.length}</b> participante(s)</span><span class="imp-pill ok"><b>${gan}</b> ganhador(es)</span>` +
+    (semMat ? `<span class="imp-pill warn"><b>${semMat}</b> sem matrícula (não contam na regra dos 2 anos)</span>` : '') +
+    (resolvidos ? `<span class="imp-pill"><b>${resolvidos}</b> matrícula(s) completada(s) pelo nome</span>` : '') + `</div>`;
+}
+function impPrevia(){
+  const box = document.getElementById('impPrevia'); if(!box || !IMP.doc) return;
+  const {regs, resolvidos} = impRegistros();
+  const mostrar = regs.slice(0, 200);
+  box.innerHTML = `<div id="impResumo">${impResumoHtml(regs, resolvidos)}</div>` + (regs.length ? `
+    <div class="table-wrap imp-tabela"><table><thead><tr><th>Ganhador</th><th>Matrícula</th><th>Nome</th><th>Setor</th><th>Filial</th><th>%</th><th>Prêmio</th></tr></thead><tbody>
+    ${mostrar.map(r=>`<tr class="${r.ganhador?'imp-ganhou':''}"><td><label class="imp-check"><input type="checkbox" data-imp="manual" data-linha="${r._linha}" ${r.ganhador?'checked':''}><span>${r._motivo === 'cor' ? 'pela cor' : r._motivo === 'coluna' ? 'pela coluna' : r._motivo === 'manual' ? 'manual' : ''}</span></label></td><td>${escH(r.matricula)||'<span class="hint">—</span>'}</td><td>${escH(r.nome)}</td><td>${escH(r.setor)}</td><td>${escH(r.filial)}</td><td>${r.percentualAcertos === '' ? '' : escH(r.percentualAcertos) + '%'}</td><td>${escH(r.premio)}</td></tr>`).join('')}
+    </tbody></table></div>${regs.length > 200 ? `<p class="hint">Mostrando as primeiras 200 de ${regs.length} linhas — todas serão importadas.</p>` : ''}`
+    : `<p class="hint" style="color:var(--error)">Nenhum participante encontrado com esta configuração. Confira a linha dos títulos e as colunas de matrícula e nome.</p>`);
+}
+function impOnChange(e){
+  const t = e.target, k = t.dataset && t.dataset.imp; if(!k) return;
+  if(k === 'arquivo'){ if(t.files && t.files[0]){ impAbrir(t.files[0]); t.value = ''; } return; }
+  if(!IMP.doc) return;
+  if(k === 'folha'){ IMP.fi = +t.value; impPrepararFolha(); impForm(); return; }
+  if(k === 'header'){ IMP.header = +t.value; impRecalcular(); impForm(); return; }
+  if(k === 'map'){ const p = t.dataset.papel; if(t.value === '') delete IMP.mapa[p]; else { IMP.mapa[p] = +t.value; IMP.extras.delete(+t.value); } impForm(); return; }
+  if(k === 'extra'){ const c = +t.dataset.col; if(t.checked) IMP.extras.add(c); else IMP.extras.delete(c); impPrevia(); return; }
+  if(k === 'cor'){ if(t.checked) IMP.cores.add(t.dataset.cor); else IMP.cores.delete(t.dataset.cor); impPrevia(); return; }
+  if(k === 'campo'){ IMP[t.dataset.campo] = t.value; return; }
+  if(k === 'resolver'){ IMP.resolver = t.checked; impPrevia(); return; }
+  if(k === 'manual'){
+    IMP.manual[+t.dataset.linha] = t.checked;
+    const {regs, resolvidos} = impRegistros(); const rs = document.getElementById('impResumo'); if(rs) rs.innerHTML = impResumoHtml(regs, resolvidos);
+    const tr = t.closest('tr'); if(tr) tr.classList.toggle('imp-ganhou', t.checked);
+  }
+}
+function impValidar(regs){
+  if(!regs.length) return 'Nenhum participante encontrado — confira a linha dos títulos e as colunas.';
+  if(regs.some(r=>!r.campanha)) return 'Informe o nome da campanha.';
+  if(!regs.some(r=>PPGImport.normalizarData(r.periodoFim))) return 'Informe quando a campanha terminou (a data é usada na regra dos 2 anos).';
+  return '';
+}
+function impAcao(a){
+  if(a === 'trocar'){ if(IMP.enviando) return; impInicio(); return; }
+  if(a === 'confirmar') impConfirmar();
+}
+async function impConfirmar(){
+  if(IMP.enviando || !IMP.doc) return;
+  const {regs} = impRegistros();
+  const erro = impValidar(regs);
+  if(erro){ showToast(erro, 'warning'); return; }
+  const btn = document.getElementById('impBtnConfirmar'); const rotulo = btn.innerHTML;
+  IMP.enviando = true; btn.disabled = true;
+  const f = IMP.doc.folhas[IMP.fi];
+  const linhas = regs.map(r=>({campanha:r.campanha, periodoInicio:PPGImport.normalizarData(r.periodoInicio)||'', periodoFim:PPGImport.normalizarData(r.periodoFim)||'', matricula:r.matricula, nome:r.nome, setor:r.setor, filial:r.filial, funcao:r.funcao, percentualAcertos:r.percentualAcertos, ganhador:r.ganhador, premio:r.premio, extras:r.extras}));
+  let enviadas = 0;
+  for(let i = 0; i < linhas.length; i += 400){
+    btn.textContent = `Enviando… ${Math.min(i+400, linhas.length)} de ${linhas.length}`;
+    const resp = await backendCall('importarHistorico', {linhas: linhas.slice(i, i+400), arquivo: IMP.doc.nome, aba: f.nome});
+    if(!resp.ok){ IMP.enviando = false; btn.disabled = false; btn.innerHTML = rotulo; showToast((resp.erro || 'Não foi possível importar.') + (enviadas ? ` (${enviadas} linha(s) já tinham sido gravadas)` : ''), 'warning'); return; }
+    enviadas += resp.importadas || 0;
+  }
+  IMP.enviando = false;
+  logAction('Histórico importado', `${enviadas} linha(s) de "${IMP.doc.nome}"`);
+  const gan = regs.filter(r=>r.ganhador).length;
+  showCelebrationPopup('Histórico importado!', `${enviadas} participação(ões) de “${regs[0].campanha}” foram guardadas${gan ? `, com ${gan} ganhador(es) que já contam na regra dos 2 anos` : ''}.`, '📚');
+  _ultimaAssinatura = null; sincronizarDadosDoServidor(true);
+  impInicio(); renderHistoricoImportado();
+}
+
+/* ======================= BANCO DE PERGUNTAS INTELIGENTE ======================= */
+const PREV = {lista:[], categoria:'', tema:'', avisos:[]};
+async function bqImportarArquivo(file){
+  if(!file) return;
+  showToast('Lendo "'+file.name+'"…');
+  try{
+    const doc = await PPGImport.lerArquivoUniversal(file);
+    const r = PPGImport.parsearPerguntas(doc);
+    if(!r.perguntas.length){ showToast('Não consegui identificar perguntas nesse arquivo. Confira se há enunciados seguidos de alternativas (a, b, c…).', 'warning'); return; }
+    PREV.lista = r.perguntas.map(p=>({texto:p.texto, categoria:p.categoria||'', options:p.options.map(o=>({text:o.text, correct:!!o.correct}))}));
+    PREV.categoria = ''; PREV.tema = ''; PREV.avisos = [].concat(r.avisos || [], doc.avisos || []);
+    const corpo = document.createElement('div'); corpo.id = 'prevCorpo';
+    const rodape = document.createElement('div'); rodape.className = 'pop-actions';
+    rodape.innerHTML = `<span class="hint" id="prevResumo"></span><div style="display:flex;gap:8px;"><button type="button" class="btn btn-outline" id="prevCancelar">Cancelar</button><button type="button" class="btn btn-primary" id="prevSalvar"><i data-lucide="check"></i> Salvar no banco</button></div>`;
+    abrirMiniPagina({titulo:'Conferir as perguntas encontradas', subtitulo:`${PREV.lista.length} pergunta(s) em “${doc.nome}” · leitura: ${r.estrategia}. Ajuste o que precisar — nada é salvo antes de você confirmar.`, corpo, rodape, largura:900});
+    corpo.addEventListener('input', prevOnInput); corpo.addEventListener('click', prevOnClick); corpo.addEventListener('change', prevOnChange);
+    rodape.querySelector('#prevCancelar').addEventListener('click', fecharMiniPagina);
+    rodape.querySelector('#prevSalvar').addEventListener('click', prevSalvar);
+    prevRender();
+  }catch(e){ showToast(e.message || 'Não foi possível ler o arquivo.', 'warning'); }
+}
+function prevResumo(){
+  const sem = PREV.lista.filter(p=>!p.options.some(o=>o.correct)).length;
+  const el = document.getElementById('prevResumo');
+  if(el) el.innerHTML = `<b>${PREV.lista.length}</b> pergunta(s)${sem ? ` · <span style="color:var(--warning)"><b>${sem}</b> sem gabarito (serão salvas como inativas)</span>` : ''}`;
+}
+function prevRender(){
+  const c = document.getElementById('prevCorpo'); if(!c) return;
+  const sc = c.parentElement ? c.parentElement.scrollTop : 0;
+  c.innerHTML = (PREV.avisos.length ? `<div class="imp-aviso"><i data-lucide="alert-triangle"></i> ${PREV.avisos.slice(0,4).map(escH).join('<br>')}</div>` : '') +
+    `<div class="form-grid" style="margin-bottom:14px;"><div class="field"><label>Categoria para todas (opcional)</label><input type="text" data-prev="cat" value="${escH(PREV.categoria)}" placeholder="Ex: Segurança"></div><div class="field"><label>Tema para todas (opcional)</label><input type="text" data-prev="tema" value="${escH(PREV.tema)}" placeholder="Ex: Segurança da Informação"></div></div>` +
+    PREV.lista.map((p,i)=>{
+      const n = p.options.filter(o=>o.correct).length;
+      return `<div class="prev-q${n===0?' sem-gab':''}">
+        <div class="prev-q-head"><b>${i+1}.</b><span class="badge ${n>1?'finalizada':'andamento'}">${n>1?'Múltipla escolha':'Resposta única'}</span>${n===0?'<span class="badge programada">sem gabarito — marque a correta</span>':''}<span style="flex:1"></span><button type="button" class="icon-btn" data-prev="delq" data-i="${i}" title="Remover pergunta"><i data-lucide="trash-2"></i></button></div>
+        <textarea rows="2" data-prev="qtexto" data-i="${i}">${escH(p.texto)}</textarea>
+        ${p.options.map((o,j)=>`<div class="prev-alt"><input type="checkbox" title="Marque se for a correta" data-prev="ok" data-i="${i}" data-j="${j}" ${o.correct?'checked':''}><input type="text" data-prev="atexto" data-i="${i}" data-j="${j}" value="${escH(o.text)}"><button type="button" class="icon-btn" data-prev="delalt" data-i="${i}" data-j="${j}" title="Remover alternativa"><i data-lucide="x"></i></button></div>`).join('')}
+        <button type="button" class="btn btn-ghost btn-sm" data-prev="addalt" data-i="${i}"><i data-lucide="plus"></i> alternativa</button>
+      </div>`;
+    }).join('');
+  if(c.parentElement) c.parentElement.scrollTop = sc;
+  prevResumo();
+  if(window.lucide) lucide.createIcons();
+}
+function prevOnInput(e){
+  const t = e.target, k = t.dataset.prev; if(!k) return;
+  if(k === 'cat') PREV.categoria = t.value; else if(k === 'tema') PREV.tema = t.value;
+  else if(k === 'qtexto') PREV.lista[+t.dataset.i].texto = t.value;
+  else if(k === 'atexto') PREV.lista[+t.dataset.i].options[+t.dataset.j].text = t.value;
+}
+function prevOnChange(e){
+  const t = e.target; if(t.dataset.prev !== 'ok') return;
+  PREV.lista[+t.dataset.i].options[+t.dataset.j].correct = t.checked; prevRender();
+}
+function prevOnClick(e){
+  const b = e.target.closest('button[data-prev]'); if(!b) return;
+  const i = +b.dataset.i, j = +b.dataset.j, k = b.dataset.prev;
+  if(k === 'delq') PREV.lista.splice(i, 1);
+  else if(k === 'delalt') PREV.lista[i].options.splice(j, 1);
+  else if(k === 'addalt') PREV.lista[i].options.push({text:'', correct:false});
+  else return;
+  prevRender();
+}
+async function prevSalvar(){
+  const validas = PREV.lista.filter(p=>p.texto.trim() && p.options.filter(o=>o.text.trim()).length >= 2);
+  if(!validas.length){ showToast('Nenhuma pergunta válida para salvar (cada uma precisa de enunciado e 2+ alternativas).', 'warning'); return; }
+  const payload = validas.map(p=>{
+    const opts = p.options.filter(o=>o.text.trim()).map(o=>({text:o.text.trim(), correct:!!o.correct}));
+    const n = opts.filter(o=>o.correct).length;
+    return {texto:p.texto.trim(), type:n>1?'multiplas_respostas':'unica', options:opts, categoria:PREV.categoria.trim() || p.categoria || 'Importada', tema:PREV.tema.trim(), status:n===0?'inativa':'ativa'};
+  });
+  const btn = document.getElementById('prevSalvar'); btn.disabled = true; btn.textContent = 'Salvando…';
+  const resp = await backendCall('salvarPerguntasLote', {perguntas: payload});
+  if(!resp.ok){ btn.disabled = false; btn.innerHTML = '<i data-lucide="check"></i> Salvar no banco'; showToast(resp.erro || 'Não foi possível salvar as perguntas.', 'warning'); return; }
+  const sem = payload.filter(p=>p.status === 'inativa').length;
+  fecharMiniPagina();
+  logAction('Importação de perguntas', `${resp.salvas} pergunta(s) importada(s)`);
+  showToast(`${resp.salvas} pergunta(s) salva(s) no banco${sem ? ` — ${sem} sem gabarito ficaram inativas` : ''}.`, 'success');
+  _ultimaAssinatura = null; sincronizarDadosDoServidor(true);
+}
+
+/* ======================= PÁGINA INICIAL DA QUALIDADE: rodada, atalhos, setor/filial e pop-ups ======================= */
+let _msgsPendentes = null, _msgsTs = 0;
+function rodadaDestaque(){
+  const abertas = campaigns.filter(c=>campaignAccessStatus(c) === 'aberta');
+  const lista = abertas.length ? abertas : campaigns;
+  return [...lista].sort((a,b)=> new Date(b.inicio||0) - new Date(a.inicio||0))[0] || null;
+}
+function statusRodada(c){
+  const roster = EMPRESA.colaboradores || [];
+  const resp = new Set(participants.filter(p=>p.campaignId === c.id).map(p=>matK(p.matricula)));
+  return {roster, respondeu: roster.filter(r=>resp.has(matK(r.matricula))), faltam: roster.filter(r=>!resp.has(matK(r.matricula))), totalRespostas: resp.size};
+}
+function renderHomeQualidade(){
+  const box = document.getElementById('homeRodada'); if(!box) return;
+  const c = rodadaDestaque();
+  if(!c){
+    box.innerHTML = `<div class="rodada-card vazio"><div><h3>Nenhuma campanha ainda</h3><p class="hint">Crie a primeira rodada do PPG para começar a receber respostas.</p></div><button type="button" class="btn btn-primary" onclick="goToSection('nova')"><i data-lucide="plus-circle"></i> Criar campanha</button></div>`;
+    return;
+  }
+  const acesso = campaignAccessStatus(c), st = statusRodada(c);
+  const total = st.roster.length, n = st.respondeu.length, pct = total ? Math.round(n / total * 100) : 0;
+  const quando = acesso === 'aberta'
+    ? `<span class="countdown"><i data-lucide="hourglass"></i><b data-countdown="${escH(c.fim)}">${tempoRestanteTexto(c.fim)}</b><small>para encerrar</small></span>`
+    : acesso === 'nao_iniciada'
+      ? `<span class="countdown"><i data-lucide="calendar-clock"></i><b data-countdown="${escH(c.inicio)}">${tempoRestanteTexto(c.inicio)}</b><small>para começar</small></span>`
+      : `<span class="countdown fim"><i data-lucide="flag"></i><b>Encerrada</b><small>${escH(fmtPeriodoValor(c.fim))}</small></span>`;
+  box.innerHTML = `<div class="rodada-card">
+    <div class="rodada-top"><div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">${statusBadge(c.status)}<span class="hint">${escH(fmtPeriodoValor(c.inicio))} → ${escH(fmtPeriodoValor(c.fim))}</span></div><h3>${escH(c.nome)}</h3></div>${quando}</div>
+    ${total ? `<div class="progress"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="rodada-stats"><b>${n}</b> de <b>${total}</b> colaboradores já responderam (<b>${pct}%</b>) · <b>${st.faltam.length}</b> ainda faltam</div>`
+      : `<div class="rodada-stats"><b>${st.totalRespostas}</b> resposta(s) recebida(s) <span class="hint">· carregando o quadro de colaboradores…</span></div>`}
+    <div class="rodada-acoes">
+      <button type="button" class="btn btn-primary btn-sm" onclick="abrirQuemFalta()"><i data-lucide="user-x"></i> Quem falta responder</button>
+      <button type="button" class="btn btn-outline btn-sm" onclick="kpiPopup('participantes')"><i data-lucide="users"></i> Quem já respondeu</button>
+      <button type="button" class="btn btn-outline btn-sm" onclick="openShareModal('${escH(c.id)}')"><i data-lucide="share-2"></i> Divulgar</button>
+    </div></div>`;
+}
+function renderHomeAtalhos(){
+  const el = document.getElementById('homeAtalhos'); if(!el) return;
+  const itens = [];
+  const semSorteio = campaigns.filter(c=>campaignAccessStatus(c) === 'encerrada' && !c.ganhadores && c.status !== 'finalizada');
+  if(semSorteio.length) itens.push({ico:'dices', cls:'warn', txt:`${semSorteio.length} rodada(s) encerrada(s) aguardando o sorteio`, acao:"goToSection('sorteio')"});
+  const encerrando = campaigns.filter(c=>{ if(campaignAccessStatus(c) !== 'aberta') return false; const d = (new Date(c.fim) - new Date()) / 86400000; return d > 0 && d <= 3; });
+  if(encerrando.length) itens.push({ico:'megaphone', txt:`${encerrando.length} rodada(s) encerram em até 3 dias — divulgue de novo`, acao:"goToSection('divulgacao')"});
+  if(_msgsPendentes > 0) itens.push({ico:'message-circle-question', cls:'warn', txt:`${_msgsPendentes} mensagem(ns) de colaboradores esperando resposta`, acao:"goToSection('fale-conosco')"});
+  const prox = campaigns.filter(c=>campaignAccessStatus(c) === 'nao_iniciada').sort((a,b)=> new Date(a.inicio) - new Date(b.inicio))[0];
+  if(prox) itens.push({ico:'calendar-clock', txt:`Próxima rodada: “${prox.nome}” começa em ${tempoRestanteTexto(prox.inicio)}`, acao:"goToSection('campanhas')"});
+  if(campaigns.length && !campaigns.some(c=>campaignAccessStatus(c) === 'aberta') && !prox) itens.push({ico:'plus-circle', txt:'Nenhuma rodada em andamento ou programada — crie a próxima campanha', acao:"goToSection('nova')"});
+  el.innerHTML = itens.length
+    ? itens.map(i=>`<button type="button" class="atalho ${i.cls||''}" onclick="${i.acao}"><i data-lucide="${i.ico}"></i><span>${escH(i.txt)}</span><i data-lucide="chevron-right" class="atalho-seta"></i></button>`).join('')
+    : (campaigns.length ? `<div class="atalho ok"><i data-lucide="check-circle-2"></i><span>Tudo em dia — nada pendente por aqui.</span></div>` : '');
+}
+function renderHomeSetorFilial(){
+  const c = rodadaDestaque(), st = c ? statusRodada(c) : null;
+  [['setor','homeSetor'],['filial','homeFilial']].forEach(([campo, id])=>{
+    const el = document.getElementById(id); if(!el) return;
+    if(!c || !st.roster.length){ el.innerHTML = '<p class="hint">Sem dados ainda — o quadro de colaboradores ou a rodada ainda não carregaram.</p>'; return; }
+    const grupos = {};
+    st.roster.forEach(r=>{ const k = r[campo] || '(não informado)'; (grupos[k] = grupos[k] || {total:0, resp:0}).total++; });
+    st.respondeu.forEach(r=>{ grupos[r[campo] || '(não informado)'].resp++; });
+    el.innerHTML = Object.entries(grupos).sort((a,b)=> (b[1].resp/b[1].total) - (a[1].resp/a[1].total) || b[1].total - a[1].total).map(([k,g])=>{
+      const p = Math.round(g.resp / g.total * 100);
+      return `<button type="button" class="part-row" onclick="popGrupo('${campo}','${encodeURIComponent(k)}')"><span class="part-nome">${escH(k)}</span><span class="part-barra"><span style="width:${p}%"></span></span><span class="part-num">${g.resp}/${g.total} · ${p}%</span></button>`;
+    }).join('');
+  });
+}
+async function carregarMsgsPendentes(){
+  if(currentRole !== 'qualidade' || !currentUser || !currentUser.token) return;
+  const agora = Date.now(); if(_msgsTs && agora - _msgsTs < 60000) return; _msgsTs = agora;
+  const r = await backendCall('listarDuvidas');
+  if(r && r.ok){ _msgsPendentes = (r.duvidas || []).filter(d=>d.status === 'pendente').length; renderHomeAtalhos(); if(window.lucide) lucide.createIcons(); }
+}
+function renderHomeExtras(){
+  try{ renderHomeQualidade(); renderHomeAtalhos(); renderHomeSetorFilial(); carregarMsgsPendentes(); }catch(e){ console.warn('Painel inicial (extras):', e); }
+}
+setInterval(()=>{ document.querySelectorAll('[data-countdown]').forEach(el=>{ el.textContent = tempoRestanteTexto(el.dataset.countdown); }); }, 30000);
+
+function copiarTexto(t, ok){
+  const fim = ()=> showToast(ok || 'Copiado!', 'success');
+  if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(fim, ()=> showToast('Não foi possível copiar.', 'warning'));
+  else { const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); fim(); }catch(e){ showToast('Não foi possível copiar.', 'warning'); } ta.remove(); }
+}
+window.abrirQuemFalta = function(){
+  const c = rodadaDestaque(); if(!c){ showToast('Ainda não há campanha.', 'warning'); return; }
+  const st = statusRodada(c);
+  if(!st.roster.length){ showToast('O quadro de colaboradores ainda está carregando. Tente de novo em instantes.', 'warning'); return; }
+  const setores = [...new Set(st.roster.map(r=>r.setor).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  const filiais = [...new Set(st.roster.map(r=>r.filial).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  const corpo = document.createElement('div');
+  corpo.innerHTML = `<div class="form-grid" style="margin-bottom:12px;">
+    <div class="field"><label>Setor</label><select data-qf="setor"><option value="">Todos</option>${setores.map(s=>`<option>${escH(s)}</option>`).join('')}</select></div>
+    <div class="field"><label>Filial</label><select data-qf="filial"><option value="">Todas</option>${filiais.map(s=>`<option>${escH(s)}</option>`).join('')}</select></div>
+    <div class="field full"><label>Buscar por nome ou matrícula</label><input type="text" data-qf="busca" placeholder="Digite para filtrar…"></div></div>
+    <div id="qfLista"></div>`;
+  const rodape = document.createElement('div'); rodape.className = 'pop-actions';
+  rodape.innerHTML = `<span class="hint" id="qfContagem"></span><div style="display:flex;gap:8px;flex-wrap:wrap;"><button type="button" class="btn btn-outline btn-sm" id="qfCopiar"><i data-lucide="copy"></i> Copiar lista</button><button type="button" class="btn btn-outline btn-sm" id="qfCsv"><i data-lucide="download"></i> Baixar .csv</button></div>`;
+  let filtrados = [];
+  const aplicar = ()=>{
+    const f = {setor: corpo.querySelector('[data-qf=setor]').value, filial: corpo.querySelector('[data-qf=filial]').value, busca: PPGImport.norm(corpo.querySelector('[data-qf=busca]').value)};
+    filtrados = st.faltam.filter(r=> (!f.setor || r.setor === f.setor) && (!f.filial || r.filial === f.filial) && (!f.busca || PPGImport.norm(r.nome).includes(f.busca) || String(r.matricula).includes(f.busca)));
+    corpo.querySelector('#qfLista').innerHTML = tabelaHtml(['Nome','Matrícula','Setor','Filial'], filtrados.slice(0,300).map(r=>[escH(r.nome), escH(r.matricula), escH(r.setor||''), escH(r.filial||'')]), 'Ninguém falta neste filtro 🎉') + (filtrados.length > 300 ? `<p class="hint">Mostrando 300 de ${filtrados.length} — use os filtros ou baixe o .csv completo.</p>` : '');
+    rodape.querySelector('#qfContagem').innerHTML = `<b>${filtrados.length}</b> de ${st.faltam.length} que faltam responder`;
+  };
+  corpo.addEventListener('input', aplicar); corpo.addEventListener('change', aplicar);
+  abrirMiniPagina({titulo:'Quem ainda não respondeu', subtitulo:`${c.nome} · ${st.respondeu.length} de ${st.roster.length} já responderam`, corpo, rodape, largura:820});
+  rodape.querySelector('#qfCopiar').addEventListener('click', ()=> copiarTexto(filtrados.map(r=>`${r.nome} (${r.matricula}) — ${r.setor||''} / ${r.filial||''}`).join('\n'), 'Lista copiada!'));
+  rodape.querySelector('#qfCsv').addEventListener('click', ()=> downloadCSV('quem_falta_responder.csv', ['Nome','Matrícula','Setor','Filial'], filtrados.map(r=>[r.nome, r.matricula, r.setor||'', r.filial||''])));
+  aplicar();
+};
+window.popGrupo = function(campo, kEnc){
+  const k = decodeURIComponent(kEnc), c = rodadaDestaque(); if(!c) return;
+  const st = statusRodada(c); const val = r=> (r[campo] || '(não informado)') === k;
+  const ja = st.respondeu.filter(val), falta = st.faltam.filter(val);
+  const lin = r=>[escH(r.nome), escH(r.matricula), escH(r.setor||''), escH(r.filial||'')];
+  abrirMiniPagina({titulo:`${campo === 'setor' ? 'Setor' : 'Filial'}: ${k}`, subtitulo:`${c.nome} · ${ja.length} de ${ja.length + falta.length} responderam`, largura:760,
+    corpo:`<h4 class="pop-sub">Ainda faltam (${falta.length})</h4>${tabelaHtml(['Nome','Matrícula','Setor','Filial'], falta.map(lin), 'Todos já responderam 🎉')}<h4 class="pop-sub">Já responderam (${ja.length})</h4>${tabelaHtml(['Nome','Matrícula','Setor','Filial'], ja.map(lin), 'Ninguém respondeu ainda.')}`});
+};
+window.kpiPopup = function(tipo){
+  const c = rodadaDestaque();
+  const periodo = x=> `${escH(fmtPeriodoValor(x.inicio))} – ${escH(fmtPeriodoValor(x.fim))}`;
+  const tabCamp = lista=> tabelaHtml(['Campanha','Período','Status','Participantes'], lista.map(x=>[escH(x.nome), periodo(x), statusBadge(x.status), campaignParticipants(x.id).length]), 'Nenhuma campanha aqui.');
+  let o = null;
+  if(tipo === 'total') o = {titulo:'Todas as campanhas', corpo:tabCamp(campaigns)};
+  else if(tipo === 'andamento') o = {titulo:'Campanhas em andamento', corpo:tabCamp(campaigns.filter(x=>x.status === 'andamento'))};
+  else if(tipo === 'programadas') o = {titulo:'Campanhas programadas', corpo:tabCamp(campaigns.filter(x=>x.status === 'programada'))};
+  else if(tipo === 'participantes' && c){
+    const ps = campaignParticipants(c.id);
+    o = {titulo:'Quem já respondeu', subtitulo:`${c.nome} · ${ps.length} resposta(s)`, corpo:tabelaHtml(['Nome','Setor','Filial','Acertos','Respondeu em'], ps.map(p=>[escH(p.nome), escH(p.setor||''), escH(p.filial||''), p.pct == null ? '—' : p.pct + '%', escH(fmtDateTime(new Date(p.data)))]), 'Ninguém respondeu ainda.'), rodape:`<div class="pop-actions"><span></span><button type="button" class="btn btn-outline btn-sm" onclick="fecharMiniPagina();goToResultadosLatest()">Abrir tela completa</button></div>`};
+  } else if(tipo === 'elegiveis' && c){
+    const ev = evaluateEligibility(c.id);
+    o = {titulo:'Elegíveis ao sorteio', subtitulo:`${c.nome} · ${ev.eligible.length} elegível(is) · ${ev.excluded.length} fora`, corpo:tabelaHtml(['Nome','Setor','Filial','Função'], ev.eligible.map(p=>[escH(p.nome), escH(p.setor||''), escH(p.filial||''), escH(p.funcao||'')]), 'Ninguém elegível por enquanto.'), rodape:`<div class="pop-actions"><span></span><button type="button" class="btn btn-outline btn-sm" onclick="fecharMiniPagina();goToElegiveisLatest()">Abrir tela completa</button></div>`};
+  } else if(tipo === 'ganhadores'){
+    const linhas = []; campaigns.filter(x=>x.ganhadores && x.ganhadores.length).forEach(x=> x.ganhadores.forEach(g=> linhas.push([escH(x.nome), escH(g.nome), escH(g.setor||''), escH(g.filial||'')])));
+    o = {titulo:'Ganhadores sorteados', corpo:tabelaHtml(['Campanha','Ganhador','Setor','Filial'], linhas, 'Nenhum sorteio realizado ainda.')};
+  }
+  if(!o){ showToast('Ainda não há dados para mostrar.', 'warning'); return; }
+  abrirMiniPagina(Object.assign({largura:820}, o));
+};
+
+
 /* ======================= INIT ======================= */
 const _hadSavedState = loadState();
 aplicarTema(window.themePreference || 'auto');
@@ -2505,19 +2914,14 @@ if(window.lucide){
 }
 
 try{
-  if(_hadSavedState && currentUser && currentUser.matricula){
+  if(_hadSavedState && currentUser && currentUser.matricula && currentUser.token){
     document.getElementById('loginScreen').style.display = "none";
     document.getElementById('appRoot').style.display = "flex";
     applyRole(currentUser.role);
     showToast(`Sessão restaurada — bem-vindo(a) de volta, ${currentUser.nome}.`, "");
-    sincronizarDadosDoServidor(true);
-    if(!window._syncIntervalIniciado){
-      window._syncIntervalIniciado = true;
-      setInterval(()=> sincronizarDadosDoServidor(true), 20 * 1000);
-    }
+    iniciarSincronizacao();
   } else if(_hadSavedState){
-    if(currentUser){ currentUser = null; saveState(); } // sessão salva não corresponde a nenhum usuário válido — exige novo login
-    showToast("Dados salvos anteriormente neste navegador foram restaurados.", "");
+    if(currentUser){ currentUser = null; saveState(); } // sessão antiga (sem token) — exige novo login
   } else {
     saveState(); // primeira vez neste navegador: grava o estado inicial
   }

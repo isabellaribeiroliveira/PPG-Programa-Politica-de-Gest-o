@@ -1,29 +1,17 @@
 /* =====================================================================
-   ARQUIVO DE CONFIGURAÇÃO DA EMPRESA (DADOS FICTÍCIOS DE DEMONSTRAÇÃO)
+   CONFIGURAÇÃO DA EMPRESA
    =====================================================================
-   Este arquivo contém APENAS uma estrutura organizacional de exemplo —
-   filiais, setores, funções compatíveis por setor e um quadro fictício de
-   colaboradores. Nenhum nome, matrícula, setor ou função aqui corresponde
-   a dados reais de qualquer empresa.
+   Os colaboradores reais vêm da planilha (aba "Colaboradores"). Aqui ficam
+   só regras fixas do programa.
 
-   O que importa aqui é a LÓGICA, que é o que deve ser reaproveitado ao
-   plugar os dados reais no futuro:
-     Empresa → Filial (independente)
-     Empresa → Setor → Funções compatíveis (encadeado)
-
-   Quando o modo de teste gera um colaborador fictício, ele sorteia um
-   registro já coerente do quadro abaixo — nunca combina setor e função
-   de forma aleatória e desconexa.
-
-   Para plugar dados reais no futuro: substitua os arrays `filiais`,
-   `setores` e `colaboradores` pelos dados da empresa (ou por uma consulta
-   à API do RH) — nenhuma outra parte do sistema precisa mudar, pois todo
-   o restante do código consome apenas esta mesma estrutura.
+   cargosImpedidosPalavras: palavras que, se aparecerem no CARGO ou na FUNÇÃO
+   da pessoa (ex.: "Gerente de Operações"), a deixam de fora do sorteio.
    ===================================================================== */
 
 window.EMPRESA_CONFIG = {
-  nome: "Univale Transportes Ltda (dados fictícios)",
-  filiais: ["Matriz", "Vale Mineração - Santa Bárbara", "Vale Mineração - Mariana", "Mineração Usiminas - Musa", "Bahia"],
+  nome: "Univale",
+  cargosImpedidosPalavras: ["gerente", "coordenador", "encarregado", "assessor"],
+  filiais: ["Matriz", "Filial Norte", "Filial Sul", "Filial Leste", "Filial Oeste"],
   cargosImpedidos: [
     "Assessor da Diretoria",
     "Coordenador de Logística",
@@ -42,8 +30,8 @@ window.EMPRESA_CONFIG = {
     "Gerente de Suprimentos"
 ],
   setores: [
-    {nome:"Recursos Humanos", funcoes:["Analista de RH", "Assistente de RH", "Auxiliar de RH", "Gerente de RH", "Encarregado de RH"]},
-    {nome:"Qualidade", funcoes:["Analista da Qualidade", "Auxiliar da Qualidade", "Gerente da Qualidade"]},
+    {nome:"Recursos Humanos", funcoes:["Analista de RH", "Assistente de RH", "Auxiliar de RH", "Gerente de RH"]},
+    {nome:"Qualidade", funcoes:["Analista da Qualidade", "Assistente da Qualidade", "Supervisor da Qualidade"]},
     {nome:"Tecnologia da Informação", funcoes:["Analista de TI", "Técnico de Informática", "Encarregado de TI"]},
     {nome:"Financeiro", funcoes:["Analista Financeiro", "Assistente Financeiro", "Gerente Financeiro"]},
     {nome:"Contabilidade", funcoes:["Analista Contábil", "Auxiliar Contábil", "Gerente Contábil"]},
@@ -84,18 +72,3 @@ window.EMPRESA_CONFIG.sortearColaboradores = function(qtd, excluirMatriculas){
   return shuffled.slice(0, qtd);
 };
 
-/* CPF FICTÍCIO — gerado de forma determinística a partir da matrícula, só para
-   preencher os campos de auditoria (nenhum CPF real é usado em lugar nenhum
-   deste protótipo). O mesmo colaborador sempre recebe o mesmo CPF fictício. */
-window.EMPRESA_CONFIG.cpfFicticio = function(matricula){
-  let seed = 0;
-  const s = String(matricula);
-  for(let i=0;i<s.length;i++) seed = (seed * 31 + s.charCodeAt(i)) >>> 0;
-  const digits = [];
-  for(let i=0;i<9;i++){ seed = (seed * 1103515245 + 12345) >>> 0; digits.push(seed % 10); }
-  // dígitos verificadores fictícios (não seguem o algoritmo oficial — é só formatação)
-  seed = (seed * 1103515245 + 12345) >>> 0; digits.push(seed % 10);
-  seed = (seed * 1103515245 + 12345) >>> 0; digits.push(seed % 10);
-  const d = digits.join('');
-  return `${d.slice(0,3)}.${d.slice(3,6)}.${d.slice(6,9)}-${d.slice(9,11)}`;
-};
