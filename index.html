@@ -1476,6 +1476,29 @@ body .user-chip .avatar, body .topbar-right > *:not(.user-chip){ flex-shrink:0; 
 .ccard-antiga{ border-left:4px solid var(--primary); }
 .log-resumo, #logResumo{ grid-template-columns:repeat(auto-fit,minmax(210px,1fr)) !important; }
 
+.sorteio-info{ display:flex; gap:12px; align-items:flex-start; padding:12px 16px; margin:14px 0 4px; border-radius:14px; border-left:4px solid var(--red); background:rgba(2,163,157,.08); }
+.sorteio-info > i, .sorteio-info > svg{ width:20px; height:20px; color:var(--primary-dark); flex-shrink:0; margin-top:2px; }
+.sorteio-info div{ display:flex; flex-direction:column; gap:2px; font-size:13px; } .sorteio-info span{ color:var(--ink-soft); font-size:12.5px; }
+.sorteio-info code{ font-family:'JetBrains Mono',monospace; background:var(--card); padding:1px 6px; border-radius:6px; }
+tr.linha-sorteado td{ background:rgba(2,163,157,.09); font-weight:600; }
+#divAviso{ align-items:flex-start; } #divAviso i, #divAviso svg{ width:16px; height:16px; }
+
+
+/* ======================= v12.2 — menu utilizável em qualquer altura de tela ======================= */
+body .sidebar .sidebar-collapse-btn{ position:static !important; top:auto; right:auto; bottom:auto; left:auto; order:3; align-self:flex-end; margin:6px 14px 8px; flex-shrink:0; }
+body .sidebar.collapsed .sidebar-collapse-btn{ align-self:center; margin:6px 0 10px; }
+body .sidebar .brand{ order:0; } body .sidebar nav.menu{ order:1; min-height:0; } body .sidebar .sidebar-foot{ order:4; padding-right:18px; }
+body .sidebar nav.menu{ scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.38) transparent; }
+body .sidebar nav.menu::-webkit-scrollbar{ width:6px; } body .sidebar nav.menu::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.32); border-radius:6px; }
+body .sidebar.collapsed nav.menu{ padding:8px 8px; gap:1px; }
+body .sidebar.collapsed .menu-item, body .sidebar.collapsed .menu-item.sub{ height:clamp(30px,5.4vh,42px); padding:0 !important; }
+body .sidebar.collapsed .menu-group{ margin:3px 0 !important; padding:3px 0 !important; }
+body .sidebar.collapsed .brand{ padding:12px 0 6px !important; }
+@media(max-height:700px){ body .sidebar:not(.collapsed) .menu-item{ padding-top:7px; padding-bottom:7px; } body .sidebar:not(.collapsed) .sidebar-foot{ padding:8px 18px 10px; } body .sidebar:not(.collapsed) .brand{ padding-top:14px; padding-bottom:10px; } }
+.wa-link{ display:inline-flex; vertical-align:middle; margin-left:6px; color:#1B8F4B; } .wa-link i, .wa-link svg{ width:15px; height:15px; }
+.tel-txt{ white-space:nowrap; font-variant-numeric:tabular-nums; }
+#qzTelefone{ font-size:20px; letter-spacing:.04em; text-align:center; }
+
 </style>
 </head>
 <body data-app-url="<?= urlApp ?>" data-campanha="<?= campanhaParam ?>">
@@ -1715,7 +1738,7 @@ body .user-chip .avatar, body .topbar-right > *:not(.user-chip){ flex-shrink:0; 
             <div class="field" style="min-width:260px;"><label>Campanha</label><select id="selectCampanhaParticipantes"></select></div>
           </div>
           <div class="sorteio-stats" id="participantesStats"></div>
-          <div class="table-wrap"><table><thead><tr><th>Colaborador</th><th>Matrícula</th><th>Função</th><th>Setor</th><th>Filial</th><th>Data/hora resposta</th><th>% Acertos</th></tr></thead><tbody id="tblParticipantes"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Colaborador</th><th>Matrícula</th><th>Função</th><th>Setor</th><th>Filial</th><th>Telefone / WhatsApp</th><th>Data/hora resposta</th><th>% Acertos</th></tr></thead><tbody id="tblParticipantes"></tbody></table></div>
         </div>
         <div class="panel">
           <h3>Questões com maior índice de erro / acerto</h3>
@@ -1732,7 +1755,7 @@ body .user-chip .avatar, body .topbar-right > *:not(.user-chip){ flex-shrink:0; 
         <div class="section-head"><div><h2>Elegíveis ao sorteio</h2><p>Regras aplicadas automaticamente: 100% de acertos, função permitida e sem premiação nos últimos 2 anos.</p></div></div>
         <div class="panel">
           <div class="field" style="max-width:320px; margin-bottom:16px;"><label>Campanha</label><select id="selectCampanhaElegiveis"></select></div>
-          <div class="table-wrap"><table><thead><tr><th>#</th><th>Colaborador</th><th>Matrícula</th><th>Função</th><th>Setor</th><th>Filial</th><th>Data/hora resposta</th></tr></thead><tbody id="tblElegiveis"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>#</th><th>Colaborador</th><th>Matrícula</th><th>Função</th><th>Setor</th><th>Filial</th><th>Telefone / WhatsApp</th><th>Data/hora resposta</th></tr></thead><tbody id="tblElegiveis"></tbody></table></div>
         </div>
         <div class="panel">
           <h3>Excluídos automaticamente</h3>
@@ -1921,7 +1944,8 @@ body .user-chip .avatar, body .topbar-right > *:not(.user-chip){ flex-shrink:0; 
           <h3>Divulgar uma campanha</h3>
           <div class="form-grid">
             <div class="field full"><label>Campanha</label><select id="divCampanha"></select></div>
-          </div>
+    </div>
+    <div id="divAviso" class="imp-aviso" style="display:none; margin-top:12px;"></div>
           <div style="display:flex; gap:10px; margin-top:14px;">
             <button class="btn btn-primary" id="btnGerarDivulgacao"><i data-lucide="megaphone"></i> Gerar arte de divulgação</button>
           </div>
@@ -1930,7 +1954,7 @@ body .user-chip .avatar, body .topbar-right > *:not(.user-chip){ flex-shrink:0; 
 
         <div class="panel">
           <h3>Banner dos ganhadores</h3>
-          <p class="hint">Disponível somente para campanhas com sorteio já registrado no histórico (oficial).</p>
+          <p class="hint">Disponível para toda campanha com sorteio registrado — as que acabaram de terminar e também as anteriores ao sistema (importadas).</p>
           <div class="form-grid">
             <div class="field full"><label>Campanha</label><select id="divCampanhaGanhadores"></select></div>
           </div>
@@ -2051,6 +2075,7 @@ body .user-chip .avatar, body .topbar-right > *:not(.user-chip){ flex-shrink:0; 
           <button class="btn btn-outline btn-sm" id="btnTrocarMinhaSenha" style="margin-top:10px;">Trocar minha senha</button>
         </div>
         <div class="panel" id="cfgEmail"><h3><i data-lucide="at-sign"></i> Meu e-mail</h3><div class="hint">Disponível para todos os perfis — pessoal ou da empresa. É por ele que você recebe respostas e avisos.</div><div id="cfgEmailEstado" style="margin-top:10px;"></div><button type="button" class="btn btn-outline btn-sm" id="btnVincularEmail" style="margin-top:12px;"><i data-lucide="at-sign"></i> Vincular e-mail</button></div>
+        <div class="panel colaborador-only" id="cfgContato"><h3><i data-lucide="phone"></i> Meu telefone / WhatsApp</h3><div class="hint">Usado só pela Qualidade, para falar com você mais rápido caso seja sorteado(a). Você também confirma ao responder cada campanha.</div><div id="cfgContatoEstado" style="margin-top:10px;"></div><div class="field" style="max-width:300px; margin-top:12px;"><label>Telefone / WhatsApp (com DDD)</label><input type="tel" id="cfgTelefone" inputmode="tel" placeholder="(11) 99999-9999"></div><label class="imp-chip" style="margin-top:10px;"><input type="checkbox" id="cfgWhats" checked> Este número tem WhatsApp</label><div><button type="button" class="btn btn-outline btn-sm" id="btnSalvarContato" style="margin-top:12px;"><i data-lucide="check"></i> Salvar telefone</button></div></div>
         <div class="panel qualidade-only">
           <h3><i data-lucide="key-round"></i> Senhas dos colaboradores</h3>
           <div style="display:flex; gap:8px; flex-wrap:wrap; margin:6px 0 12px;"><button type="button" class="btn btn-outline btn-sm" onclick="abrirSituacaoSenhas()"><i data-lucide="users"></i> Situação das senhas</button><button type="button" class="btn btn-outline btn-sm" onclick="LOG.tipo='senha'; goToSection('log')"><i data-lucide="activity"></i> Ver quem trocou de senha</button></div>
@@ -2103,7 +2128,7 @@ body .user-chip .avatar, body .topbar-right > *:not(.user-chip){ flex-shrink:0; 
           <h3>Dados e armazenamento</h3>
           <div class="hint">Campanhas, respostas e o quadro de colaboradores ficam salvos na planilha da empresa e sincronizam automaticamente entre qualquer computador ou celular</div>
           <div class="qualidade-only" style="margin:4px 0 14px;">
-            <a id="linkPlanilha" class="btn btn-primary btn-sm" href="#" target="_blank" rel="noopener" style="display:none;"><i data-lucide="external-link"></i> Abrir a planilha no  Planilhas</a>
+            <a id="linkPlanilha" class="btn btn-primary btn-sm" href="#" target="_blank" rel="noopener" style="display:none;"><i data-lucide="external-link"></i> Abrir a planilha no Google Planilhas</a>
             <div class="hint" id="infoEmailTeste" style="margin-top:8px;"></div>
           </div>
           <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
@@ -2123,7 +2148,7 @@ body .user-chip .avatar, body .topbar-right > *:not(.user-chip){ flex-shrink:0; 
           <div class="panel"><h3>Segurança e integrações</h3><div class="hint">Parâmetros técnicos do sistema</div>
             <div class="form-grid">
               <div class="field full"><label>Autenticação</label><input type="text" value="Matrícula + senha, com sessão assinada pelo servidor (expira em 12 h)" disabled></div>
-              <div class="field full"><label>Armazenamento</label><input type="text" value=" Planilhas da empresa — sincronização automática entre aparelhos" disabled></div>
+              <div class="field full"><label>Armazenamento</label><input type="text" value="Google Planilhas da empresa — sincronização automática entre aparelhos" disabled></div>
               <div class="field full"><label>Integração futura com RH</label><input type="text" value="Atualização automática de matrícula, filial, setor e função" disabled></div>
               <div class="field full"><label>Duplicidade de respostas</label><select><option>Bloquear — 1 resposta por matrícula</option></select></div>
             </div>
@@ -5758,7 +5783,9 @@ function evaluateEligibility(campaignId){
   const antiga = !!(camp && camp.importada && camp.fim);
   const eligible = [], excluded = [];
   const ref = antiga ? new Date(camp.fim) : new Date();
+  const sorteados = new Set(((camp && camp.ganhadores) || []).map(w=>String(w.matricula)));   // quem foi sorteado nesta campanha continua na lista de elegíveis
   all.forEach(p=>{
+    if(sorteados.has(String(p.matricula))){ eligible.push({...p, sorteado:true}); return; }
     const motivos = [];
     if(p.pct !== 100) motivos.push(`Não atingiu 100% de acertos no questionário (fez ${pctTxt(p.pct)})`);
     if(cargoImpedido(p)) motivos.push(`Ocupa cargo de liderança impedido de participar (${p.cargo || p.funcao})`);
@@ -5857,7 +5884,7 @@ function renderSectionContent(target){
   if(target==="campanha-atual") renderCampanhaAtual();
   if(target==="historico-colab") renderHistoricoColaborador();
     if(target==="nova") fillBQPicker();
-  if(target==="config") renderMeuEmail();
+  if(target==="config"){ renderMeuEmail(); renderMeuContato(); }
 }
 
 document.getElementById('hamburger').addEventListener('click', ()=>{
@@ -5938,7 +5965,7 @@ function linkCampanha(id){ return `${APP_URL}${APP_URL.includes('?') ? '&' : '?'
 /* ======================= LOGIN ======================= */
 /* A autenticação de verdade agora mora na planilha (via Google Apps Script).
    Não existe mais senha nenhuma escrita aqui no código. */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbx2YDb7TH-L3JD9zBftkaw34SWSQYnAj4xGJNUALYN_XufZujyIrV68BrhYFosE0tzslw/exec";
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxNTmLbDf_qQwwohT4GE5mw9vHgw72bAe__f7Het_cYibLvbdhD7aDiIA7ZCGaEkoXfWQ/exec";
 
 function urlDoApp(){ try{ return APP_URL.split('#')[0].split('?')[0]; }catch(e){ return ''; } }
 
@@ -6347,7 +6374,7 @@ function sairDoApp(msg){
   campaigns = []; participants = []; questionBank = []; wonHistory = []; historicoServidor = []; EMPRESA.colaboradores = [];
   campanhasAntigas = []; participantesAntigos = []; _dadosCarregados = false; _ultimoSyncOk = 0; _snapPendente = null; limparCacheSnapshot();
   LOG.itens = []; LOG.resumo = null; LOG.contagem = {}; ruleChangeLog = []; _excTs = 0;
-  MEU_EMAIL = {email:'', vinculado:false, sugestao:''}; estatisticasGerais = null;
+  MEU_EMAIL = {email:'', vinculado:false, sugestao:''}; MEU_CONTATO = {telefone:'', whatsapp:true}; estatisticasGerais = null;
   saveState();
   document.getElementById('appRoot').style.display = "none";
   document.getElementById('loginScreen').style.display = "";
@@ -6554,6 +6581,8 @@ function renderCampaignGrid(){
         <div class="actions">
           <button class="btn btn-ghost btn-sm" onclick="goToParticipants('${escH(c.id)}')">Ver participantes</button>
           <button class="btn btn-outline btn-sm" onclick="abrirHistoricoCampanha('${escH(c.id)}')">Ver detalhes</button>
+          ${gan ? `<button class="btn btn-outline btn-sm" onclick="irParaBannerGanhadores('${escH(c.id)}')"><i data-lucide="trophy"></i> Banner dos ganhadores</button>` : ''}
+          <button class="btn btn-outline btn-sm" onclick="openShareModal('${escH(c.id)}')"><i data-lucide="share-2"></i> Divulgar</button>
         </div>
       </div>`;
     }
@@ -6570,6 +6599,7 @@ function renderCampaignGrid(){
         <button class="btn btn-ghost btn-sm" onclick="goToParticipants('${escH(c.id)}')">Ver participantes</button>
         <button class="btn btn-outline btn-sm" onclick="loadCampaignForEdit('${escH(c.id)}')">Editar</button>
         <button class="btn btn-outline btn-sm" onclick="openShareModal('${escH(c.id)}')"><i data-lucide="share-2"></i> Compartilhar</button>
+        ${(c.ganhadores && c.ganhadores.length) ? `<button class="btn btn-outline btn-sm" onclick="irParaBannerGanhadores('${escH(c.id)}')"><i data-lucide="trophy"></i> Banner dos ganhadores</button>` : ''}
       </div>
     </div>`;
   };
@@ -6590,8 +6620,8 @@ function renderParticipantsTable(){
   const id = sel.value;
   const list = campaignParticipants(id).sort((a,b)=>(b.pct||0)-(a.pct||0));
   document.getElementById('tblParticipantes').innerHTML = list.map(p=>`
-    <tr><td>${p.nome}</td><td>${p.matricula}</td><td>${p.cargo}</td><td>${p.setor}</td><td>${p.filial}</td><td>${fmtDateTime(p.data)}</td><td><span class="${p.pct===100?'pct100':'pctless'}">${pctTxt(p.pct)}</span></td></tr>`).join('') ||
-    `<tr><td colspan="7" style="text-align:center; color:var(--ink-soft); padding:20px;">Nenhum participante ainda.</td></tr>`;
+    <tr><td>${p.nome}</td><td>${p.matricula}</td><td>${p.cargo}</td><td>${p.setor}</td><td>${p.filial}</td><td>${celulaContato(p)}</td><td>${fmtDateTime(p.data)}</td><td><span class="${p.pct===100?'pct100':'pctless'}">${pctTxt(p.pct)}</span></td></tr>`).join('') ||
+    `<tr><td colspan="8" style="text-align:center; color:var(--ink-soft); padding:20px;">Nenhum participante ainda.</td></tr>`;
   const media = list.length ? Math.round(list.reduce((a,p)=>a+p.pct,0)/list.length) : 0;
   const {eligible} = evaluateEligibility(id);
   document.getElementById('participantesStats').innerHTML = `
@@ -6621,21 +6651,38 @@ document.getElementById('selectCampanhaParticipantes').addEventListener('change'
 
 /* ======================= ELEGÍVEIS ======================= */
 function renderEligibleTable(){
-  const id = document.getElementById('selectCampanhaElegiveis').value;
+  const sel = document.getElementById('selectCampanhaElegiveis');
+  const id = sel.value;
+  const camp = campanhaPorId(id);
   const {eligible, excluded} = evaluateEligibility(id);
-  const gan = new Set((((todasCampanhas().find(c=>c.id===id)) || {}).ganhadores || []).map(w=>String(w.matricula)));
-  document.getElementById('tblElegiveis').innerHTML = eligible.map((p,i)=>`<tr><td>${i+1}</td><td>${escH(p.nome)}${gan.has(String(p.matricula)) ? ' <span class="chip"><i data-lucide="trophy"></i> ganhador</span>' : ''}</td><td>${p.matricula}</td><td>${p.cargo}</td><td>${p.setor}</td><td>${p.filial}</td><td>${fmtDateTime(p.data)}</td></tr>`).join('') ||
-    `<tr><td colspan="7" style="text-align:center; color:var(--ink-soft); padding:20px;">Nenhum colaborador elegível nesta campanha.</td></tr>`;
-  document.getElementById('tblExcluidos').innerHTML = excluded.map(p=>`<tr><td>${p.nome}</td><td>${p.matricula}</td><td>${p.cargo}</td><td>${p.setor}</td><td><span class="badge excluido">${p.motivo}</span></td></tr>`).join('') ||
+  const gan = (camp && camp.ganhadores) || [];
+  const ganSet = new Set(gan.map(w=>String(w.matricula)));
+  let info = document.getElementById('elegSorteioInfo');
+  if(!info){ info = document.createElement('div'); info.id = 'elegSorteioInfo'; (sel.closest('.field') || sel.parentElement).insertAdjacentElement('afterend', info); }
+  info.innerHTML = gan.length ? `<div class="sorteio-info"><i data-lucide="trophy"></i><div><b>Sorteio realizado — ${gan.length} ganhador(es)</b><span>${gan.map(w=>escH(w.nome)).join(' · ')}${camp.randomSeed ? ` · semente <code>${escH(camp.randomSeed)}</code>` : ''}</span></div></div>` : '';
+  const ordenados = [...eligible].sort((a,b)=> (ganSet.has(String(b.matricula)) ? 1 : 0) - (ganSet.has(String(a.matricula)) ? 1 : 0));
+  const linhas = ordenados.map((p,i)=>{
+    const s = ganSet.has(String(p.matricula));
+    return `<tr class="${s ? 'linha-sorteado' : ''}"><td>${i+1}</td><td>${escH(p.nome)}${s ? ' <span class="chip"><i data-lucide="trophy"></i> sorteado(a)</span>' : ''}</td><td>${escH(p.matricula)}</td><td>${escH(p.cargo || p.funcao || '')}</td><td>${escH(p.setor)}</td><td>${escH(p.filial)}</td><td>${celulaContato(p.telefone ? p : contatoDe(p.matricula))}</td><td>${fmtDateTime(p.data)}</td></tr>`;
+  });
+  const presentes = new Set(eligible.map(p=>String(p.matricula)));
+  gan.filter(w=>!presentes.has(String(w.matricula))).forEach(w=>{   // sorteado que não consta entre as respostas (ex.: substituição feita pela Qualidade)
+    linhas.push(`<tr class="linha-sorteado"><td>${linhas.length + 1}</td><td>${escH(w.nome)} <span class="chip"><i data-lucide="trophy"></i> sorteado(a)</span></td><td>${escH(w.matricula)}</td><td>${escH(w.funcao || '')}</td><td>${escH(w.setor || '')}</td><td>${escH(w.filial || '')}</td><td>${celulaContato(contatoDe(w.matricula))}</td><td>—</td></tr>`);
+  });
+  document.getElementById('tblElegiveis').innerHTML = linhas.join('') ||
+    `<tr><td colspan="8" style="text-align:center; color:var(--ink-soft); padding:20px;">Nenhum colaborador elegível nesta campanha.</td></tr>`;
+  document.getElementById('tblExcluidos').innerHTML = excluded.map(p=>`<tr><td>${escH(p.nome)}</td><td>${escH(p.matricula)}</td><td>${escH(p.cargo || p.funcao || '')}</td><td>${escH(p.setor)}</td><td><span class="badge excluido">${escH(p.motivo)}</span></td></tr>`).join('') ||
     `<tr><td colspan="5" style="text-align:center; color:var(--ink-soft); padding:20px;">Nenhuma exclusão automática nesta campanha.</td></tr>`;
+  if(window.lucide) lucide.createIcons();
 }
 document.getElementById('selectCampanhaElegiveis').addEventListener('change', renderEligibleTable);
 
 /* ======================= COMPARTILHAMENTO (LINK + QR CODE) ======================= */
 window.openShareModal = function(campaignId){
-  const c = campaigns.find(x=>x.id===campaignId);
+  const c = campanhaPorId(campaignId);
   if(!c) return;
-  const link = linkCampanha(campaignId);
+  const passou = campanhaTerminou(c);
+  const link = c.importada ? urlDoApp() : linkCampanha(campaignId);
   const qrUrl = gerarQrDataUrl(link, 200);
   const backdrop = document.createElement('div');
   backdrop.className = "share-backdrop";
@@ -6643,16 +6690,18 @@ window.openShareModal = function(campaignId){
   backdrop.innerHTML = `
     <div class="share-card">
       <h3>Divulgar campanha</h3>
-      <p>${c.nome}</p>
+      <p>${escH(c.nome)}</p>
+      ${passou ? `<div class="imp-aviso" style="text-align:left;"><i data-lucide="alert-triangle"></i><span><b>Campanha que já passou.</b> ${escH(avisoCampanhaPassou(c))}</span></div>` : ''}
       <div class="share-qr"><img src="${qrUrl}" alt="QR Code de acesso à campanha" onerror="this.parentElement.innerHTML='<span style=\\'font-size:11px;color:var(--ink-soft);padding:12px;\\'>QR indisponível sem conexão à internet</span>'"></div>
       <div class="share-link-box">
         <input type="text" id="shareLinkInput" value="${link}" readonly>
         <button class="btn btn-primary btn-sm" id="btnCopyShareLink">Copiar</button>
       </div>
-      <p class="hint" style="margin-bottom:16px;">Compartilhe este link ou o QR Code por e-mail, WhatsApp ou impresso — ao abrir, o colaborador faz login e já cai direto no questionário.</p>
+      <p class="hint" style="margin-bottom:16px;">Compartilhe este link ou o QR Code por e-mail, WhatsApp ou impresso — ${passou ? 'esta campanha não aceita mais respostas.' : 'ao abrir, o colaborador faz login e já cai direto no questionário.'}</p>
       <div class="share-actions"><button class="btn btn-outline" id="btnCloseShare">Fechar</button></div>
     </div>`;
   document.body.appendChild(backdrop);
+  if(window.lucide) lucide.createIcons();
   backdrop.addEventListener('click', (e)=>{ if(e.target === backdrop) closeShareModal(); });
   document.getElementById('btnCloseShare').addEventListener('click', closeShareModal);
   document.getElementById('btnCopyShareLink').addEventListener('click', ()=>{
@@ -7070,7 +7119,7 @@ function renderQuizStep(){
   contBtn.disabled = !hasAnswer;
   contBtn.addEventListener('click', ()=>{
     if(index < total-1){ quizState.index++; renderQuizStep(); }
-    else { finalizeQuiz(); }
+    else { renderQuizContato(); }
   });
 }
 
@@ -7086,6 +7135,37 @@ function isCorrect(q, ans){
   return !!(q.options[ans] && q.options[ans].correct);
 }
 
+/* Última etapa: telefone/WhatsApp obrigatório (para a Qualidade falar com quem for sorteado) */
+function renderQuizContato(){
+  const {campaign} = quizState;
+  const body = document.getElementById('responderBody');
+  const c = quizState.contato || MEU_CONTATO || {};
+  body.innerHTML = `<div class="duo-wrap">
+    <div class="duo-progress-segmented">${campaign.questoes.map(()=>'<div class="duo-seg done"></div>').join('')}</div>
+    <div class="duo-counter">Última etapa — seu contato</div>
+    <div class="duo-card">
+      <div class="duo-question"><i data-lucide="phone"></i> Qual o melhor telefone ou WhatsApp para falarmos com você?</div>
+      <p class="hint" style="margin:0 0 14px;">Obrigatório. Se você for sorteado(a), a Qualidade chama neste número para combinar o prêmio mais rápido. Ele aparece só para a equipe de Qualidade.</p>
+      <div class="field"><label>Telefone / WhatsApp (com DDD)</label><input type="tel" id="qzTelefone" inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" value="${escH(fmtTelefone(c.telefone))}"></div>
+      <label class="imp-chip" style="margin-top:12px;"><input type="checkbox" id="qzWhats" ${c.whatsapp === false ? '' : 'checked'}> Este número tem WhatsApp</label>
+      <div class="login-error" id="qzTelErro"></div>
+    </div>
+    <div class="duo-nav"><button class="btn btn-outline" id="duoBack">← Voltar</button><button class="btn btn-primary" id="qzEnviar" disabled>Enviar minhas respostas</button></div>
+  </div>`;
+  if(window.lucide) lucide.createIcons();
+  const inp = document.getElementById('qzTelefone'), btn = document.getElementById('qzEnviar'), erro = document.getElementById('qzTelErro');
+  const validar = ()=>{ const ok = !!normalizarTelefone(inp.value); btn.disabled = !ok; return ok; };
+  inp.addEventListener('input', ()=>{ inp.value = fmtTelefone(inp.value); erro.style.display = 'none'; validar(); });
+  validar();
+  document.getElementById('duoBack').addEventListener('click', ()=>{ quizState.index = campaign.questoes.length - 1; renderQuizStep(); });
+  btn.addEventListener('click', ()=>{
+    const tel = normalizarTelefone(inp.value);
+    if(!tel){ erro.textContent = 'Digite um telefone válido com DDD, por exemplo (11) 99999-9999.'; erro.style.display = 'block'; return; }
+    quizState.contato = {telefone: tel, whatsapp: tel.length === 11 && document.getElementById('qzWhats').checked};
+    finalizeQuiz();
+  });
+  setTimeout(()=>inp.focus(), 60);
+}
 async function finalizeQuiz(){
   const {campaign, answers, dataInicio, sessaoId} = quizState;
   // Trava de segurança: nenhuma pergunta pode ficar em branco.
@@ -7096,13 +7176,15 @@ async function finalizeQuiz(){
     renderQuizStep();
     return;
   }
+  if(!quizState.contato){ renderQuizContato(); return; }   // última etapa: telefone/WhatsApp obrigatório
   const container = document.getElementById('responderBody');
   container.innerHTML = `<div class="duo-done"><span class="mascot-figure mascot-figure-emoji">${MASCOT_SVG}</span><h2>Enviando sua resposta...</h2><p>Só um instante, isso é registrado direto no servidor.</p></div>`;
 
   // O navegador só manda o que foi marcado — quem corrige a prova é o servidor.
   const resp = await backendCall('submeterResposta', {resposta: {
     campaignId: campaign.id, respostasSelecionadas: answers,
-    dataInicio: (dataInicio || new Date()).toISOString(), sessaoId, dispositivo: dispositivoReal()
+    dataInicio: (dataInicio || new Date()).toISOString(), sessaoId, dispositivo: dispositivoReal(),
+    telefone: quizState.contato.telefone, whatsapp: quizState.contato.whatsapp
   }});
 
   if(!resp.ok){
@@ -7112,14 +7194,17 @@ async function finalizeQuiz(){
       quizState = null; _ultimaAssinatura = null; sincronizarDadosDoServidor(true);
       return;
     }
+    if(resp.precisaTelefone){ quizState.contato = null; showToast(resp.erro, "warning"); renderQuizContato(); return; }
     if(typeof resp.faltando === 'number'){ quizState.index = resp.faltando; showToast(resp.erro, "warning"); renderQuizStep(); return; }
     // Qualquer outro erro: mantém as respostas na tela para tentar de novo sem perder nada.
     container.innerHTML = `<div class="duo-done"><span class="mascot-figure mascot-figure-emoji"><i data-lucide="alert-triangle"></i></span><h2>Não foi possível enviar sua resposta</h2><p>${resp.erro || 'Verifique sua internet e tente novamente.'}</p><p class="hint">Suas respostas continuam aqui — é só tentar de novo.</p><button class="btn btn-primary" onclick="finalizeQuiz()" style="margin-top:12px;">Tentar novamente</button></div>`;
     return;
   }
 
+  MEU_CONTATO = {telefone: quizState.contato.telefone, whatsapp: quizState.contato.whatsapp};
   const agora = new Date();
   const novoParticipante = {
+    telefone: quizState.contato.telefone, whatsapp: quizState.contato.whatsapp,
     campaignId: campaign.id, nome: currentUser.nome, matricula: currentUser.matricula,
     setor: currentUser.setor, filial: currentUser.filial, funcao: currentUser.funcao, cargo: currentUser.cargo,
     data: agora, dataInicio: dataInicio || agora, dataFim: agora, pct: null, acertosQtd: null, totalQuestoes: campaign.questoes.length,
@@ -7417,7 +7502,7 @@ function revealWinners(slotEls, winners, campaignId, seed, fair, distinctSetores
       const slotEl = slotEls[i];
       slotEl.classList.remove('rolling'); slotEl.classList.add('won');
       slotEl.querySelector('.name').textContent = w.nome;
-      slotEl.querySelector('.info').textContent = `${w.matricula} · ${w.setor} · ${w.filial}`;
+      slotEl.querySelector('.info').textContent = `${w.matricula} · ${w.setor} · ${w.filial}` + (w.telefone ? ` · ${telefoneTxt(w)}` : '');
       if(i === winners.length-1){
         sorteioRunning = false;
         document.getElementById('sorteioResultActions').style.display = "flex";
@@ -7538,17 +7623,17 @@ function openPrintReport(title, headers, rows, footNote, chartSvg){
 function buildReportData(reportType, campaignId){
   const c = todasCampanhas().find(x=>x.id===campaignId);
   if(reportType === 'participantes'){
-    const rows = campaignParticipants(campaignId).map(p=>[p.nome,p.matricula,p.cargo,p.setor,p.filial,fmtDateTime(p.data),pctTxt(p.pct)]);
-    return {title:`Lista de participantes — ${c.nome}`, headers:["Nome","Matrícula","Cargo","Setor","Filial","Data/hora","% Acertos"], rows};
+    const rows = campaignParticipants(campaignId).map(p=>[p.nome,p.matricula,p.cargo,p.setor,p.filial,fmtDateTime(p.data),pctTxt(p.pct),telefoneTxt(p)]);
+    return {title:`Lista de participantes — ${c.nome}`, headers:["Nome","Matrícula","Cargo","Setor","Filial","Data/hora","% Acertos","Telefone / WhatsApp"], rows};
   }
   if(reportType === 'elegiveis'){
     const {eligible} = evaluateEligibility(campaignId);
-    const rows = eligible.map((p,i)=>[i+1,p.nome,p.matricula,p.cargo,p.setor,p.filial,fmtDateTime(p.data)]);
-    return {title:`Elegíveis ao sorteio — ${c.nome}`, headers:["#","Nome","Matrícula","Cargo","Setor","Filial","Data/hora"], rows};
+    const rows = eligible.map((p,i)=>[i+1,p.nome,p.matricula,p.cargo,p.setor,p.filial,fmtDateTime(p.data),telefoneTxt(p.telefone ? p : contatoDe(p.matricula))]);
+    return {title:`Elegíveis ao sorteio — ${c.nome}`, headers:["#","Nome","Matrícula","Cargo","Setor","Filial","Data/hora","Telefone / WhatsApp"], rows};
   }
   if(reportType === 'ganhadores'){
-    const rows = (c.ganhadores||[]).map((w,i)=>[i+1,w.nome,w.matricula,w.setor,w.filial,w.funcao]);
-    return {title:`Ganhadores sorteados — ${c.nome}`, headers:["Posição","Nome","Matrícula","Setor","Filial","Função"], rows};
+    const rows = (c.ganhadores||[]).map((w,i)=>[i+1,w.nome,w.matricula,w.setor,w.filial,w.funcao,telefoneTxt(contatoDe(w.matricula))]);
+    return {title:`Ganhadores sorteados — ${c.nome}`, headers:["Posição","Nome","Matrícula","Setor","Filial","Função","Telefone / WhatsApp"], rows};
   }
   if(reportType === 'distribuicao'){
     const allWinners = todasCampanhas().filter(x=>x.ganhadores).flatMap(x=>x.ganhadores);
@@ -7620,15 +7705,28 @@ function renderTimelineReais(){
 
 /* ======================= REGRAS & EXCEÇÕES ======================= */
 /* ======================= DIVULGAÇÃO (banners) ======================= */
+function mostrarAvisoDivulgacao(c){
+  const a = document.getElementById('divAviso'); if(!a) return;
+  if(c && campanhaTerminou(c)){ a.innerHTML = `<i data-lucide="alert-triangle"></i><span><b>Campanha que já passou.</b> ${escH(avisoCampanhaPassou(c))}</span>`; a.style.display = 'flex'; if(window.lucide) lucide.createIcons(); }
+  else { a.style.display = 'none'; a.innerHTML = ''; }
+}
 function renderDivulgacao(){
   const selDiv = document.getElementById('divCampanha');
   const selGanh = document.getElementById('divCampanhaGanhadores');
-  if(selDiv) selDiv.innerHTML = campaigns.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
-  const comGanhadores = campaigns.filter(c=>c.ganhadores && c.ganhadores.length);
-  if(selGanh) selGanh.innerHTML = comGanhadores.length
-    ? comGanhadores.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('')
-    : `<option value="">Nenhuma campanha com sorteio oficial registrado ainda</option>`;
+  const todas = [...campaigns, ...ordenarPorFim(campanhasAntigas).reverse()];   // as do sistema + as importadas do histórico
+  const rotulo = c => c.nome + (c.importada ? ' (anterior)' : campanhaTerminou(c) ? ' (encerrada)' : '');
+  const prevDiv = selDiv && selDiv.value, prevG = selGanh && selGanh.value;
+  if(selDiv){ selDiv.innerHTML = todas.map(c=>`<option value="${escH(c.id)}">${escH(rotulo(c))}</option>`).join(''); if(prevDiv && [...selDiv.options].some(o=>o.value === prevDiv)) selDiv.value = prevDiv; }
+  const comGanhadores = todas.filter(c=>c.ganhadores && c.ganhadores.length);
+  if(selGanh){
+    selGanh.innerHTML = comGanhadores.length
+      ? comGanhadores.map(c=>`<option value="${escH(c.id)}">${escH(rotulo(c))}</option>`).join('')
+      : `<option value="">Nenhuma campanha com sorteio registrado ainda</option>`;
+    if(prevG && [...selGanh.options].some(o=>o.value === prevG)) selGanh.value = prevG;
+  }
+  mostrarAvisoDivulgacao(selDiv ? campanhaPorId(selDiv.value) : null);
 }
+document.getElementById('divCampanha')?.addEventListener('change', e=> mostrarAvisoDivulgacao(campanhaPorId(e.target.value)));
 function baixarComoImagem(elId, filename){
   const el = document.getElementById(elId);
   if(!el){ return; }
@@ -7650,9 +7748,10 @@ function baixarComoImagem(elId, filename){
   });
 }
 document.getElementById('btnGerarDivulgacao').addEventListener('click', ()=>{
-  const c = campaigns.find(x=>x.id===document.getElementById('divCampanha').value);
+  const c = campanhaPorId(document.getElementById('divCampanha').value);
   if(!c) return;
-  const link = linkCampanha(c.id);
+  const terminou = campanhaTerminou(c);
+  const link = c.importada ? urlDoApp() : linkCampanha(c.id);
   const qrUrl = gerarQrDataUrl(link, 180);
   const wrap = document.getElementById('divPreviewWrap');
   wrap.style.display = "block";
@@ -7661,7 +7760,7 @@ document.getElementById('btnGerarDivulgacao').addEventListener('click', ()=>{
       <div style="font-size:13px; letter-spacing:2px; opacity:.85; text-transform:uppercase;">Programa Política de Gestão</div>
       <div style="width:64px; height:64px; margin:14px auto; animation:mascotBob 3s ease-in-out infinite;">${mascotSvg('#ffffff')}</div>
       <h2 style="margin:6px 0; font-family:'Manrope',sans-serif;">${escH(c.nome)}</h2>
-      <p style="opacity:.95; margin-bottom:18px;">Participe respondendo o questionário e concorra aos prêmios!</p>
+      <p style="opacity:.95; margin-bottom:18px;">${terminou ? 'Campanha encerrada — acompanhe as próximas rodadas do PPG!' : 'Participe respondendo o questionário e concorra aos prêmios!'}</p>
       <div style="background:#fff; display:inline-block; padding:10px; border-radius:12px;"><img src="${qrUrl}" alt="QR Code" onerror="this.parentElement.innerHTML='<span style=\\'font-size:11px;color:#333;\\'>QR indisponível offline</span>'"></div>
       <p style="font-size:11px; margin-top:12px; opacity:.85;">Período: ${fmtPeriodoValor(c.inicio)} até ${fmtPeriodoValor(c.fim)}</p>
     </div>
@@ -7670,10 +7769,11 @@ document.getElementById('btnGerarDivulgacao').addEventListener('click', ()=>{
       <button class="btn btn-outline btn-sm" onclick="openShareModal('${c.id}')"><i data-lucide="share-2"></i> Ver link e copiar</button>
     </div>`;
   document.getElementById('btnBaixarDivulgacao').addEventListener('click', ()=> baixarComoImagem('divBannerArt', `divulgacao-${c.id}.png`));
+  mostrarAvisoDivulgacao(c);
   logAction("Arte de divulgação gerada", c.nome);
 });
 document.getElementById('btnGerarBannerGanhadores').addEventListener('click', ()=>{
-  const c = campaigns.find(x=>x.id===document.getElementById('divCampanhaGanhadores').value);
+  const c = campanhaPorId(document.getElementById('divCampanhaGanhadores').value);
   const wrap = document.getElementById('bannerGanhadoresWrap');
   if(!c || !c.ganhadores || !c.ganhadores.length){
     showToast("Selecione uma campanha com sorteio oficial registrado.","warning");
@@ -7689,11 +7789,11 @@ document.getElementById('btnGerarBannerGanhadores').addEventListener('click', ()
         ${c.ganhadores.map((w,i)=>`
           <div style="background:rgba(255,255,255,.15); border-radius:14px; padding:14px;">
             <div style="font-size:11px; opacity:.85;">${i+1}º lugar</div>
-            <div style="font-weight:700; font-family:'Manrope',sans-serif;">${w.nome}</div>
-            <div style="font-size:11px; opacity:.9;">${w.setor} · ${w.filial}</div>
+            <div style="font-weight:700; font-family:'Manrope',sans-serif;">${escH(w.nome)}</div>
+            <div style="font-size:11px; opacity:.9;">${escH([w.setor, w.filial].filter(Boolean).join(" · "))}</div>
           </div>`).join('')}
       </div>
-      <p style="font-size:11px; margin-top:18px; opacity:.85;">Sorteio realizado com número aleatório auditável: ${c.randomSeed || '—'}</p>
+      ${c.randomSeed ? `<p style="font-size:11px; margin-top:18px; opacity:.85;">Sorteio realizado com número aleatório auditável: ${escH(c.randomSeed)}</p>` : `<p style="font-size:11px; margin-top:18px; opacity:.85;">Campanha anterior ao sistema — resultado importado do histórico.</p>`}
     </div>
     <div style="text-align:center; margin-top:16px;">
       <button class="btn btn-primary btn-sm" id="btnBaixarBannerGanhadores"><i data-lucide="download"></i> Baixar banner (PNG)</button>
@@ -8093,6 +8193,20 @@ function hashTxt(s){ let h = 5381; s = String(s); for(let i = 0; i < s.length; i
 function pctTxt(v){ return (v == null || v === '' || isNaN(v)) ? '—' : v + '%'; }
 function ordenarPorFim(lista){ return [...lista].sort((a,b)=> new Date(a.fim || a.inicio || 0) - new Date(b.fim || b.inicio || 0)); }
 function todasCampanhas(){ return [...campaigns, ...campanhasAntigas]; }
+function campanhaPorId(id){ return todasCampanhas().find(c=>c.id===id); }
+/* campanha que já passou: importada do histórico, já sorteada/finalizada ou com o prazo encerrado */
+function campanhaTerminou(c){ return !!c && (!!c.importada || c.status === 'finalizada' || c.status === 'encerrada' || campaignAccessStatus(c) === 'encerrada'); }
+function avisoCampanhaPassou(c){
+  return c.importada
+    ? `Esta campanha é de um período anterior ao sistema (${fmtPeriodoValor(c.inicio)} a ${fmtPeriodoValor(c.fim)}). O link não abre questionário — use só para divulgar o resultado ou lembrar do programa.`
+    : `Esta campanha já terminou (encerrou em ${fmtPeriodoValor(c.fim)}). Quem abrir o link não poderá mais responder.`;
+}
+window.irParaBannerGanhadores = function(id){
+  document.querySelectorAll('.menu-item').forEach(b=>b.classList.remove('active'));
+  const btn = document.querySelector('[data-target="divulgacao"]'); if(btn) btn.classList.add('active');
+  goToSection('divulgacao');
+  const sel = document.getElementById('divCampanhaGanhadores'); if(sel) sel.value = id;
+};
 function todosParticipantes(){ return [...participants, ...participantesAntigos]; }
 function construirAntigas(hist){
   const grupos = {};
@@ -8123,7 +8237,7 @@ function construirAntigas(hist){
 let _ultimoSyncOk = 0, _dadosCarregados = false, _snapPendente = null, _rosterEm = 0, _aplicouNoLogin = false;
 const CACHE_SNAP = 'ppg_snap_v1';
 function salvarCacheSnapshot(resp){
-  try{ if(!currentUser) return; localStorage.setItem(CACHE_SNAP, JSON.stringify({mat:currentUser.matricula, em:Date.now(), snap:{campanhas:resp.campanhas, respostas:resp.respostas, historico:resp.historico, perguntas:resp.perguntas || null, meuEmail:resp.meuEmail || null, estatisticas:resp.estatisticas || null}})); }
+  try{ if(!currentUser) return; localStorage.setItem(CACHE_SNAP, JSON.stringify({mat:currentUser.matricula, em:Date.now(), snap:{campanhas:resp.campanhas, respostas:resp.respostas, historico:resp.historico, perguntas:resp.perguntas || null, meuEmail:resp.meuEmail || null, meuContato:resp.meuContato || null, estatisticas:resp.estatisticas || null}})); }
   catch(e){ try{ localStorage.removeItem(CACHE_SNAP); }catch(_){} }
 }
 function limparCacheSnapshot(){ try{ localStorage.removeItem(CACHE_SNAP); }catch(e){} }
@@ -8141,6 +8255,7 @@ function esqueletoHtml(){ return `<div class="skel-wrap"><div class="skel skel-l
 function aplicarSnapshot(resp){
   _ultimoSyncOk = Date.now(); _falhasSync = 0;
   if(resp.meuEmail) MEU_EMAIL = resp.meuEmail;
+  if(resp.meuContato) MEU_CONTATO = resp.meuContato;
   estatisticasGerais = resp.estatisticas || null;
   const trava = document.getElementById('emailBackdrop');
   if(trava && trava.dataset.fixo && MEU_EMAIL.vinculado) trava.remove();   // vinculou em outro aparelho/aba
@@ -8590,6 +8705,37 @@ document.getElementById('btnVerSenha')?.addEventListener('click', ()=>{
 
 /* ======================= E-MAIL VINCULADO (obrigatório para falar com a Qualidade) ======================= */
 let MEU_EMAIL = {email:'', vinculado:false, sugestao:''};
+let MEU_CONTATO = {telefone:'', whatsapp:true};
+/* ---- telefone / WhatsApp (mesma regra do servidor) ---- */
+function normalizarTelefone(t){
+  let d = String(t == null ? '' : t).replace(/\D/g, '');
+  if(d.length >= 12 && d.indexOf('55') === 0) d = d.slice(2);
+  if(d.length > 11) d = d.replace(/^0+/, '');
+  if(d.length !== 10 && d.length !== 11) return '';
+  const ddd = Number(d.slice(0, 2)); if(ddd < 11 || ddd > 99) return '';
+  if(d.length === 11 && d.charAt(2) !== '9') return '';
+  if(/^(\d)\1+$/.test(d)) return '';
+  return d;
+}
+function fmtTelefone(d){
+  d = String(d || '').replace(/\D/g, '').slice(0, 11);
+  if(!d) return '';
+  if(d.length <= 2) return '(' + d;
+  if(d.length <= 6) return `(${d.slice(0,2)}) ${d.slice(2)}`;
+  if(d.length <= 10) return `(${d.slice(0,2)}) ${d.slice(2, d.length - 4)}-${d.slice(-4)}`;
+  return `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;
+}
+/* contato mais recente de uma pessoa (a Qualidade enxerga pelos participantes) */
+function contatoDe(mat){
+  const p = participants.filter(x=>String(x.matricula) === String(mat) && x.telefone).sort((a,b)=> (b.data || 0) - (a.data || 0))[0];
+  return p ? {telefone:p.telefone, whatsapp:p.whatsapp} : null;
+}
+function telefoneTxt(c){ return (c && c.telefone) ? fmtTelefone(c.telefone) + ((c.whatsapp && c.telefone.length === 11) ? ' (WhatsApp)' : '') : ''; }
+function celulaContato(c){
+  if(!c || !c.telefone) return '<span class="hint">—</span>';
+  const wa = (c.whatsapp && c.telefone.length === 11) ? ` <a class="wa-link" href="https://wa.me/55${c.telefone}" target="_blank" rel="noopener" title="Chamar no WhatsApp"><i data-lucide="message-circle"></i></a>` : '';
+  return `<span class="tel-txt">${escH(fmtTelefone(c.telefone))}</span>${wa}`;
+}
 let estatisticasGerais = null;   // números gerais que o servidor manda para o colaborador (sem identificar ninguém)
 function emailVinculadoOk(){ return !!(MEU_EMAIL && MEU_EMAIL.vinculado); }
 
@@ -8657,6 +8803,22 @@ function atualizarGateEmail(){
   if(window.lucide) lucide.createIcons();
 }
 /* Configurações → "Meu e-mail" (todos os perfis) */
+function renderMeuContato(){
+  const inp = document.getElementById('cfgTelefone'); if(!inp || document.activeElement === inp) return;
+  inp.value = fmtTelefone(MEU_CONTATO.telefone);
+  const w = document.getElementById('cfgWhats'); if(w) w.checked = MEU_CONTATO.whatsapp !== false;
+  const st = document.getElementById('cfgContatoEstado');
+  if(st) st.innerHTML = MEU_CONTATO.telefone ? `<div class="email-estado ok"><i data-lucide="badge-check"></i><div><b>${escH(fmtTelefone(MEU_CONTATO.telefone))}</b><span>${MEU_CONTATO.whatsapp !== false && MEU_CONTATO.telefone.length === 11 ? 'WhatsApp' : 'telefone'} · visível só para a Qualidade</span></div></div>` : `<div class="email-estado pend"><i data-lucide="alert-triangle"></i><div><b>Nenhum telefone informado</b><span>você vai informar ao responder a próxima campanha</span></div></div>`;
+  if(window.lucide) lucide.createIcons();
+}
+document.getElementById('cfgTelefone')?.addEventListener('input', e=>{ e.target.value = fmtTelefone(e.target.value); });
+document.getElementById('btnSalvarContato')?.addEventListener('click', async ()=>{
+  const tel = normalizarTelefone(document.getElementById('cfgTelefone').value);
+  if(!tel){ showToast('Digite um telefone válido com DDD, por exemplo (11) 99999-9999.', 'warning'); return; }
+  const resp = await backendCall('salvarContato', {telefone: tel, whatsapp: document.getElementById('cfgWhats').checked});
+  if(!resp.ok){ showToast(resp.erro || 'Não foi possível salvar.', 'warning'); return; }
+  MEU_CONTATO = resp.contato; showToast('Telefone salvo.', 'success'); renderMeuContato();
+});
 function renderMeuEmail(){
   const el = document.getElementById('cfgEmailEstado'); if(!el) return;
   const ok = emailVinculadoOk();
