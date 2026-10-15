@@ -1458,6 +1458,24 @@ body.dark .senha-temp code{ color:#7FF0EA; }
 .t-conta .log-ico, .t-sistema .log-ico{ background:rgba(2,163,157,.12); color:var(--primary-dark); }
 @media(max-width:560px){ .senha-temp{ flex-direction:column; align-items:stretch; text-align:center; } .senha-temp code{ font-size:21px; } .email-gate{ flex-direction:column; } }
 
+
+/* ======================= v12.1 — menu, cabeçalho e resposta rápida ======================= */
+/* botão de recolher/expandir: DENTRO do menu (antes ficava metade para fora e era cortado) */
+body .sidebar .sidebar-collapse-btn{ top:auto; bottom:16px; right:14px; z-index:45; }
+body .sidebar.collapsed .sidebar-collapse-btn{ right:auto; left:50%; margin-left:-13px; }
+body .sidebar .sidebar-foot{ padding-right:52px; }
+/* troca de tela instantânea: animações curtas e sem atraso */
+body.anim-entrada .kpi-grid .kpi, body.anim-entrada .streak-strip .streak-chip, body.anim-entrada .eleg-panel{ animation-duration:.16s !important; animation-delay:0s !important; }
+body .sidebar .menu-item, body .sidebar .menu-group-header{ transition:background .1s, color .1s, box-shadow .1s !important; }
+/* nome e perfil no cabeçalho nunca passam por baixo do avatar */
+body .topbar-right{ min-width:0; }
+body .user-chip{ min-width:0; flex-shrink:1; }
+body .user-chip .who{ min-width:0; max-width:230px; }
+body .user-chip .who .n, body .user-chip .who .r{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+body .user-chip .avatar, body .topbar-right > *:not(.user-chip){ flex-shrink:0; }
+.ccard-antiga{ border-left:4px solid var(--primary); }
+.log-resumo, #logResumo{ grid-template-columns:repeat(auto-fit,minmax(210px,1fr)) !important; }
+
 </style>
 </head>
 <body data-app-url="<?= urlApp ?>" data-campanha="<?= campanhaParam ?>">
@@ -1942,12 +1960,12 @@ body.dark .senha-temp code{ color:#7FF0EA; }
         <div class="section-head"><div><h2>Regras e Transparência</h2><p>Entenda exatamente como o PPG funciona, do início ao sorteio.</p></div></div>
         <div class="mascot-row">
           <div class="mascot-avatar">
-            <span class="mascot-emoji mascot-emoji-blink"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" width="100%" height="100%"><circle fill="#DD2E44" cx="18" cy="18" r="18"/><circle fill="#FFF" cx="18" cy="18" r="13.5"/><circle fill="#DD2E44" cx="18" cy="18" r="10"/><circle fill="#FFF" cx="18" cy="18" r="6"/><circle fill="#DD2E44" cx="18" cy="18" r="3"/><path opacity=".2" d="M18.24 18.282l13.144 11.754s-2.647 3.376-7.89 5.109L17.579 18.42l.661-.138z"/><path fill="#FFAC33" d="M18.294 19c-.255 0-.509-.097-.704-.292-.389-.389-.389-1.018 0-1.407l.563-.563c.389-.389 1.018-.389 1.408 0 .388.389.388 1.018 0 1.407l-.564.563c-.194.195-.448.292-.703.292z"/><path fill="#55ACEE" d="M24.016 6.981c-.403 2.079 0 4.691 0 4.691l7.054-7.388c.291-1.454-.528-3.932-1.718-4.238-1.19-.306-4.079.803-5.336 6.935zm5.003 5.003c-2.079.403-4.691 0-4.691 0l7.388-7.054c1.454-.291 3.932.528 4.238 1.718.306 1.19-.803 4.079-6.935 5.336z"/><path fill="#3A87C2" d="M32.798 4.485L21.176 17.587c-.362.362-1.673.882-2.51.046-.836-.836-.419-2.08-.057-2.443L31.815 3.501s.676-.635 1.159-.152-.176 1.136-.176 1.136z"/></svg></span>
+            <span class="mascot-emoji mascot-emoji-blink" data-mascote="1"></span>
           </div>
           <div class="mascot-speech">Bora entender as regras? É rapidinho, prometo!</div>
         </div>
 
-        <div id="regulamentoStats"></div>
+        
 
         <div class="panel">
           <div class="reg-block">
@@ -5014,11 +5032,11 @@ window.EMPRESA_CONFIG.sortearColaboradores = function(qtd, excluirMatriculas){
   /* =====================================================================
      BANCO DE PERGUNTAS — entender enunciado × alternativas × gabarito
      ===================================================================== */
-  const RE_MARC_FIM = /\s*(\(\s*(correta|certa|certo|resposta|gabarito|x)\s*\)|\[\s*x\s*\]|[\u2713\u2714\u2705\u2611]|\*+)\s*$/i;
+  const RE_MARC_FIM = /\s*(\(\s*(correta|certa|certo|resposta|gabarito|x)\s*\)|\[\s*x\s*\]|[\u2713\u2714\u2705\u2611\u2190]|<-+\s*(?:correta|certa|certo)?|[-\u2013]\s*(?:correta|certa|certo)|\*+)\s*$/i;
   const RE_MARC_INI = /^\s*(\(\s*x\s*\)|\[\s*x\s*\]|[\u2713\u2714\u2705\u2611]|\*{1,2})\s*/i;
   const RE_ALT_LETRA = /^\s*[\(\[]?\s*([a-hA-H])\s*[\)\]\.\-\u2013:]\s+(\S.*)$/;
   const RE_ALT_BULLET = /^\s*[-\u2022*\u25CB\u25E6\u25AA\u25A1\u2610\u2611\u2713\u2714\u2705]\s+(\S.*)$/;
-  const RE_GAB = /^\s*(?:gabarito|resposta(?:s)?(?:\s+correta(?:s)?)?|resp\.?|correta(?:s)?|alternativa(?:s)?\s+correta(?:s)?)\s*[:\-\u2013=]?\s*(.+)$/i;
+  const RE_GAB = /^\s*(?:gabarito(?:\s+oficial)?|resposta(?:s)?(?:\s+correta(?:s)?)?|resp\.?|correta(?:s)?|alternativa(?:s)?\s+correta(?:s)?|letra\s+correta|r(?=\s*[:=]))\s*[:\-\u2013=]?\s*(.+)$/i;
   const RE_Q_NUM = /^\s*(?:(?:quest[aã]o|pergunta|q)\s*)?(\d{1,3})\s*[\.\)\-\u2013:]\s*(\S.*)$/i;
   const RE_Q_PALAVRA = /^\s*(?:quest[aã]o|pergunta)\s*(?:n[\u00ba\u00b0o.]*\s*)?(\d{0,3})\s*[:\-\u2013.)]?\s*(.*)$/i;
 
@@ -5029,10 +5047,24 @@ window.EMPRESA_CONFIG.sortearColaboradores = function(qtd, excluirMatriculas){
     return { texto: s.replace(/\*\*/g, '').trim(), marcada };
   }
   function letrasDoGabarito(s) {
-    const t = norm(s).replace(/[^a-h0-9, ;/e\-]/g, ' ');
-    const L = new Set();
-    t.split(/[\s,;/]+|\be\b/).forEach(p => { if (/^[a-h]$/.test(p)) L.add(p); else if (/^[1-8]$/.test(p)) L.add(String.fromCharCode(96 + +p)); });
+    const toks = String(s == null ? '' : s).split(/[^A-Za-z0-9\u00C0-\u00FF]+/).filter(Boolean);
+    const L = new Set(), maius = toks.some(t => /^[A-H]$/.test(t));
+    const letras = toks.filter(t => /^[a-hA-H\u00E9]$/.test(t)).length;
+    toks.forEach(t => {
+      const n = norm(t);
+      if (/^[a-h]$/.test(n)) {
+        if (maius && !/^[A-H]$/.test(t)) return;                    // "a resposta correta é C": só vale o C
+        if (n === 'e' && t !== 'E' && letras > 1) return;            // "A e C": o "e" é só ligação
+        L.add(n);
+      } else if (/^[1-8]$/.test(n)) L.add(String.fromCharCode(96 + +n));
+      else if (/^[A-H]{2,5}$/.test(t)) t.toLowerCase().split('').forEach(c => L.add(c));   // "AC", "BD"
+    });
     return Array.from(L);
+  }
+  /* o gabarito é "só letras" (B, A e C, Alternativa B, letra C…) e não o texto de uma alternativa */
+  function soLetras(v) {
+    const toks = String(v == null ? '' : v).split(/[^A-Za-z0-9\u00C0-\u00FF]+/).filter(Boolean);
+    return toks.length > 0 && toks.every(t => /^[a-hA-H1-8]$/.test(t) || /^[A-H]{2,5}$/.test(t) || /^(alternativa|alternativas|opcao|opcoes|letra|letras|item|itens|correta|corretas|certa|ou|e)$/.test(norm(t)));
   }
   function fecharQuestao(q, lista, avisos) {
     if (!q) return;
@@ -5054,15 +5086,26 @@ window.EMPRESA_CONFIG.sortearColaboradores = function(qtd, excluirMatriculas){
     let h = -1;
     for (let i = 0; i < Math.min(L.length, 8); i++) {
       const cs = L[i].map(norm);
-      if (cs.some(c => /^(pergunta|enunciado|questao|quest[aã]o|texto da pergunta)/.test(c)) && cs.filter(Boolean).length >= 3) { h = i; break; }
+      if (cs.some(c => /^(pergunta|enunciado|questao|quest[aã]o|texto|descricao|conteudo)/.test(c)) && cs.filter(Boolean).length >= 3) { h = i; break; }
     }
     const lista = [], avisos = [];
     if (h >= 0) {
       const cab = L[h].map(norm);
-      const iQ = cab.findIndex(c => /^(pergunta|enunciado|questao|texto da pergunta)/.test(c));
+      const iQ = cab.findIndex(c => /^(pergunta|enunciado|questao|texto|descricao|conteudo)/.test(c));
       const iAlt = []; cab.forEach((c, i) => { if (i !== iQ && /^(alternativa|opcao|resposta|alt\.?|item)?\s*[\(\[]?([a-h]|[1-8])[\)\]]?$/.test(c) || /^(alternativa|opcao|alt)\s*[a-h1-8]/.test(c)) iAlt.push(i); });
-      const iGab = cab.findIndex((c, i) => i !== iQ && iAlt.indexOf(i) === -1 && /(gabarito|correta|certa|resposta correta|resp\b)/.test(c));
+      const iGab = cab.findIndex((c, i) => i !== iQ && iAlt.indexOf(i) === -1 && /(gabarito|correta|certa|resposta|resp\b)/.test(c));
       const iCat = cab.findIndex(c => /(categoria|tema|assunto|topico)/.test(c));
+      const iOk = cab.findIndex((c, i) => i !== iQ && /(correta|certa)\b/.test(c) && !/(incorret|errad)/.test(c) && iAlt.indexOf(i) === -1);
+      const iErr = []; cab.forEach((c, i) => { if (i !== iQ && /(incorret|errad|distrat|falsa)/.test(c)) iErr.push(i); });
+      if (iQ >= 0 && iAlt.length < 2 && iOk >= 0 && iErr.length >= 1) {          // colunas "Resposta correta" + "Resposta errada 1..n"
+        for (let i = h + 1; i < L.length; i++) {
+          const l = L[i]; if (!txt(l[iQ])) continue;
+          const ops = [{ text: txt(l[iOk]), correct: true }].concat(iErr.map(c => ({ text: txt(l[c]), correct: false })).filter(o => o.text));
+          for (let k = ops.length - 1; k > 0; k--) { const j = Math.floor(Math.random() * (k + 1)); const t = ops[k]; ops[k] = ops[j]; ops[j] = t; }   // a certa não fica sempre na 1ª posição
+          fecharQuestao({ texto: txt(l[iQ]), options: ops, categoria: iCat >= 0 ? txt(l[iCat]) : '' }, lista, avisos);
+        }
+        return { perguntas: lista, avisos, estrategia: 'tabela (correta + erradas)' };
+      }
       if (iQ >= 0 && iAlt.length >= 2) {
         for (let i = h + 1; i < L.length; i++) {
           const l = L[i]; if (!txt(l[iQ])) continue;
@@ -5075,7 +5118,7 @@ window.EMPRESA_CONFIG.sortearColaboradores = function(qtd, excluirMatriculas){
             const m = limparMarcadores(t);
             let correta = m.marcada;
             const letra = String.fromCharCode(97 + k);
-            if (gab.indexOf(letra) !== -1 && gab.length && /^[a-h1-8][\s,;/e]*([a-h1-8][\s,;/e]*)*$/.test(gabTexto)) correta = true;
+            if (gab.length && gab.indexOf(letra) !== -1 && soLetras(l[iGab])) correta = true;
             if (gabTexto && norm(m.texto) === gabTexto) correta = true;
             const cor = (C[i] || [])[c];
             if (cor && coresRow.length < iAlt.filter(cc => txt(l[cc])).length) correta = true;
@@ -5117,8 +5160,22 @@ window.EMPRESA_CONFIG.sortearColaboradores = function(qtd, excluirMatriculas){
   }
 
   /* Estratégia C: texto corrido (Word, PDF, TXT, foto, planilha de 1 coluna) */
+  /* "1. Cor do céu? a) azul b) verde c) preto" → uma linha por parte */
+  function explodirInline(L) {
+    const out = [];
+    L.forEach(l => {
+      const t = l.t || '', ms = [...t.matchAll(/(?:^|\s)([(\[]?[a-eA-E][)\]\.])\s+(?=\S)/g)];
+      const letras = ms.slice(0, 3).map(m => m[1].replace(/[^a-zA-Z]/g, '').toLowerCase()).join('');
+      if (ms.length >= 3 && letras === 'abc') {
+        const pos = ms.map(m => m.index + (m[0].length - m[0].trimStart().length));
+        const antes = t.slice(0, pos[0]).trim(); if (antes) out.push({ t: antes, b: l.b });
+        pos.forEach((a, i) => out.push({ t: t.slice(a, pos[i + 1] != null ? pos[i + 1] : t.length).trim(), b: l.b }));
+      } else out.push(l);
+    });
+    return out;
+  }
   function parsearTexto(linhasTexto) {
-    const L = linhasTexto.map(l => (typeof l === 'string' ? { t: l, b: false } : l));
+    const L = explodirInline(linhasTexto.map(l => (typeof l === 'string' ? { t: l, b: false } : l)));
     const ls = L.map(l => l.t);
     const qtdLetra = ls.filter(t => RE_ALT_LETRA.test(t)).length;
     const qtdBullet = ls.filter(t => RE_ALT_BULLET.test(t)).length;
@@ -5141,6 +5198,13 @@ window.EMPRESA_CONFIG.sortearColaboradores = function(qtd, excluirMatriculas){
       });
     });
     const idxChave = new Set(linhaChave.map(x => x.i));
+    // gabarito em lista no fim do arquivo: "Gabarito" e, abaixo, "1 - B", "2 - C"...
+    const rePar = /^\s*(\d{1,3})\s*[-\u2013.):]?\s*([a-hA-H])\s*$/, reParEstrito = /^\s*(\d{1,3})\s*[-\u2013.):]\s*([a-hA-H])\s*$/;
+    const hGab = ls.findIndex(t => /^\s*(gabarito(\s+oficial)?|respostas?|chave de corre[cç][aã]o)\s*:?\s*$/i.test(t));
+    if (hGab >= 0) { idxChave.add(hGab); for (let i = hGab + 1; i < ls.length; i++) { const m = rePar.exec(ls[i]); if (m) { (gabaritoGeral[+m[1]] = gabaritoGeral[+m[1]] || []).push(m[2].toLowerCase()); idxChave.add(i); } } }
+    else { const fim = []; for (let i = ls.length - 1; i >= 0; i--) { if (!ls[i].trim()) continue; if (reParEstrito.test(ls[i])) fim.push(i); else break; }
+      if (fim.length >= 3) fim.forEach(i => { const m = reParEstrito.exec(ls[i]); (gabaritoGeral[+m[1]] = gabaritoGeral[+m[1]] || []).push(m[2].toLowerCase()); idxChave.add(i); }); }
+    let catAtual = '';
 
     let q = null, numQ = 0, ultimaAlt = null;
     const ehInicioQuestao = (t) => {
@@ -5157,6 +5221,8 @@ window.EMPRESA_CONFIG.sortearColaboradores = function(qtd, excluirMatriculas){
       const t = t0; const info = L[idx];
       if (idxChave.has(idx)) return;
       if (!t) { return; }
+      const mCat = /^\s*(categoria|tema|assunto|procedimento)\s*[:\-\u2013]\s*(.+)$/i.exec(t);
+      if (mCat && (!q || q.options.length >= 2)) { catAtual = mCat[2].trim(); return; }
       const g = RE_GAB.exec(t);
       if (g && q && q.options.length >= 2) {
         const letras = letrasDoGabarito(g[1]);
@@ -5178,7 +5244,7 @@ window.EMPRESA_CONFIG.sortearColaboradores = function(qtd, excluirMatriculas){
       if (ini && (ini.n != null || /\?\s*$/.test(t) || !q || q.options.length >= 2)) {
         if (q) fecharQuestao(q, lista, avisos);
         numQ = ini.n != null ? ini.n : numQ + 1;
-        q = { texto: ini.texto, options: [], numero: numQ, categoria: '' };
+        q = { texto: ini.texto, options: [], numero: numQ, categoria: catAtual };
         ultimaAlt = null;
         return;
       }
@@ -5199,24 +5265,48 @@ window.EMPRESA_CONFIG.sortearColaboradores = function(qtd, excluirMatriculas){
     return { perguntas: lista, avisos, estrategia: 'texto corrido' };
   }
 
+  /* Plano C: cada bloco entre linhas em branco é uma pergunta (1ª linha = enunciado, as demais = alternativas, sem letras) */
+  function parsearBlocos(linhasTexto) {
+    const L = linhasTexto.map(l => (typeof l === 'string' ? { t: l, b: false } : l));
+    const blocos = []; let cur = [];
+    L.forEach(l => { if (!String(l.t || '').trim()) { if (cur.length) { blocos.push(cur); cur = []; } } else cur.push(l); });
+    if (cur.length) blocos.push(cur);
+    const lista = [], avisos = [];
+    blocos.forEach(bl => {
+      if (bl.length < 3 || bl.length > 9) return;
+      const q = { texto: bl[0].t.replace(RE_Q_NUM, '$2'), options: [], categoria: '' };
+      bl.slice(1).forEach(l => { const m = limparMarcadores(l.t.replace(RE_ALT_LETRA, '$2').replace(RE_ALT_BULLET, '$1')); q.options.push({ text: m.texto, correct: m.marcada || !!l.b }); });
+      fecharQuestao(q, lista, avisos);
+    });
+    lista.forEach(p => { const n = p.options.filter(o => o.correct).length; if (n === p.options.length) p.options.forEach(o => { o.correct = false; }); const n2 = p.options.filter(o => o.correct).length; p.type = n2 > 1 ? 'multiplas_respostas' : 'unica'; p.semGabarito = n2 === 0; });
+    return { perguntas: lista, avisos, estrategia: 'blocos separados por linha em branco' };
+  }
+
+  /* Tenta todas as leituras possíveis e fica com a que entendeu MAIS perguntas (e mais gabaritos). */
   PPGImport.parsearPerguntas = function (documento) {
-    const resultados = [];
+    const cand = [];
+    const tabelas = [];
     (documento.folhas || []).forEach(f => {
       if (documento.tipo === 'planilha' || documento.tipo === 'docx' || documento.tipo === 'html' || documento.tipo === 'texto') {
         const r = parsearTabela(f);
-        if (r && r.perguntas.length) resultados.push(r);
+        if (r && r.perguntas.length) tabelas.push(r);
       }
     });
-    if (resultados.length) {
+    if (tabelas.length) {
       const todas = [], avisos = [];
-      resultados.forEach(r => { todas.push.apply(todas, r.perguntas); avisos.push.apply(avisos, r.avisos); });
-      return { perguntas: todas, avisos, estrategia: resultados[0].estrategia };
+      tabelas.forEach(r => { todas.push.apply(todas, r.perguntas); avisos.push.apply(avisos, r.avisos); });
+      cand.push({ perguntas: todas, avisos, estrategia: tabelas[0].estrategia });
     }
     let linhas = documento.textoLinhas && documento.textoLinhas.length ? documento.textoLinhas : null;
     if (!linhas) { linhas = []; (documento.folhas || []).forEach(f => f.linhas.forEach(r => { const t = r.map(txt).filter(Boolean).join(' '); if (t) linhas.push({ t, b: false }); })); }
-    return parsearTexto(linhas);
+    try { cand.push(parsearTexto(linhas)); } catch (e) {}
+    try { cand.push(parsearBlocos(linhas)); } catch (e) {}
+    const pontos = r => r.perguntas.length * 3 + r.perguntas.filter(p => !p.semGabarito).length * 2 - r.avisos.length;
+    let melhor = cand[0];
+    cand.forEach((r, i) => { if (i > 0 && pontos(r) > pontos(melhor)) melhor = r; });
+    return melhor;
   };
-  PPGImport._internos.parsearTexto = parsearTexto; PPGImport._internos.parsearTabela = parsearTabela;
+  PPGImport._internos.parsearTexto = parsearTexto; PPGImport._internos.parsearTabela = parsearTabela; PPGImport._internos.parsearBlocos = parsearBlocos;
 
   if (typeof module !== 'undefined' && module.exports) module.exports = PPGImport;
   root.PPGImport = PPGImport;
@@ -5658,15 +5748,21 @@ function isWithinTwoYears(matricula, refDate){
   const twoYearsMs = 2*365*24*60*60*1000;
   return wonHistory.some(w => w.matricula === matricula && (refDate - w.data) < twoYearsMs);
 }
+/* Já foi premiado(a) ANTES desta campanha, nos 2 anos anteriores? (para campanhas importadas, a referência é o fim dela) */
+function premiadoAntes(matricula, ref){
+  return wonHistory.some(w=>{ if(String(w.matricula) !== String(matricula)) return false; const d = ref - new Date(w.data); return d >= 2*86400000 && d <= 2*365*86400000; });   // quem ganhou NESTA campanha (mesma data) não conta como premiado antes
+}
 function evaluateEligibility(campaignId){
   const all = campaignParticipants(campaignId);
+  const camp = todasCampanhas().find(c=>c.id===campaignId);
+  const antiga = !!(camp && camp.importada && camp.fim);
   const eligible = [], excluded = [];
-  const now = new Date();
+  const ref = antiga ? new Date(camp.fim) : new Date();
   all.forEach(p=>{
     const motivos = [];
-    if(p.pct !== 100) motivos.push(`Não atingiu 100% de acertos no questionário (fez ${p.pct}%)`);
+    if(p.pct !== 100) motivos.push(`Não atingiu 100% de acertos no questionário (fez ${pctTxt(p.pct)})`);
     if(cargoImpedido(p)) motivos.push(`Ocupa cargo de liderança impedido de participar (${p.cargo || p.funcao})`);
-    if(isWithinTwoYears(p.matricula, now)) motivos.push("Já foi premiado(a) em uma campanha do PPG nos últimos 2 anos");
+    if(antiga ? premiadoAntes(p.matricula, ref) : isWithinTwoYears(p.matricula, ref)) motivos.push("Já foi premiado(a) em uma campanha do PPG nos últimos 2 anos");
     if(motivos.length) excluded.push({...p, motivo: motivos.join(" · "), motivos});
     else eligible.push(p);
   });
@@ -5760,8 +5856,7 @@ function renderSectionContent(target){
   if(target==="config" && currentRole==="qualidade"){ renderPedidosSenha(); renderRegrasExcecoes(); renderInfoPlanilha(); renderQuadro(); }
   if(target==="campanha-atual") renderCampanhaAtual();
   if(target==="historico-colab") renderHistoricoColaborador();
-  if(target==="regulamento") renderRegulamentoStats();
-  if(target==="nova") fillBQPicker();
+    if(target==="nova") fillBQPicker();
   if(target==="config") renderMeuEmail();
 }
 
@@ -5843,7 +5938,7 @@ function linkCampanha(id){ return `${APP_URL}${APP_URL.includes('?') ? '&' : '?'
 /* ======================= LOGIN ======================= */
 /* A autenticação de verdade agora mora na planilha (via Google Apps Script).
    Não existe mais senha nenhuma escrita aqui no código. */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbzezuLc9ZqMBWwu4uLXcUd3ZBsNiqcGSj8gn-7U3TfkkF9RbE7YqK-xbCDFM2B-1vKQeQ/exec";
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxNTmLbDf_qQwwohT4GE5mw9vHgw72bAe__f7Het_cYibLvbdhD7aDiIA7ZCGaEkoXfWQ/exec";
 
 function urlDoApp(){ try{ return APP_URL.split('#')[0].split('?')[0]; }catch(e){ return ''; } }
 
@@ -6347,7 +6442,7 @@ function statusBadge(status){
 }
 function campaignParticipants(id){ return (String(id).indexOf('hist:') === 0 ? participantesAntigos : participants).filter(p=>p.campaignId===id); }
 function fillCampaignSelects(){
-  const comAntigas = {selectCampanhaParticipantes:true, selectCampanhaRelatorio:true, selectCampanhaElegiveis:false, selectCampanhaSorteio:false};
+  const comAntigas = {selectCampanhaParticipantes:true, selectCampanhaRelatorio:true, selectCampanhaElegiveis:true, selectCampanhaSorteio:false};
   Object.keys(comAntigas).forEach(id=>{
     const sel = document.getElementById(id); if(!sel) return;
     const lista = comAntigas[id] ? [...campaigns, ...ordenarPorFim(campanhasAntigas).reverse()] : campaigns;
@@ -6444,24 +6539,42 @@ window.goToHistoricoAdmin = function(){ document.querySelector('[data-target="hi
 
 /* ======================= CAMPANHAS / RODADAS (Qualidade) ======================= */
 function renderCampaignGrid(){
-  document.getElementById('campaignGrid').innerHTML = campaigns.map(c=>{
+  const antigas = ordenarPorFim(campanhasAntigas).reverse();
+  const cartao = c=>{
     const n = campaignParticipants(c.id).length;
+    if(c.importada){
+      const gan = (c.ganhadores || []).length;
+      return `<div class="ccard ccard-antiga">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;"><h4>${escH(c.nome)}</h4>${statusBadge(c.status)}</div>
+        <div class="desc">Campanha anterior ao sistema (importada do histórico).</div>
+        <div class="meta">
+          <span><i data-lucide="calendar"></i> ${fmtPeriodoValor(c.inicio)} → ${fmtPeriodoValor(c.fim)}</span>
+          <span><i data-lucide="users"></i> ${n} participantes · <i data-lucide="trophy"></i> ${gan} ganhador(es)</span>
+        </div>
+        <div class="actions">
+          <button class="btn btn-ghost btn-sm" onclick="goToParticipants('${escH(c.id)}')">Ver participantes</button>
+          <button class="btn btn-outline btn-sm" onclick="abrirHistoricoCampanha('${escH(c.id)}')">Ver detalhes</button>
+        </div>
+      </div>`;
+    }
     const {eligible} = evaluateEligibility(c.id);
     return `<div class="ccard">
-      <div style="display:flex; justify-content:space-between; align-items:flex-start;"><h4>${c.nome}</h4>${statusBadge(c.status)}</div>
-      <div class="desc">${c.descricao}</div>
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;"><h4>${escH(c.nome)}</h4>${statusBadge(c.status)}</div>
+      <div class="desc">${escH(c.descricao || '')}</div>
       <div class="meta">
         <span><i data-lucide="calendar"></i> ${fmtPeriodoValor(c.inicio)} → ${fmtPeriodoValor(c.fim)}</span>
         <span><i data-lucide="clipboard-list"></i> ${c.questoes ? c.questoes.length : '—'} perguntas · <i data-lucide="trophy"></i> ${c.qtdGanhadores} ganhadores</span>
         <span><i data-lucide="users"></i> ${n} participantes · <i data-lucide="check-circle-2"></i> ${eligible.length} elegíveis</span>
       </div>
       <div class="actions">
-        <button class="btn btn-ghost btn-sm" onclick="goToParticipants('${c.id}')">Ver participantes</button>
-        <button class="btn btn-outline btn-sm" onclick="loadCampaignForEdit('${c.id}')">Editar</button>
-        <button class="btn btn-outline btn-sm" onclick="openShareModal('${c.id}')"><i data-lucide="share-2"></i> Compartilhar</button>
+        <button class="btn btn-ghost btn-sm" onclick="goToParticipants('${escH(c.id)}')">Ver participantes</button>
+        <button class="btn btn-outline btn-sm" onclick="loadCampaignForEdit('${escH(c.id)}')">Editar</button>
+        <button class="btn btn-outline btn-sm" onclick="openShareModal('${escH(c.id)}')"><i data-lucide="share-2"></i> Compartilhar</button>
       </div>
     </div>`;
-  }).join('') || `<p style="color:var(--ink-soft); font-size:13px;">Nenhuma campanha cadastrada.</p>`;
+  };
+  document.getElementById('campaignGrid').innerHTML = [...campaigns, ...antigas].map(cartao).join('') || `<p style="color:var(--ink-soft); font-size:13px;">Nenhuma campanha cadastrada.</p>`;
+  if(window.lucide) lucide.createIcons();
 }
 window.goToParticipants = function(id){
   document.querySelectorAll('.menu-item').forEach(b=>b.classList.remove('active'));
@@ -6510,7 +6623,8 @@ document.getElementById('selectCampanhaParticipantes').addEventListener('change'
 function renderEligibleTable(){
   const id = document.getElementById('selectCampanhaElegiveis').value;
   const {eligible, excluded} = evaluateEligibility(id);
-  document.getElementById('tblElegiveis').innerHTML = eligible.map((p,i)=>`<tr><td>${i+1}</td><td>${p.nome}</td><td>${p.matricula}</td><td>${p.cargo}</td><td>${p.setor}</td><td>${p.filial}</td><td>${fmtDateTime(p.data)}</td></tr>`).join('') ||
+  const gan = new Set((((todasCampanhas().find(c=>c.id===id)) || {}).ganhadores || []).map(w=>String(w.matricula)));
+  document.getElementById('tblElegiveis').innerHTML = eligible.map((p,i)=>`<tr><td>${i+1}</td><td>${escH(p.nome)}${gan.has(String(p.matricula)) ? ' <span class="chip"><i data-lucide="trophy"></i> ganhador</span>' : ''}</td><td>${p.matricula}</td><td>${p.cargo}</td><td>${p.setor}</td><td>${p.filial}</td><td>${fmtDateTime(p.data)}</td></tr>`).join('') ||
     `<tr><td colspan="7" style="text-align:center; color:var(--ink-soft); padding:20px;">Nenhum colaborador elegível nesta campanha.</td></tr>`;
   document.getElementById('tblExcluidos').innerHTML = excluded.map(p=>`<tr><td>${p.nome}</td><td>${p.matricula}</td><td>${p.cargo}</td><td>${p.setor}</td><td><span class="badge excluido">${p.motivo}</span></td></tr>`).join('') ||
     `<tr><td colspan="5" style="text-align:center; color:var(--ink-soft); padding:20px;">Nenhuma exclusão automática nesta campanha.</td></tr>`;
@@ -7028,6 +7142,7 @@ const MASCOT_EMOJI = '';
 /* Mascote da marca: mira em traço (mesmo estilo dos ícones Lucide) com o centro vermelho da logo. */
 function mascotSvg(cor){ return `<svg viewBox="0 0 48 48" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="24" cy="24" r="18.5" stroke="${cor}" stroke-width="2.6"/><circle cx="24" cy="24" r="11" stroke="${cor}" stroke-width="2.6" opacity=".72"/><circle cx="24" cy="24" r="4.6" fill="#E2082D"/><path d="M24 2.5v8M24 37.5v8M2.5 24h8M37.5 24h8" stroke="${cor}" stroke-width="2.6" stroke-linecap="round"/></svg>`; }
 const MASCOT_SVG = mascotSvg('currentColor');
+document.querySelectorAll('[data-mascote]').forEach(el=>{ el.innerHTML = MASCOT_SVG; });
 const MASCOT_NOME = "Univaldo";
 function mascotBubble(texto, opts){
   const pro = opts && opts.pro;
@@ -8274,9 +8389,9 @@ new MutationObserver(()=>{ document.body.classList.toggle('modal-aberto', !!docu
 
 
 /* ======================= REGISTRO DE ATIVIDADES (gravado no servidor) ======================= */
-const LOG = {tipo:'', busca:'', dias:7, limite:300, itens:[], total:0, contagem:{}, resumo:null, carregando:false, ultimo:0, erro:''};
+const LOG = {tipo:'', busca:'', dias:7, limite:80, itens:[], total:0, contagem:{}, resumo:null, carregando:false, ultimo:0, erro:''};
 const LOG_TIPOS = [
-  ['','Tudo','layers'], ['senha','Senhas','key-round'], ['acesso','Acessos','log-in'], ['campanha','Campanhas','folder-kanban'],
+  ['','Tudo','layers'], ['senha','Senhas','key-round'], ['acesso','Falhas de acesso','shield-alert'], ['campanha','Campanhas','folder-kanban'],
   ['sorteio','Sorteios','dices'], ['participacao','Participações','clipboard-check'], ['importacao','Importações','upload-cloud'],
   ['banco','Banco de perguntas','database'], ['mensagem','Mensagens','message-circle'], ['regra','Regras e exceções','scale'],
   ['exportacao','Exportações','download'], ['divulgacao','Divulgação','megaphone'], ['conta','Conta e e-mail','at-sign'], ['sistema','Outros','ellipsis']
@@ -8311,9 +8426,9 @@ async function logCarregar(silencioso){
 function logMostrar(){ renderLog(); logCarregar(false); }
 function renderLog(){
   const lista = document.getElementById('logLista'); if(!lista) return;
-  const r = LOG.resumo || {acessosHoje:0, senhas7d:0, acoesQualidade7d:0, falhas7d:0};
+  const r = LOG.resumo || {senhas7d:0, acoesQualidade7d:0, falhas7d:0};
   const stat = (ico, n, txt, cls)=> `<div class="log-stat ${cls||''}"><span class="log-stat-ico"><i data-lucide="${ico}"></i></span><div><b>${n}</b><span>${txt}</span></div></div>`;
-  document.getElementById('logResumo').innerHTML = stat('log-in', r.acessosHoje, 'acessos nas últimas 24 h') + stat('key-round', r.senhas7d, 'senhas criadas ou trocadas (7 dias)') + stat('shield-check', r.acoesQualidade7d, 'ações da Qualidade (7 dias)') + stat('alert-octagon', r.falhas7d, 'falhas de acesso (7 dias)', r.falhas7d ? 'alerta' : '');
+  document.getElementById('logResumo').innerHTML = stat('key-round', r.senhas7d, 'senhas criadas ou trocadas (7 dias)') + stat('shield-check', r.acoesQualidade7d, 'ações da Qualidade (7 dias)') + stat('alert-octagon', r.falhas7d, 'falhas de acesso (7 dias)', r.falhas7d ? 'alerta' : '');
   document.getElementById('logChips').innerHTML = LOG_TIPOS.map(([k, rot, ico])=>{
     const n = k ? (LOG.contagem[k] || 0) : Object.values(LOG.contagem).reduce((a,b)=>a+b, 0);
     return `<button type="button" class="log-chip${LOG.tipo === k ? ' ativo' : ''}" data-logtipo="${k}"><i data-lucide="${ico}"></i> ${rot}${n ? ` <em>${n}</em>` : ''}</button>`;
@@ -8348,7 +8463,7 @@ function renderLog(){
 (function ligarLog(){
   const q = id => document.getElementById(id);
   if(!q('logChips')) return;
-  q('logChips').addEventListener('click', e=>{ const b = e.target.closest('[data-logtipo]'); if(!b) return; LOG.tipo = b.dataset.logtipo; LOG.limite = 300; logCarregar(false); });
+  q('logChips').addEventListener('click', e=>{ const b = e.target.closest('[data-logtipo]'); if(!b) return; LOG.tipo = b.dataset.logtipo; LOG.limite = 80; logCarregar(false); });
   let t = null;
   q('logBusca').addEventListener('input', e=>{ clearTimeout(t); t = setTimeout(()=>{ LOG.busca = e.target.value.trim(); LOG.limite = 300; logCarregar(false); }, 350); });
   q('logPeriodo').addEventListener('change', e=>{ LOG.dias = +e.target.value; LOG.limite = 300; logCarregar(false); });
@@ -8688,23 +8803,6 @@ function pickFairWinners(pool, need, seed){
   return {winners, fair, distinctSetores};
 }
 
-/* ======================= REGULAMENTO: números gerais (sem identificar ninguém) ======================= */
-function renderRegulamentoStats(){
-  const el = document.getElementById('regulamentoStats');
-  if(!el) return;
-  let e = estatisticasGerais;
-  if(!e){   // Qualidade: calcula com tudo o que já recebeu
-    const fechadas = todasCampanhas().filter(c=> { const st = campaignAccessStatus(c); return st !== 'aberta' && st !== 'nao_iniciada'; });
-    const ids = new Set(fechadas.map(c=>c.id)), rf = todosParticipantes().filter(p=>ids.has(p.campaignId) && p.pct != null);
-    e = {campanhasEncerradas: fechadas.length, totalPremiados: new Set(wonHistory.map(w=>w.matricula)).size, mediaGeral: rf.length ? Math.round(rf.reduce((a,p)=>a + p.pct, 0) / rf.length) : 0, total100: rf.filter(p=>p.pct === 100).length};
-  }
-  el.innerHTML = `<div class="transp-stats">
-    <div class="transp-stat"><b>${e.campanhasEncerradas}</b><span>Campanhas encerradas</span></div>
-    <div class="transp-stat"><b>${e.totalPremiados}</b><span>Colaboradores já premiados</span></div>
-    <div class="transp-stat"><b>${e.mediaGeral}%</b><span>Média geral de acertos (rodadas encerradas)</span></div>
-    <div class="transp-stat"><b>${e.total100}</b><span>Participações com 100%</span></div>
-  </div>`;
-}
 
 function bannerSenha(a){
   return `<div class="senha-aviso"><div class="senha-aviso-txt"><b>Senha temporária de ${escH(a.nome)}</b><span>Passe para a pessoa — ela só aparece agora e não fica guardada.</span></div><div class="senha-temp"><code>${escH(a.senha)}</code><button type="button" class="btn btn-outline btn-sm" data-copiar="${escH(a.senha)}"><i data-lucide="copy"></i> Copiar</button></div></div>`;
