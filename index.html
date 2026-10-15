@@ -2103,7 +2103,7 @@ body .user-chip .avatar, body .topbar-right > *:not(.user-chip){ flex-shrink:0; 
           <h3>Dados e armazenamento</h3>
           <div class="hint">Campanhas, respostas e o quadro de colaboradores ficam salvos na planilha da empresa e sincronizam automaticamente entre qualquer computador ou celular</div>
           <div class="qualidade-only" style="margin:4px 0 14px;">
-            <a id="linkPlanilha" class="btn btn-primary btn-sm" href="#" target="_blank" rel="noopener" style="display:none;"><i data-lucide="external-link"></i> Abrir a planilha no Google Planilhas</a>
+            <a id="linkPlanilha" class="btn btn-primary btn-sm" href="#" target="_blank" rel="noopener" style="display:none;"><i data-lucide="external-link"></i> Abrir a planilha no  Planilhas</a>
             <div class="hint" id="infoEmailTeste" style="margin-top:8px;"></div>
           </div>
           <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
@@ -2123,7 +2123,7 @@ body .user-chip .avatar, body .topbar-right > *:not(.user-chip){ flex-shrink:0; 
           <div class="panel"><h3>Segurança e integrações</h3><div class="hint">Parâmetros técnicos do sistema</div>
             <div class="form-grid">
               <div class="field full"><label>Autenticação</label><input type="text" value="Matrícula + senha, com sessão assinada pelo servidor (expira em 12 h)" disabled></div>
-              <div class="field full"><label>Armazenamento</label><input type="text" value="Google Planilhas da empresa — sincronização automática entre aparelhos" disabled></div>
+              <div class="field full"><label>Armazenamento</label><input type="text" value=" Planilhas da empresa — sincronização automática entre aparelhos" disabled></div>
               <div class="field full"><label>Integração futura com RH</label><input type="text" value="Atualização automática de matrícula, filial, setor e função" disabled></div>
               <div class="field full"><label>Duplicidade de respostas</label><select><option>Bloquear — 1 resposta por matrícula</option></select></div>
             </div>
@@ -5938,7 +5938,7 @@ function linkCampanha(id){ return `${APP_URL}${APP_URL.includes('?') ? '&' : '?'
 /* ======================= LOGIN ======================= */
 /* A autenticação de verdade agora mora na planilha (via Google Apps Script).
    Não existe mais senha nenhuma escrita aqui no código. */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxNTmLbDf_qQwwohT4GE5mw9vHgw72bAe__f7Het_cYibLvbdhD7aDiIA7ZCGaEkoXfWQ/exec";
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbx2YDb7TH-L3JD9zBftkaw34SWSQYnAj4xGJNUALYN_XufZujyIrV68BrhYFosE0tzslw/exec";
 
 function urlDoApp(){ try{ return APP_URL.split('#')[0].split('?')[0]; }catch(e){ return ''; } }
 
