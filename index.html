@@ -5965,7 +5965,7 @@ function linkCampanha(id){ return `${APP_URL}${APP_URL.includes('?') ? '&' : '?'
 /* ======================= LOGIN ======================= */
 /* A autenticação de verdade agora mora na planilha (via Google Apps Script).
    Não existe mais senha nenhuma escrita aqui no código. */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbye0tvluERewWAXsTY2w3pb3niyK8udAVdQn910BGIf9qSbrxNDUyEs5xbYKTX52maeKg/exec";
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxNTmLbDf_qQwwohT4GE5mw9vHgw72bAe__f7Het_cYibLvbdhD7aDiIA7ZCGaEkoXfWQ/exec";
 
 function urlDoApp(){ try{ return APP_URL.split('#')[0].split('?')[0]; }catch(e){ return ''; } }
 
@@ -5996,26 +5996,41 @@ function chamarServidor(corpoJson, ms){
     }
   });
 }
+/* Ações que podem ser repetidas sem efeito colateral (ler dados, entrar) ou que o servidor protege contra duplicidade (responder). */
+const ACOES_REPETIVEIS = new Set(['login','getSnapshot','jaRespondeu','getInfo','getMinhasDuvidas','listarDuvidas','listarLog','listarPedidos','situacaoSenhas','getColaboradores','getBancoPerguntas','vincularEmail','salvarContato','submeterResposta']);
+/* Tenta de novo sozinho quando o servidor está ocupado (nada foi gravado) ou a conexão falha (só nas ações seguras), com pausa crescente. */
 async function backendCall(action, payload){
+  const max = ACOES_REPETIVEIS.has(action) ? 3 : 2;
+  let r = null;
+  for(let t = 0; t < max; t++){
+    if(t > 0) await new Promise(res=> setTimeout(res, 1500 * t + Math.random() * 900));
+    r = await backendCallUmaVez(action, payload);
+    const repetir = r && (r.ocupado || (r.falhaDeConexao && ACOES_REPETIVEIS.has(action)));
+    if(!repetir) return r;
+  }
+  return r;
+}
+async function backendCallUmaVez(action, payload){
   try{
     const corpo = JSON.stringify({action, token: (typeof currentUser !== 'undefined' && currentUser) ? currentUser.token : undefined, appUrl: urlDoApp(), ...(payload||{})});
-    const res = await chamarServidor(corpo, 20000);
+    const res = await chamarServidor(corpo, 45000);
     const textoCru = res.texto;
     if(!res.ok){
       console.error(`Backend respondeu HTTP ${res.status} para a ação "${action}". Corpo da resposta:`, textoCru);
-      return {ok:false, erro:`O servidor respondeu com erro ${res.status}. Veja o Console (F12) para detalhes.`};
+      return {ok:false, falhaDeConexao:true, detalhe:`HTTP ${res.status}`, erro:`O servidor respondeu com erro ${res.status}. Tente de novo em instantes. (Detalhe técnico no Console, F12)`};
     }
     try{
       const r = JSON.parse(textoCru);
       if(r && r.sessaoExpirada && typeof currentUser !== 'undefined' && currentUser){ sairDoApp("Sua sessão expirou. Entre novamente."); }
       return r;
     }catch(parseErr){
-      console.error(`A resposta da ação "${action}" não veio em JSON. Isso geralmente acontece quando a implantação do Apps Script não está com acesso "Qualquer pessoa", ou quando houve um erro dentro do Code.gs. Resposta recebida:`, textoCru);
-      return {ok:false, erro:"O servidor respondeu algo inesperado (não era JSON). Veja o Console (F12) — provavelmente a implantação do Apps Script precisa ser revisada."};
+      console.error(`A resposta da ação "${action}" não veio em JSON (costuma ser limite do Google por excesso de acessos ao mesmo tempo, ou erro dentro do Code.gs). Resposta recebida:`, textoCru);
+      return {ok:false, falhaDeConexao:true, detalhe:'resposta inesperada', erro:"O servidor respondeu algo inesperado (provavelmente muitos acessos ao mesmo tempo). Tente de novo em instantes. (Detalhe técnico no Console, F12)"};
     }
   }catch(e){
     console.error(`Erro de conexão com o servidor na ação "${action}":`, e);
-    return {ok:false, erro:"Não foi possível conectar ao servidor. Verifique sua internet e tente de novo. (Detalhe técnico no Console, F12)"};
+    const det = String((e && e.message) || e || '').slice(0, 120);
+    return {ok:false, falhaDeConexao:true, detalhe:det, erro:"Não foi possível conectar ao servidor. Verifique sua internet e tente de novo." + (det ? ` [${det}]` : '') + " (Detalhe técnico no Console, F12)"};
   }
 }
 
@@ -6127,7 +6142,13 @@ function abrirModalTrocaSenha(opts){
     const senhaAtual = obrigatoria ? (opts.senhaAtual != null ? opts.senhaAtual : currentUser.matricula) : document.getElementById('tsSenhaAtual').value;
     const btn = this.querySelector('button[type="submit"]');
     btn.disabled = true; btn.textContent = "Salvando...";
-    const resp = await backendCall('changePassword', {matricula: currentUser.matricula, senhaAtual, novaSenha});
+    let resp = await backendCall('changePassword', {matricula: currentUser.matricula, senhaAtual, novaSenha});
+    if(!resp.ok && resp.falhaDeConexao){
+      // A resposta pode ter se perdido DEPOIS de o servidor salvar a senha: confere entrando com a senha nova.
+      btn.textContent = "Conferindo...";
+      const conf = await backendCall('login', {matricula: currentUser.matricula, senha: novaSenha});
+      if(conf.ok && conf.token) resp = conf;
+    }
     btn.disabled = false; btn.textContent = "Salvar nova senha";
     if(!resp.ok){ erroEl.textContent = resp.erro || "Não foi possível trocar a senha."; erroEl.style.display = "block"; return; }
     backdrop.remove();
