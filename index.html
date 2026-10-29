@@ -5486,7 +5486,7 @@ const EVENTOS_DO_NAVEGADOR = {'Relatório exportado':'exportacao', 'Relatório o
 function logAction(acao, detalhe){
   const tipo = EVENTOS_DO_NAVEGADOR[acao];
   if(!tipo || !currentUser || !currentUser.token || currentRole !== 'qualidade') return;
-  Call('registrarEvento', {tipo, acao, detalhe: String(detalhe || '')});
+  backendCall('registrarEvento', {tipo, acao, detalhe: String(detalhe || '')});
 }
 function renderAuditoria(){
   const tbody = document.getElementById('tblAuditoria');
@@ -5965,7 +5965,7 @@ function linkCampanha(id){ return `${APP_URL}${APP_URL.includes('?') ? '&' : '?'
 /* ======================= LOGIN ======================= */
 /* A autenticação de verdade agora mora na planilha (via Google Apps Script).
    Não existe mais senha nenhuma escrita aqui no código. */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbzhtgvybbqE1Q5MyxaHxSLl86tiWZqTQHyMgrv6yWoGOwgLPnNBZjR2gcJsYVfDBDDd2A/exec";
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxNTmLbDf_qQwwohT4GE5mw9vHgw72bAe__f7Het_cYibLvbdhD7aDiIA7ZCGaEkoXfWQ/exec";
 
 function urlDoApp(){ try{ return APP_URL.split('#')[0].split('?')[0]; }catch(e){ return ''; } }
 
