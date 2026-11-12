@@ -1499,6 +1499,40 @@ body .sidebar.collapsed .brand{ padding:12px 0 6px !important; }
 .tel-txt{ white-space:nowrap; font-variant-numeric:tabular-nums; }
 #qzTelefone{ font-size:20px; letter-spacing:.04em; text-align:center; }
 
+
+/* ---- Resultado do colaborador: desempenho por pergunta ---- */
+.duo-revisao{ width:100%; max-width:640px; margin:20px auto 0; text-align:left; }
+.duo-revisao h3{ font-size:15px; margin:0 0 10px; color:var(--ink); }
+.rev-lista{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+.rev-item{ display:flex; align-items:flex-start; gap:12px; padding:12px 14px; border-radius:14px; border:1px solid var(--border); border-left-width:4px; background:var(--card); }
+.rev-item.rev-ok{ border-left-color:var(--success); } .rev-item.rev-erro{ border-left-color:var(--red); }
+.rev-num{ flex:0 0 26px; height:26px; border-radius:50%; display:grid; place-items:center; font-size:12px; font-weight:700; background:rgba(2,163,157,.12); color:var(--primary-dark); }
+.rev-corpo{ flex:1; min-width:0; }
+.rev-pergunta{ font-weight:600; font-size:13.5px; line-height:1.4; overflow-wrap:anywhere; }
+.rev-resposta{ font-size:12.5px; color:var(--ink-soft); margin-top:3px; overflow-wrap:anywhere; }
+.rev-status{ display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:700; white-space:nowrap; }
+.rev-ok .rev-status{ color:var(--success); } .rev-erro .rev-status{ color:var(--red); }
+.rev-status i, .rev-status svg{ width:15px; height:15px; }
+@media(max-width:560px){ .rev-item{ flex-wrap:wrap; } .rev-status{ margin-left:38px; } }
+
+/* ---- Tela inicial do colaborador: ganhadores da rodada recém finalizada ---- */
+.ganhadores-card{ border-left:4px solid var(--red); }
+.gc-topo{ display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+.gc-topo > i, .gc-topo > svg{ width:26px; height:26px; color:var(--primary-dark); flex-shrink:0; }
+.gc-topo h3{ margin:0; font-size:16px; } .gc-topo .hint{ display:block; margin-top:2px; }
+.gc-lista{ list-style:none; margin:0 0 12px; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:8px; }
+.gc-lista li{ display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--border); border-radius:12px; background:var(--card); }
+.gc-lista li.eu{ border-color:var(--primary); background:rgba(2,163,157,.09); }
+.gc-ini{ flex:0 0 32px; height:32px; border-radius:50%; display:grid; place-items:center; font-weight:700; font-size:13px; background:linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; }
+.gc-lista li > div{ flex:1; min-width:0; display:flex; flex-direction:column; } .gc-lista b{ font-size:13.5px; overflow-wrap:anywhere; } .gc-lista span{ font-size:12px; color:var(--ink-soft); }
+.gc-lista em{ font-style:normal; font-size:11px; font-weight:700; color:var(--primary-dark); background:rgba(2,163,157,.16); padding:2px 8px; border-radius:20px; }
+.gc-status{ display:flex; align-items:flex-start; gap:10px; padding:12px 14px; border-radius:12px; font-size:13.5px; line-height:1.45; background:var(--bg); border:1px solid var(--border); }
+.gc-status i, .gc-status svg{ width:18px; height:18px; flex-shrink:0; margin-top:1px; }
+.gc-status.ok{ background:rgba(46,125,50,.1); border-color:rgba(46,125,50,.4); font-weight:600; } .gc-status.ok i, .gc-status.ok svg{ color:var(--success); }
+
+.panel.fun-empty{ text-align:center; } .panel.fun-empty h3{ text-align:center; margin-top:6px; }
+
+.gc-lista span.gc-ini{ color:#fff; font-size:13px; }
 </style>
 </head>
 <body data-app-url="<?= urlApp ?>" data-campanha="<?= campanhaParam ?>">
@@ -2013,7 +2047,7 @@ body .sidebar.collapsed .brand{ padding:12px 0 6px !important; }
           </div>
           <div class="reg-block">
             <h4>4. O que é mantido em sigilo</h4>
-            <p>O <b>gabarito</b> (as respostas corretas de cada pergunta) é de acesso exclusivo da equipe da Qualidade — nem antes, nem depois da campanha ele é divulgado. Ao final do questionário você vê apenas sua pontuação final, sem indicação de quais perguntas específicas acertou ou errou.</p>
+            <p>O <b>gabarito</b> (as respostas corretas de cada pergunta) é de acesso exclusivo da equipe da Qualidade — nem antes, nem depois da campanha ele é divulgado, porque as perguntas podem voltar em campanhas futuras. Depois que a rodada encerra, você vê a sua pontuação e quais perguntas acertou ou errou, mas não qual era a resposta correta.</p>
           </div>
         </div>
 
@@ -2128,7 +2162,7 @@ body .sidebar.collapsed .brand{ padding:12px 0 6px !important; }
           <h3>Dados e armazenamento</h3>
           <div class="hint">Campanhas, respostas e o quadro de colaboradores ficam salvos na planilha da empresa e sincronizam automaticamente entre qualquer computador ou celular</div>
           <div class="qualidade-only" style="margin:4px 0 14px;">
-            <a id="linkPlanilha" class="btn btn-primary btn-sm" href="#" target="_blank" rel="noopener" style="display:none;"><i data-lucide="external-link"></i> Abrir a planilha no  Planilhas</a>
+            <a id="linkPlanilha" class="btn btn-primary btn-sm" href="#" target="_blank" rel="noopener" style="display:none;"><i data-lucide="external-link"></i> Abrir a planilha no Google Planilhas</a>
             <div class="hint" id="infoEmailTeste" style="margin-top:8px;"></div>
           </div>
           <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
@@ -2148,7 +2182,7 @@ body .sidebar.collapsed .brand{ padding:12px 0 6px !important; }
           <div class="panel"><h3>Segurança e integrações</h3><div class="hint">Parâmetros técnicos do sistema</div>
             <div class="form-grid">
               <div class="field full"><label>Autenticação</label><input type="text" value="Matrícula + senha, com sessão assinada pelo servidor (expira em 12 h)" disabled></div>
-              <div class="field full"><label>Armazenamento</label><input type="text" value=" Planilhas da empresa — sincronização automática entre aparelhos" disabled></div>
+              <div class="field full"><label>Armazenamento</label><input type="text" value="Google Planilhas da empresa — sincronização automática entre aparelhos" disabled></div>
               <div class="field full"><label>Integração futura com RH</label><input type="text" value="Atualização automática de matrícula, filial, setor e função" disabled></div>
               <div class="field full"><label>Duplicidade de respostas</label><select><option>Bloquear — 1 resposta por matrícula</option></select></div>
             </div>
@@ -4487,6 +4521,7 @@ var qrcode = function() {
 
 window.EMPRESA_CONFIG = {
   nome: "Univale",
+  mostrarAcertoPorPergunta: true,   // false = o colaborador vê só a pontuação (sem o "acertou/errou" de cada pergunta)
   cargosImpedidosPalavras: ["gerente", "coordenador", "encarregado", "assessor"],
   filiais: ["Matriz", "Filial Norte", "Filial Sul", "Filial Leste", "Filial Oeste"],
   cargosImpedidos: [
@@ -5798,6 +5833,7 @@ function evaluateEligibility(campaignId){
 
 /* ======================= ACESSO POR DATA ======================= */
 function campaignAccessStatus(c){
+  if(c.status === 'finalizada') return 'encerrada';   // sorteio registrado = rodada encerrada, mesmo que a data de fim ainda não tenha chegado
   const now = new Date();
   const start = new Date(c.inicio), end = new Date(c.fim);
   if(now < start) return 'nao_iniciada';
@@ -5963,9 +5999,9 @@ function linkCampanha(id){ return `${APP_URL}${APP_URL.includes('?') ? '&' : '?'
 })();
 
 /* ======================= LOGIN ======================= */
-/* A autenticação de verdade agora mora na planilha (via  Apps Script).
+/* A autenticação de verdade agora mora na planilha (via Google Apps Script).
    Não existe mais senha nenhuma escrita aqui no código. */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbyceSGhvDCfXxoOKtkcufXxH5NhNA3M59X-TYqotAiLomp22DZUVs_OdDzY6GGLoBvm7Q/exec";
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxNTmLbDf_qQwwohT4GE5mw9vHgw72bAe__f7Het_cYibLvbdhD7aDiIA7ZCGaEkoXfWQ/exec";
 
 function urlDoApp(){ try{ return APP_URL.split('#')[0].split('?')[0]; }catch(e){ return ''; } }
 
@@ -7032,6 +7068,7 @@ window.deleteBQ = async function(codigo){
 /* ======================= RESPONDER QUESTIONÁRIO — ESTILO DUOLINGO ======================= */
 window.openQuiz = async function(campaignId){
   const c = campaigns.find(x=>x.id===campaignId);
+  if(!c){ showToast('Não encontrei esta campanha. Atualizando seus dados — tente de novo em instantes.', 'warning'); _ultimaAssinatura = null; sincronizarDadosDoServidor(true); return; }
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.getElementById('sec-responder').classList.add('active');
   document.getElementById('pageTitle').textContent = "Questionário";
@@ -7040,6 +7077,11 @@ window.openQuiz = async function(campaignId){
   const body = document.getElementById('responderBody');
 
   let existing = participants.find(p=>p.campaignId===campaignId && p.matricula===currentUser.matricula);
+  if(existing && campaignAccessStatus(c) !== 'aberta' && existing.pct == null){   // rodada encerrada mas o resultado ainda não chegou: busca agora
+    body.innerHTML = `<div class="duo-done"><span class="mascot-figure mascot-figure-emoji">${MASCOT_SVG}</span><h2>Carregando seu resultado...</h2></div>`;
+    _ultimaAssinatura = null; await sincronizarDadosDoServidor(true);
+    existing = participants.find(p=>p.campaignId===campaignId && p.matricula===currentUser.matricula) || existing;
+  }
   if(!existing){
     // checagem fresca no servidor — cobre o caso raro de ter respondido em
     // outro dispositivo nos últimos segundos, antes do próximo ciclo de sincronização
@@ -7296,6 +7338,25 @@ function confettiHTML(){
 
 /* Tela final — exatamente o que o colaborador deve ver, nada de gabarito ou
    detalhamento de acertos/erros por pergunta (isso fica exclusivo da Qualidade). */
+/* Revisão por pergunta (só depois que a rodada encerra): mostra "Acertou/Errou" e o que a pessoa marcou — a resposta CERTA nunca é mostrada. */
+function htmlRevisaoPorPergunta(c, participant){
+  if(typeof EMPRESA !== 'undefined' && EMPRESA.mostrarAcertoPorPergunta === false) return '';
+  const certas = participant.respostasCorretas, sels = participant.respostasSelecionadas;
+  if(!Array.isArray(certas) || certas.length !== (c.questoes || []).length) return '';
+  const itens = c.questoes.map((q, i)=>{
+    const ok = !!certas[i], s = Array.isArray(sels) ? sels[i] : null;
+    const marcadas = (Array.isArray(s) ? s : (s === null || s === undefined || s === '' ? [] : [s])).map(Number).filter(n=>!isNaN(n));
+    const textos = marcadas.map(n => (q.options && q.options[n]) ? q.options[n].text : null).filter(Boolean);
+    return `<li class="rev-item ${ok ? 'rev-ok' : 'rev-erro'}">
+      <span class="rev-num">${i+1}</span>
+      <div class="rev-corpo"><div class="rev-pergunta">${escH(q.texto)}</div>
+        <div class="rev-resposta">Sua resposta: ${textos.length ? textos.map(escH).join(' · ') : '<i>sem resposta</i>'}</div></div>
+      <span class="rev-status">${ok ? '<i data-lucide="check-circle-2"></i> Acertou' : '<i data-lucide="x-circle"></i> Errou'}</span>
+    </li>`;
+  }).join('');
+  return `<div class="duo-revisao"><h3>Seu desempenho por pergunta</h3><ul class="rev-lista">${itens}</ul>
+    <p class="hint">A resposta correta não é divulgada, porque as perguntas podem voltar em campanhas futuras.</p></div>`;
+}
 function renderQuizDoneInto(container, c, participant){
   const roundClosed = campaignAccessStatus(c) !== 'aberta' && participant.pct != null;
 
@@ -7306,7 +7367,7 @@ function renderQuizDoneInto(container, c, participant){
       <div class="duo-done">
         <span class="mascot-figure mascot-figure-emoji">${MASCOT_SVG}</span>
         <h2>Resposta registrada!</h2>
-        <p>Sua participação em <b>${c.nome}</b> foi registrada com sucesso.</p>
+        <p>Sua participação em <b>${escH(c.nome)}</b> foi registrada com sucesso.</p>
         <p class="hint">Por transparência com todos os participantes, o resultado só é liberado depois que a rodada encerrar, em <b>${fmtDateTime(new Date(c.fim))}</b>. Volte aqui depois desse prazo para ver seu desempenho.</p>
       </div>
       ${mascotBubble("Sua resposta está registrada e segura. Assim que a rodada encerrar, você vê aqui quantas você acertou. Até lá!")}`;
@@ -7319,6 +7380,9 @@ function renderQuizDoneInto(container, c, participant){
   const mascotMsg = perfeito
     ? "Mandou muito bem! 100% de acertos — boa sorte no sorteio!"
     : "Valeu por participar! Continue de olho nas próximas campanhas.";
+  const dicaSorteio = perfeito
+    ? 'Você acertou todas! Está na lista de elegíveis e concorre ao sorteio, desde que atenda às regras do regulamento (cargo e prêmio nos últimos 2 anos).'
+    : 'Para concorrer ao sorteio é preciso acertar 100% das perguntas. Continue participando das próximas campanhas!';
   container.innerHTML = `
     <div class="duo-done">
       ${perfeito ? confettiHTML() : ''}
@@ -7326,9 +7390,11 @@ function renderQuizDoneInto(container, c, participant){
       <h2>Obrigado por participar!</h2>
       <p>Sua participação foi registrada com sucesso.</p>
       <div class="duo-score">Você acertou <b>${correctCount} de ${c.questoes.length}</b> perguntas.</div>
-      <p class="hint">Boa sorte no sorteio!</p>
+      <p class="hint">${dicaSorteio}</p>
+      ${htmlRevisaoPorPergunta(c, participant)}
     </div>
     ${mascotBubble(mascotMsg)}`;
+  if(window.lucide) lucide.createIcons();
 }
 
 
@@ -7354,6 +7420,33 @@ function colaboradorStreakStrip(){
     <div class="streak-chip trophy"><div class="si"><i data-lucide="trophy"></i></div><div><b>${premios}</b><span>Vezes premiado(a)</span></div></div>
   </div>`;
 }
+/* Última rodada com sorteio registrado, enquanto for "recém finalizada" (30 dias). */
+const DIAS_DESTAQUE_GANHADORES = 30;
+function rodadaRecemFinalizada(){
+  const c = campaigns.filter(x=>!x.importada && x.status === 'finalizada' && (x.ganhadores || []).length).sort((a,b)=> new Date(b.fim) - new Date(a.fim))[0];
+  if(!c) return null;
+  return (Date.now() - new Date(c.fim)) / 864e5 <= DIAS_DESTAQUE_GANHADORES ? c : null;
+}
+/* Cartão dos ganhadores + a situação da própria pessoa. Os resultados dos demais participantes NÃO aparecem (só a Qualidade vê). */
+function htmlGanhadoresRodada(c){
+  const gan = c.ganhadores || [], eu = currentUser.matricula;
+  const souGanhador = gan.some(g=>matK(g.matricula) === matK(eu));
+  const minha = participants.find(p=>p.campaignId === c.id && p.matricula === eu);
+  let st;
+  if(souGanhador) st = {cls:'ok', icon:'trophy', txt:'Parabéns! Você foi sorteado(a). A equipe de Qualidade vai entrar em contato pelo telefone que você informou.'};
+  else if(!minha) st = {cls:'neutro', icon:'info', txt:'Você não participou desta rodada. Participe da próxima!'};
+  else if(minha.pct == null) st = {cls:'neutro', icon:'info', txt:'Seu resultado está sendo carregado…'};
+  else {
+    const elegivel = evaluateEligibility(c.id).eligible.some(e=>matK(e.matricula) === matK(eu));
+    st = elegivel ? {cls:'neutro', icon:'check-circle-2', txt:'Você estava entre os elegíveis, mas não foi sorteado(a) desta vez.'}
+                  : {cls:'neutro', icon:'ban', txt:'Você não foi elegível ao sorteio desta rodada.'};
+  }
+  return `<div class="panel ganhadores-card">
+    <div class="gc-topo"><i data-lucide="trophy"></i><div><h3>Ganhadores — ${escH(c.nome)}</h3><span class="hint">Sorteio realizado${c.premio ? ' · Prêmio: ' + escH(c.premio) : ''}</span></div></div>
+    <ul class="gc-lista">${gan.map(g=>{ const eu2 = matK(g.matricula) === matK(eu); return `<li class="${eu2 ? 'eu' : ''}"><span class="gc-ini">${escH(String(g.nome || '?').trim().charAt(0).toUpperCase())}</span><div><b>${escH(g.nome)}</b><span>${escH([g.setor, g.filial].filter(Boolean).join(' · '))}</span></div>${eu2 ? '<em>Você</em>' : ''}</li>`; }).join('')}</ul>
+    <div class="gc-status ${st.cls}"><i data-lucide="${st.icon}"></i><span>${st.txt}</span></div>
+  </div>`;
+}
 function renderCampanhaAtual(){
   const body = document.getElementById('campanhaAtualBody');
   if(!body) return;
@@ -7362,17 +7455,21 @@ function renderCampanhaAtual(){
   const respondida = c => participants.some(p=>p.campaignId===c.id && p.matricula===currentUser.matricula);
   const pendentes = open.filter(c=>!respondida(c));
   const primeiro = currentUser.nome.split(' ')[0];
-  const msg = !open.length ? `Oi, ${primeiro}! Nenhuma campanha aberta agora, mas fica de olho — aviso assim que abrir uma nova!`
+  const rec = rodadaRecemFinalizada();
+  const souGanhador = !!(rec && (rec.ganhadores || []).some(g=>matK(g.matricula) === matK(currentUser.matricula)));
+  const msg = souGanhador ? `Parabéns, ${primeiro}! Você foi sorteado(a) na última rodada!`
+    : !open.length ? (rec ? `Oi, ${primeiro}! Confira os ganhadores da última rodada e aguarde a próxima campanha.` : `Oi, ${primeiro}! Nenhuma campanha aberta agora, mas fica de olho — aviso assim que abrir uma nova!`)
     : !pendentes.length ? `Oi, ${primeiro}! Você já participou da rodada atual — sua resposta está computada. Obrigado!`
     : `Oi, ${primeiro}! Tem campanha nova esperando por você aqui embaixo`;
   let html = mascotBubble(msg) + colaboradorStreakStrip();
   if(!open.length){
-    html += `<div class="panel fun-empty">
+    html += (rec ? htmlGanhadoresRodada(rec) : '') + `<div class="panel fun-empty">
       <div class="fe-icon"><i data-lucide="clock"></i></div>
-      <h3>Nenhuma campanha em andamento</h3>
-      <p class="hint">Assim que uma nova campanha do PPG for aberta, ela aparecerá aqui.</p>
+      <h3>Aguarde a próxima campanha</h3>
+      <p class="hint">Assim que a próxima campanha do PPG for aberta, ela aparecerá aqui. Fique de olho!</p>
     </div>`;
     body.innerHTML = html;
+    if(window.lucide) lucide.createIcons();
     return;
   }
   html += open.map(c=>{
@@ -7394,7 +7491,9 @@ function renderCampanhaAtual(){
         : `<button class="btn btn-primary" onclick="openQuiz('${c.id}')"><i data-lucide="rocket"></i> Responder agora</button>`}
     </div>`;
   }).join('');
+  if(rec) html += htmlGanhadoresRodada(rec);
   body.innerHTML = html;
+  if(window.lucide) lucide.createIcons();
 }
 
 function painelElegibilidadeHtml(p){
@@ -7426,6 +7525,10 @@ function renderHistoricoColaborador(){
   if(!body) return;
   if(!_dadosCarregados){ body.innerHTML = esqueletoHtml(); return; }
   const mine = todosParticipantes().filter(p=>p.matricula===currentUser.matricula).sort((a,b)=>b.data-a.data);
+  // rodada já encerrada, mas o resultado ainda não chegou (tela antiga em memória): pede os dados novos (no máximo 1 vez a cada 30 s)
+  if(mine.some(p=>{ const cc = campaigns.find(x=>x.id===p.campaignId); return cc && !cc.importada && campaignAccessStatus(cc) !== 'aberta' && p.pct == null; }) && Date.now() - (window._ultimoPedidoResultado || 0) > 30000){
+    window._ultimoPedidoResultado = Date.now(); setTimeout(()=>{ _ultimaAssinatura = null; sincronizarDadosDoServidor(true); }, 300);
+  }
   let html = mascotBubble(mine.length ? "Aqui estão todas as suas participações. O resultado de cada rodada aparece assim que ela encerra." : "Você ainda não participou de nenhuma campanha — que tal começar agora?");
   html += colaboradorStreakStrip();
   if(!mine.length){
@@ -7453,7 +7556,7 @@ function renderHistoricoColaborador(){
       <div><h3 style="font-size:14.5px;">${nome}</h3><p class="hint" style="margin-top:4px;">${quando}</p></div>
       <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
         <div class="part-status"><span class="part-pct">${p.pct}%</span><span class="hint">${acertos} de ${total} perguntas</span></div>
-        <button class="btn btn-outline btn-sm" onclick="openQuiz('${p.campaignId}')">Ver resumo</button>
+        <button class="btn btn-outline btn-sm" onclick="openQuiz('${p.campaignId}')"><i data-lucide="eye"></i> Ver resultado</button>
       </div>
     </div>`;
   }).join('');
