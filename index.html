@@ -1635,7 +1635,7 @@ body.dark .como-card .btn-ghost{ background:rgba(2,163,157,.22); color:#7ee6e0; 
 :root{ --topo-h:64px; --ease:cubic-bezier(.25,.8,.25,1); --t1:.16s; --t2:.26s; --t3:.42s; }
 
 /* ---- casca: menu lateral + barra superior numa peça só (o divisor da marca fica na MESMA altura da barra) ---- */
-body .sidebar{ background:linear-gradient(180deg,#0B4F48 0%,#06342F 100%) !important; border-right:1px solid rgba(255,255,255,.07); border-radius:0 !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; box-shadow:none !important; }
+body .sidebar{ background:linear-gradient(180deg,#0B4F48 0%,#06342F 100%) !important; border-right:1px solid rgba(255,255,255,.07); border-radius:0 !important; box-shadow:none !important; }
 body .sidebar::before, body .sidebar::after{ display:none !important; }
 body .brand{ box-sizing:border-box; height:var(--topo-h); padding:0 20px !important; gap:11px; border-bottom:1px solid rgba(255,255,255,.09); align-items:center; }
 body .sidebar.collapsed .brand{ padding:0 !important; justify-content:center; }
@@ -1643,7 +1643,7 @@ body .sidebar.collapsed .brand{ padding:0 !important; justify-content:center; }
 .brand-text h1{ font-size:16px; line-height:1.1; letter-spacing:.3px; }
 .brand-text h1::after{ display:none !important; }
 .brand-text span{ display:block; margin-top:2px; font-size:10.5px; color:#9FCFC9; }
-body .topbar{ box-sizing:border-box; height:var(--topo-h); padding:0 28px !important; background:var(--card) !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; border-bottom:1px solid var(--border) !important; border-radius:0 !important; box-shadow:none !important; }
+body .topbar{ box-sizing:border-box; height:var(--topo-h); padding:0 28px !important; background:var(--card) !important; border-bottom:1px solid var(--border) !important; border-radius:0 !important; box-shadow:none !important; }
 body.dark .topbar{ background:var(--card) !important; }
 .topbar::after{ display:none !important; }
 .topbar h2{ font-size:17px; letter-spacing:-.1px; }
@@ -1734,7 +1734,7 @@ tbody tr:hover td{ background:rgba(2,163,157,.04); }
 .qk-val{ font-size:30px; line-height:1.1; font-weight:800; letter-spacing:-.6px; }
 .qk-sub{ font-size:12px; color:var(--ink-soft); } .qk-sub em{ font-style:normal; font-weight:800; color:var(--ink); }
 .qk-sub a{ cursor:pointer; } .qk-sub a:hover{ color:var(--primary-dark); text-decoration:underline; }
-@media(max-width:860px){ .qk-grid{ grid-template-columns:1fr; } }
+@media(max-width:640px){ .qk-grid{ grid-template-columns:1fr; } }
 .donut-wrap{ display:flex; align-items:center; gap:22px; flex-wrap:wrap; }
 .donut{ width:132px; height:132px; border-radius:50%; display:grid; place-items:center; flex-shrink:0; }
 .donut-miolo{ width:84px; height:84px; border-radius:50%; background:var(--card); display:flex; flex-direction:column; align-items:center; justify-content:center; }
@@ -1779,6 +1779,255 @@ body .sidebar .menu-item, body .sidebar .menu-group-header{ transition:backgroun
 @media (prefers-reduced-motion: reduce){ body .sidebar .menu-item, body .sidebar .menu-group-header{ transition-duration:.01ms !important; } }
 
 .donut-miolo b{ color:var(--ink); }
+
+/* =====================================================================
+   v4 — vermelho da marca, leveza (nada que trave), gráfico de evolução
+   ===================================================================== */
+:root{ --marca-vermelho:#E2082D; }
+/* vermelho: acento discreto da marca (o laranja fica para prêmios e detalhes) */
+.brand-text h1::after{ display:inline-block !important; content:''; width:7px; height:7px; border-radius:50%; margin-left:7px; vertical-align:middle; background:var(--marca-vermelho); }
+body .sidebar .menu-item.active::before{ background:var(--marca-vermelho) !important; }
+.section-head h2{ position:relative; padding-left:14px !important; }
+.section-head h2::before{ display:block !important; content:''; position:absolute; left:0; top:.22em; bottom:.22em; width:4px; border-radius:4px; background:var(--marca-vermelho); box-shadow:none !important; }
+.section-head.sem-titulo h2{ display:none; }
+.qh::after{ content:''; position:absolute; left:30px; top:0; width:56px; height:4px; border-radius:0 0 4px 4px; background:var(--marca-vermelho); z-index:2; }
+.menu-badge{ margin-left:auto; min-width:20px; height:20px; padding:0 6px; border-radius:20px; background:var(--marca-vermelho); color:#fff; font-size:11px; font-weight:800; display:grid; place-items:center; flex-shrink:0; }
+.menu-badge[hidden]{ display:none; }
+.sidebar.collapsed .menu-badge{ position:absolute; top:3px; right:6px; min-width:16px; height:16px; font-size:10px; padding:0 4px; }
+
+/* leveza: o desfoque de fundo (blur) nos painéis, menus e popups era o que pesava na rolagem e fazia a tela travar */
+.main{ transition:none !important; }
+body .sidebar{ overflow-y:auto; overscroll-behavior:contain; }
+body .sidebar .menu{ overflow-y:auto; overscroll-behavior:contain; }
+.menu-item:focus, .menu-group-header:focus{ outline:none; }
+.menu-item:focus-visible, .menu-group-header:focus-visible{ outline:2px solid rgba(255,255,255,.55); outline-offset:-2px; }
+
+/* gráfico de evolução das rodadas */
+.evo svg{ width:100%; height:auto; display:block; }
+.evo-g{ stroke:var(--border); stroke-width:1; stroke-dasharray:3 4; }
+.evo-t{ font-size:10px; fill:var(--ink-soft); }
+.evo-x{ font-size:10.5px; fill:var(--ink-soft); font-weight:600; }
+.evo-v{ font-size:11px; fill:var(--ink); font-weight:800; }
+.evo-b{ fill:url(#evoGrad); fill:var(--primary); opacity:.88; transition:opacity var(--t2) var(--ease); }
+.evo-b:hover{ opacity:1; }
+.evo-l{ fill:none; stroke:var(--marca-vermelho); stroke-width:2.5; stroke-linejoin:round; stroke-linecap:round; }
+.evo-p{ fill:var(--card); stroke:var(--marca-vermelho); stroke-width:2.5; }
+.evo-leg{ display:flex; gap:18px; flex-wrap:wrap; margin-top:8px; font-size:12px; color:var(--ink-soft); }
+.evo-leg i{ display:inline-block; vertical-align:middle; margin-right:6px; }
+.evo-leg .sq{ width:12px; height:12px; border-radius:3px; background:var(--primary); }
+.evo-leg .dt{ width:11px; height:11px; border-radius:50%; border:2.5px solid var(--marca-vermelho); background:var(--card); }
+.evo-sub{ font-size:13px; margin:18px 0 10px; color:var(--ink); } .evo-sub span{ font-weight:500; color:var(--ink-soft); }
+.stk{ display:flex; height:14px; border-radius:14px; overflow:hidden; background:var(--border); gap:2px; }
+.stk span{ display:block; height:100%; }
+.stk-leg{ display:flex; flex-wrap:wrap; gap:6px 18px; margin-top:10px; font-size:12.5px; }
+.stk-leg small{ color:var(--ink-soft); }
+
+/* ===== mensagens ===== */
+.msg-colab{ display:grid; grid-template-columns:minmax(0,420px) minmax(0,1fr); gap:20px; align-items:start; }
+@media(max-width:980px){ .msg-colab{ grid-template-columns:1fr; } }
+.msg-compor h3, .msg-hist-topo h3{ margin:0 0 10px; font-size:16px; }
+.msg-assuntos{ display:flex; flex-wrap:wrap; gap:8px; margin:6px 0 14px; }
+.msg-assuntos button{ border:1px solid var(--border); background:var(--bg); color:var(--ink); padding:7px 13px; border-radius:20px; font-size:12.5px; font-weight:600; cursor:pointer; }
+.msg-assuntos button:hover, .msg-assuntos button.on{ border-color:var(--primary); background:rgba(2,163,157,.1); color:var(--primary-dark); }
+.msg-cont{ text-align:right; font-size:11.5px; color:var(--ink-soft); margin-top:4px; }
+.msg-vazio{ display:flex; flex-direction:column; align-items:center; gap:6px; text-align:center; padding:34px 18px; border:1px dashed var(--border); border-radius:18px; color:var(--ink-soft); }
+.msg-vazio i, .msg-vazio svg{ width:34px; height:34px; color:var(--primary-dark); opacity:.8; } .msg-vazio b{ color:var(--ink); font-size:15px; } .msg-vazio span{ font-size:13px; max-width:340px; }
+.msg-thread{ margin-bottom:14px; }
+.msg-thread.novo{ border-color:rgba(2,163,157,.5); box-shadow:0 0 0 3px rgba(2,163,157,.1); }
+.msg-th-topo, .msg-c-topo{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+.msg-st{ padding:4px 11px; border-radius:20px; font-size:11.5px; font-weight:700; white-space:nowrap; }
+.msg-st.pend{ background:rgba(249,168,37,.18); color:#9A5B00; } .msg-st.ok{ background:rgba(46,125,50,.14); color:var(--success); }
+.msg-st em{ font-style:normal; background:var(--marca-vermelho); color:#fff; padding:1px 7px; border-radius:10px; margin-right:4px; font-size:10.5px; }
+.msg-bolha{ max-width:92%; padding:11px 14px; border-radius:16px; margin-bottom:10px; font-size:13.5px; line-height:1.55; }
+.msg-bolha p{ margin:0; overflow-wrap:anywhere; white-space:pre-wrap; }
+.msg-bolha.eu{ margin-left:auto; background:rgba(2,163,157,.12); border-top-right-radius:5px; }
+.msg-bolha.eles{ background:var(--bg); border:1px solid var(--border); border-top-left-radius:5px; }
+.msg-meta{ font-size:11.5px; color:var(--ink-soft); margin-bottom:4px; display:flex; align-items:center; gap:5px; } .msg-meta i, .msg-meta svg{ width:13px; height:13px; }
+.msg-espera{ display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--ink-soft); padding:8px 2px 0; } .msg-espera i, .msg-espera svg{ width:15px; height:15px; }
+.msg-barra{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }
+.msg-barra .seg-tabs b{ margin-left:4px; font-size:11px; background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:0 6px; }
+.msg-barra input[type=search]{ flex:1; min-width:200px; padding:10px 13px; border:1px solid var(--border); border-radius:12px; background:var(--card); font-size:13px; }
+.msg-inbox{ max-width:900px; }
+.msg-card{ margin-bottom:14px; } .msg-card.pend{ border-left:4px solid #F9A825; }
+.msg-av{ flex:0 0 40px; height:40px; border-radius:50%; display:grid; place-items:center; font-weight:800; color:#fff; background:var(--grad-brand); }
+.msg-c-topo{ flex-wrap:nowrap; } .msg-c-quem{ flex:1; min-width:0; display:flex; flex-direction:column; } .msg-c-quem b{ font-size:14.5px; } .msg-c-quem span{ font-size:12px; color:var(--ink-soft); overflow-wrap:anywhere; }
+.msg-c-dir{ display:flex; flex-direction:column; align-items:flex-end; gap:3px; } .msg-c-dir small{ font-size:11px; color:var(--ink-soft); }
+@media(max-width:560px){ .msg-c-topo{ flex-wrap:wrap; } .msg-c-dir{ align-items:flex-start; } }
+.msg-contatos{ display:flex; flex-wrap:wrap; gap:8px; margin:0 0 10px; }
+.msg-ct{ display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border-radius:20px; background:var(--bg); border:1px solid var(--border); font-size:12px; color:var(--ink); text-decoration:none; overflow-wrap:anywhere; }
+.msg-ct i, .msg-ct svg{ width:13px; height:13px; } .msg-ct.wa{ background:rgba(37,211,102,.12); border-color:rgba(37,211,102,.45); color:#128C4A; font-weight:700; } .msg-ct.sem{ color:var(--ink-soft); }
+.msg-assunto{ margin:4px 0 8px; font-weight:700; font-size:14.5px; }
+.msg-resp textarea{ width:100%; margin-top:6px; } .msg-enviar{ margin-top:8px; }
+.msg-modelos{ display:flex; flex-wrap:wrap; gap:6px; }
+.msg-modelos button{ border:1px dashed var(--border); background:transparent; color:var(--ink-soft); padding:5px 10px; border-radius:14px; font-size:11.5px; cursor:pointer; }
+.msg-modelos button:hover{ border-color:var(--primary); color:var(--primary-dark); }
+
+/* ===== relatórios ===== */
+.rel-topo{ display:flex; align-items:flex-end; gap:20px; flex-wrap:wrap; }
+.rel-topo .field{ flex:1; min-width:240px; max-width:420px; margin:0; } .rel-periodo{ font-size:12.5px; color:var(--ink-soft); padding-bottom:10px; }
+.rel-tiles{ display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; margin-bottom:16px; }
+.rel-tile{ display:flex; flex-direction:column; gap:3px; padding:15px 16px; background:var(--card); border:1px solid var(--border); border-radius:18px; box-shadow:var(--shadow); }
+.rel-tile span{ font-size:11px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; color:var(--ink-soft); }
+.rel-tile b{ font-size:28px; line-height:1.1; font-weight:800; letter-spacing:-.5px; } .rel-tile small{ font-size:12px; color:var(--ink-soft); }
+.rel-tile.alerta{ border-color:rgba(226,8,45,.4); } .rel-tile.alerta small{ color:var(--marca-vermelho); font-weight:700; }
+.rel-alertas{ display:flex; flex-direction:column; gap:8px; margin-top:10px; }
+.rel-alerta{ display:flex; gap:10px; align-items:flex-start; padding:10px 13px; border-radius:12px; font-size:13.5px; line-height:1.5; background:var(--bg); border:1px solid var(--border); }
+.rel-alerta i, .rel-alerta svg{ width:17px; height:17px; flex-shrink:0; margin-top:2px; }
+.rel-alerta.warn{ background:rgba(226,8,45,.07); border-color:rgba(226,8,45,.3); } .rel-alerta.warn svg{ color:var(--marca-vermelho); }
+.rel-alerta.info svg{ color:#C77700; } .rel-alerta.ok{ background:rgba(46,125,50,.08); border-color:rgba(46,125,50,.3); } .rel-alerta.ok svg{ color:var(--success); }
+.rel-tab td, .rel-tab th{ vertical-align:middle; }
+.rel-tab tr.sel td{ background:rgba(2,163,157,.1); }
+.rel-nq{ display:inline-grid; place-items:center; width:20px; height:20px; border-radius:50%; background:rgba(2,163,157,.14); color:var(--primary-dark); font-size:11px; font-weight:800; margin-right:4px; }
+.tb-bar.baixo span{ background:linear-gradient(90deg,rgba(226,8,45,.25),rgba(226,8,45,.45)); } .tb-bar.bom span{ background:linear-gradient(90deg,rgba(46,125,50,.28),rgba(46,125,50,.5)); }
+.sobe{ color:var(--success); font-style:normal; font-size:11px; } .desce{ color:var(--marca-vermelho); font-style:normal; font-size:11px; }
+.rel-exp{ display:flex; flex-direction:column; margin-top:6px; }
+.rel-exp-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 2px; border-top:1px solid var(--border); flex-wrap:wrap; }
+.rel-exp-row b{ display:block; font-size:13.5px; } .rel-exp-row span{ font-size:12px; color:var(--ink-soft); } .rel-exp-bt{ display:flex; gap:8px; }
+@media(max-width:560px){ .rel-tile b{ font-size:24px; } .rel-topo .field{ max-width:none; } }
+
+.evo-t{ font-size:11px; } .evo-x{ font-size:11.5px; } .evo-v{ font-size:12.5px; }
+
+.rel-tiles{ grid-template-columns:repeat(6,1fr); } @media(max-width:1180px){ .rel-tiles{ grid-template-columns:repeat(3,1fr); } } @media(max-width:560px){ .rel-tiles{ grid-template-columns:repeat(2,1fr); } }
+
+.msg-colab:has(#formFaleConosco[style*="display: none"]){ grid-template-columns:1fr; }
+
+/* celular: nada pode ser mais largo que a tela (as colunas passam a poder encolher) */
+.two-col{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+@media(max-width:900px){ .two-col{ grid-template-columns:minmax(0,1fr); } }
+.two-col > *, .main, .content, .section, .panel{ min-width:0; }
+@media(max-width:640px){ .hbar-detail{ padding-left:0; } .hbar-label{ width:96px; } .panel-topo{ flex-wrap:wrap; } }
+.msg-barra input[type=search]{ min-width:0; flex:1 1 160px; }
+
+/* barra superior em telas estreitas: o título encolhe com reticências e os botões não saem da tela */
+body .topbar{ gap:10px; }
+body .topbar > *:first-child{ min-width:0; flex:1 1 auto; }
+.topbar h2{ min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.topbar-right{ flex-shrink:0; min-width:0; }
+@media(max-width:560px){ body .topbar{ padding:0 12px !important; } .topbar-right{ gap:6px; } .topbar h2{ font-size:15px; } }
+
+@media(max-width:560px){ .msg-barra .seg-tabs{ width:100%; } .msg-barra .seg-tabs button{ flex:1 1 0; padding:6px 4px; font-size:11.5px; white-space:nowrap; } .msg-barra .seg-tabs b{ margin-left:3px; } }
+
+/* =====================================================================
+   v5 — desfoque mantido onde se vê (menu, topo, janelas, cartões), mais barato, e sem a trava
+   ===================================================================== */
+:root{ --glass-blur:blur(12px) saturate(140%); }
+/* miudezas (campos, botões, chips, tabelas): o desfoque não aparece e custava caro a cada quadro */
+input, select, textarea, .field select, .field textarea, .share-link-box input, .btn-outline, .chip.c-setor, .chip.c-filial, .switch-track,
+.duo-option, .table-wrap, .streak-chip, .transp-stat, .lock-banner, .ll-block, .ll-step, .part-row, .atalho{ backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
+/* janelas: o desfoque fica FIXO e só a opacidade anima (animar o raio do desfoque na tela inteira era o que travava ao abrir/fechar) */
+.pop-backdrop{ background:rgba(6,30,28,.48) !important; backdrop-filter:blur(5px) !important; -webkit-backdrop-filter:blur(5px) !important; opacity:0; transition:opacity .18s var(--ease) !important; }
+.pop-backdrop.show{ opacity:1; }
+.share-backdrop{ background:rgba(6,30,28,.5); }
+.mais-linhas td{ text-align:center; padding:14px 8px !important; } .mais-linhas .hint{ margin-right:8px; }
+
+/* =====================================================================
+   v5b — tema dinâmico e harmônico: o claro fica claro (menu e faixas mais leves) e o escuro fica mais escuro
+   ===================================================================== */
+:root{
+  --bg:#F1F7F6; --card:#FFFFFF; --ink:#0F2A28; --ink-soft:#587571; --border:#D6E6E3;
+  --glass-bg:rgba(255,255,255,.66); --glass-bg-strong:rgba(255,255,255,.80); --glass-border:rgba(255,255,255,.6);
+  /* menu lateral */
+  --sb-bg:linear-gradient(180deg,rgba(238,249,246,.94) 0%,rgba(222,241,237,.94) 100%);
+  --sb-border:rgba(2,105,92,.14); --sb-sep:rgba(2,105,92,.13);
+  --sb-ink:#2A6159; --sb-ink-strong:#08504A; --sb-ink-dim:#6C938D; --sb-hover:rgba(2,163,157,.10); --sb-active:rgba(2,163,157,.19);
+  /* barra superior */
+  --tb-bg:rgba(255,255,255,.80);
+  /* faixas de destaque (início do colaborador e da Qualidade) */
+  --hero-a:#0E9B91; --hero-b:#087A72; --hero-scrim:rgba(0,66,60,.30); --hero-shadow:rgba(2,105,92,.22); --hero-text-shadow:rgba(0,60,55,.30);
+  --hero-calm-a:#2CBBB0; --hero-calm-b:#0E8D84;
+  --hero-ok-a:#3FBA7C; --hero-ok-b:#0C8A6F;
+  --hero-prog-a:#2DAAC6; --hero-prog-b:#0F8197;
+  --hero-win-a:#FAB63A; --hero-win-b:#EE6C2E; --hero-win-shadow:rgba(238,108,46,.30);
+  /* brilhos suaves do fundo da página */
+  --glow-1:rgba(2,163,157,.15); --glow-2:rgba(249,168,37,.09); --glow-3:rgba(0,105,92,.08);
+}
+body.dark{
+  --bg:#060E0D; --card:#0C1A18; --ink:#E7F5F3; --ink-soft:#8DB8B2; --border:#16302C;
+  --glass-bg:rgba(12,26,24,.62); --glass-bg-strong:rgba(12,26,24,.82); --glass-border:rgba(255,255,255,.07);
+  --shadow:0 2px 12px rgba(0,0,0,.45);
+  --sb-bg:linear-gradient(180deg,rgba(5,16,15,.95) 0%,rgba(3,10,9,.95) 100%);
+  --sb-border:rgba(255,255,255,.06); --sb-sep:rgba(255,255,255,.07);
+  --sb-ink:#9CC6C0; --sb-ink-strong:#E7F5F3; --sb-ink-dim:#5E8782; --sb-hover:rgba(255,255,255,.06); --sb-active:rgba(2,163,157,.22);
+  --tb-bg:rgba(7,16,15,.82);
+  --hero-a:#0B5E57; --hero-b:#042D29; --hero-scrim:rgba(0,0,0,.10); --hero-shadow:rgba(0,0,0,.55); --hero-text-shadow:rgba(0,0,0,.35);
+  --hero-calm-a:#0B4E48; --hero-calm-b:#04231F;
+  --hero-ok-a:#0F5A45; --hero-ok-b:#052F20;
+  --hero-prog-a:#0C4B5A; --hero-prog-b:#052A34;
+  --hero-win-a:#A8670F; --hero-win-b:#7A2D0C; --hero-win-shadow:rgba(0,0,0,.5);
+  --glow-1:rgba(2,163,157,.09); --glow-2:rgba(249,168,37,.03); --glow-3:rgba(0,105,92,.10);
+}
+body::before{ background:
+  radial-gradient(38vw 38vw at 8% 12%, var(--glow-1), transparent 60%),
+  radial-gradient(34vw 34vw at 92% 18%, var(--glow-2), transparent 60%),
+  radial-gradient(42vw 42vw at 25% 92%, var(--glow-3), transparent 60%) !important; }
+
+/* menu lateral: vidro que acompanha o tema */
+body .sidebar{ background:var(--sb-bg) !important; border-right:1px solid var(--sb-border) !important; backdrop-filter:var(--glass-blur) !important; -webkit-backdrop-filter:var(--glass-blur) !important; color:var(--sb-ink); }
+body .sidebar .brand{ border-bottom:1px solid var(--sb-sep) !important; }
+body .brand-text h1{ color:var(--sb-ink-strong) !important; }
+body .brand-text span{ color:var(--sb-ink-dim) !important; }
+body .sidebar .menu-item, body .sidebar .menu-group-header{ color:var(--sb-ink) !important; }
+body .sidebar .menu-item:hover, body .sidebar .menu-group-header:hover{ background:var(--sb-hover) !important; color:var(--sb-ink-strong) !important; }
+body .sidebar .menu-item.active{ background:var(--sb-active) !important; color:var(--sb-ink-strong) !important; }
+body .sidebar .menu-item svg, body .sidebar .menu-group-header svg{ opacity:.95; }
+body .sidebar .sidebar-foot{ color:var(--sb-ink-dim) !important; border-top:1px solid var(--sb-sep) !important; }
+body .sidebar-collapse-btn{ border-color:var(--card) !important; }
+body .sidebar nav.menu::-webkit-scrollbar-thumb{ background:var(--sb-ink-dim) !important; }
+.menu-item:focus-visible, .menu-group-header:focus-visible{ outline:2px solid var(--primary) !important; }
+
+/* barra superior: vidro que acompanha o tema (a linha de baixo alinha com a do menu) */
+body .topbar{ background:var(--tb-bg) !important; backdrop-filter:var(--glass-blur) !important; -webkit-backdrop-filter:var(--glass-blur) !important; border-bottom:1px solid var(--sb-sep) !important; }
+
+/* faixas de destaque */
+.home-hero{ background:linear-gradient(135deg,var(--hero-a),var(--hero-b)); box-shadow:0 16px 36px var(--hero-shadow); }
+.home-hero.hh-ganhou{ background:linear-gradient(135deg,var(--hero-win-a),var(--hero-win-b)); box-shadow:0 16px 36px var(--hero-win-shadow); }
+.home-hero.hh-espera, .home-hero.hh-vazio{ background:linear-gradient(135deg,var(--hero-calm-a),var(--hero-calm-b)); }
+.home-hero.hh-respondeu{ background:linear-gradient(135deg,var(--hero-ok-a),var(--hero-ok-b)); }
+.qh{ background:linear-gradient(135deg,var(--hero-a),var(--hero-b)); box-shadow:0 14px 32px var(--hero-shadow); }
+.qh-encerrada, .qh-vazio{ background:linear-gradient(135deg,var(--hero-calm-a),var(--hero-calm-b)); }
+.qh-programada{ background:linear-gradient(135deg,var(--hero-prog-a),var(--hero-prog-b)); }
+.qh-carregando{ background:var(--card); }
+.home-hero .hh-texto p, .home-hero .hh-chip, .home-hero h2, .qh h2, .qh p, .qh-stats, .qh-per, .qh-sauda, .qh-chip{ text-shadow:0 1px 2px var(--hero-text-shadow); }
+.hh-btn, .qh-btn{ text-shadow:none; }
+body.dark .hh-arte{ background:rgba(236,250,247,.9); }
+body.dark .hh-btn, body.dark .qh-btn:not(.ghost){ background:#E7F5F3; color:#064A44; }
+
+/* =====================================================================
+   v5c — encaixe por aparelho: alvos de toque confortáveis, nada cortado, textos legíveis
+   ===================================================================== */
+.stk-leg small, .rel-tile small, .qh-rel small, .msg-c-dir small, .evo-leg{ font-size:11.5px; }
+small{ font-size:11.5px; }
+form#formCampanha > div[style*="display:flex"], #sec-nova form > div[style*="display:flex"]{ flex-wrap:wrap; }
+.share-card .btn, .share-link-box .btn{ white-space:normal; }
+.share-link-box{ flex-wrap:wrap; }
+@media (pointer:coarse), (max-width:1100px){
+  .btn{ min-height:40px; } .btn.btn-sm{ min-height:36px; }
+  .seg-tabs button{ min-height:34px; }
+  .sync-chip{ min-height:36px; padding-inline:12px; }
+  .faq-item summary, details summary{ min-height:46px; display:flex; align-items:center; gap:8px; }
+  .link-btn, .remove-q, .icon-btn{ min-height:36px; min-width:36px; padding:6px 10px; }
+  .qk-sub a{ display:inline-block; padding:8px 3px; margin:-8px 0; }
+  .msg-assuntos button, .msg-modelos button{ min-height:36px; }
+  .menu-item, .menu-group-header{ min-height:42px; }
+  .table-wrap a{ display:inline-block; padding:8px 2px; margin:-8px 0; }
+}
+
+@media (pointer:coarse), (max-width:1100px){ .msg-ct{ min-height:36px; padding-inline:13px; } }
+
+@media (pointer:coarse), (max-width:1100px){ body .sidebar-collapse-btn{ width:34px; height:34px; } }
+
+/* monitores grandes: o conteúdo não estica; fica centralizado numa largura confortável */
+.content{ width:100%; max-width:1480px; margin-inline:auto; }
+
+/* faixa de destaque: um leve escurecimento só do lado do texto garante a leitura sem apagar a cor viva do resto */
+.home-hero{ background:linear-gradient(90deg,var(--hero-scrim) 0%,transparent 72%),linear-gradient(135deg,var(--hero-a),var(--hero-b)); }
+.home-hero.hh-espera, .home-hero.hh-vazio{ background:linear-gradient(90deg,var(--hero-scrim) 0%,transparent 72%),linear-gradient(135deg,var(--hero-calm-a),var(--hero-calm-b)); }
+.home-hero.hh-respondeu{ background:linear-gradient(90deg,var(--hero-scrim) 0%,transparent 72%),linear-gradient(135deg,var(--hero-ok-a),var(--hero-ok-b)); }
+.home-hero.hh-ganhou{ background:linear-gradient(90deg,rgba(120,40,0,.22) 0%,transparent 72%),linear-gradient(135deg,var(--hero-win-a),var(--hero-win-b)); }
+.qh{ background:linear-gradient(90deg,var(--hero-scrim) 0%,transparent 72%),linear-gradient(135deg,var(--hero-a),var(--hero-b)); }
+.qh-encerrada, .qh-vazio{ background:linear-gradient(90deg,var(--hero-scrim) 0%,transparent 72%),linear-gradient(135deg,var(--hero-calm-a),var(--hero-calm-b)); }
+.qh-programada{ background:linear-gradient(90deg,var(--hero-scrim) 0%,transparent 72%),linear-gradient(135deg,var(--hero-prog-a),var(--hero-prog-b)); }
+.qh-carregando{ background:var(--card); }
 </style>
 </head>
 <body data-app-url="<?= urlApp ?>" data-campanha="<?= campanhaParam ?>">
@@ -1884,22 +2133,22 @@ body .sidebar .menu-item, body .sidebar .menu-group-header{ transition:backgroun
           <button class="menu-item sub" data-target="nova"><i data-lucide="plus-circle"></i><span class="label">Nova Campanha</span></button>
           <button class="menu-item sub" data-target="campanhas"><i data-lucide="list"></i><span class="label">Rodadas</span></button>
           <button class="menu-item sub" data-target="participantes"><i data-lucide="bar-chart-2"></i><span class="label">Resultados</span></button>
+          <button class="menu-item sub" data-target="elegiveis"><i data-lucide="user-check"></i><span class="label">Elegíveis</span></button>
           <button class="menu-item sub" data-target="historico"><i data-lucide="history"></i><span class="label">Histórico</span></button>
           <button class="menu-item sub" data-target="banco"><i data-lucide="database"></i><span class="label">Banco de Perguntas</span></button>
         </div>
       </div>
 
-      <button class="menu-item qualidade-only" data-target="elegiveis"><i data-lucide="user-check"></i><span class="label">Elegíveis</span></button>
       <button class="menu-item qualidade-only" data-target="sorteio"><i data-lucide="dices"></i><span class="label">Sorteio</span></button>
       <button class="menu-item qualidade-only" data-target="divulgacao"><i data-lucide="megaphone"></i><span class="label">Divulgação</span></button>
-      <button class="menu-item qualidade-only" data-target="fale-conosco"><i data-lucide="message-circle-question"></i><span class="label">Mensagens recebidas</span></button>
+      <button class="menu-item qualidade-only" data-target="fale-conosco"><i data-lucide="message-circle-question"></i><span class="label">Mensagens recebidas</span><span class="menu-badge" id="badgeMsgsQ" hidden></span></button>
       <button class="menu-item qualidade-only" data-target="relatorios"><i data-lucide="file-text"></i><span class="label">Relatórios</span></button>
 
       <!-- ===== Perfil Colaborador ===== -->
       <button class="menu-item colaborador-only active" data-target="campanha-atual"><i data-lucide="target"></i><span class="label">Campanha Atual</span></button>
       <button class="menu-item colaborador-only" data-target="historico-colab"><i data-lucide="history"></i><span class="label">Minhas participações</span></button>
       <button class="menu-item colaborador-only" data-target="regulamento"><i data-lucide="book-open"></i><span class="label">Regulamento</span></button>
-      <button class="menu-item colaborador-only" data-target="fale-conosco"><i data-lucide="message-circle-question"></i><span class="label">Fale com a Qualidade</span></button>
+      <button class="menu-item colaborador-only" data-target="fale-conosco"><i data-lucide="message-circle-question"></i><span class="label">Fale com a Qualidade</span><span class="menu-badge" id="badgeMsgsC" hidden></span></button>
 
       <button class="menu-item" data-target="config"><i data-lucide="settings"></i><span class="label">Configurações</span></button>
     </nav>
@@ -1953,7 +2202,10 @@ body .sidebar .menu-item, body .sidebar .menu-group-header{ transition:backgroun
           <div class="seg-tabs"><button type="button" class="on" data-pane="homeSetor">Setor</button><button type="button" data-pane="homeFilial">Filial</button></div></div>
         <div id="homeSetor" class="part-lista tab-pane"></div><div id="homeFilial" class="part-lista tab-pane" hidden></div>
       </div>
-      <div class="panel"><h3>Acertos da última rodada encerrada</h3><div class="hint" id="donutRef">&nbsp;</div><div class="donut-wrap" id="chartDonut"></div></div>
+      <div class="panel"><h3>Evolução das rodadas</h3><div class="hint">Participantes de cada rodada (barras) e % que acertou tudo (linha) — inclui as rodadas importadas do Excel</div>
+        <div id="chartEvolucao" class="evo"></div>
+        <h4 class="evo-sub">Acertos na última rodada encerrada <span id="donutRef"></span></h4><div id="chartDonut"></div>
+      </div>
     </div>
     <div class="two-col">
       <div class="panel">
@@ -2022,6 +2274,7 @@ body .sidebar .menu-item, body .sidebar .menu-group-header{ transition:backgroun
         <div class="panel">
           <div style="display:flex; gap:12px; align-items:flex-end; margin-bottom:16px; flex-wrap:wrap;">
             <div class="field" style="min-width:260px;"><label>Campanha</label><select id="selectCampanhaParticipantes"></select></div>
+ <div class="field" style="flex:1; min-width:220px;"><label>Buscar</label><input type="search" id="buscaParticipantes" placeholder="Nome, matrícula, setor ou filial…" autocomplete="off"></div>
           </div>
           <div class="sorteio-stats" id="participantesStats"></div>
           <div class="table-wrap"><table><thead><tr><th>Colaborador</th><th>Matrícula</th><th>Função</th><th>Setor</th><th>Filial</th><th>Telefone / WhatsApp</th><th>Data/hora resposta</th><th>% Acertos</th></tr></thead><tbody id="tblParticipantes"></tbody></table></div>
@@ -2074,21 +2327,11 @@ body .sidebar .menu-item, body .sidebar .menu-group-header{ transition:backgroun
 
       <!-- ================= RELATÓRIOS (Qualidade) ================= -->
       <section class="section qualidade-only" id="sec-relatorios">
-        <div class="section-head"><div><h2>Relatórios</h2><p>Exportação de dados para auditoria e prestação de contas — .xlsx baixa um arquivo real; .pdf abre a visualização de impressão do navegador.</p></div></div>
-        <div class="panel">
-          <div class="field" style="max-width:320px; margin-bottom:18px;"><label>Campanha</label><select id="selectCampanhaRelatorio"></select></div>
-          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px;">
-            <div class="panel" style="margin:0; box-shadow:none; border:1px solid var(--border);"><h3 style="font-size:13.5px;">Lista de participantes</h3><p class="hint" style="margin-bottom:12px;">Todos os que responderam</p><div style="display:flex; gap:8px;"><button class="btn btn-outline btn-sm report-btn" data-report="participantes" data-type="Excel">.xlsx</button><button class="btn btn-outline btn-sm report-btn" data-report="participantes" data-type="PDF">.pdf</button></div></div>
-            <div class="panel" style="margin:0; box-shadow:none; border:1px solid var(--border);"><h3 style="font-size:13.5px;">Elegíveis ao sorteio</h3><p class="hint" style="margin-bottom:12px;">Após aplicação das regras de elegibilidade</p><div style="display:flex; gap:8px;"><button class="btn btn-outline btn-sm report-btn" data-report="elegiveis" data-type="Excel">.xlsx</button><button class="btn btn-outline btn-sm report-btn" data-report="elegiveis" data-type="PDF">.pdf</button></div></div>
-            <div class="panel" style="margin:0; box-shadow:none; border:1px solid var(--border);"><h3 style="font-size:13.5px;">Ganhadores sorteados</h3><p class="hint" style="margin-bottom:12px;">Com data e hora do sorteio</p><div style="display:flex; gap:8px;"><button class="btn btn-outline btn-sm report-btn" data-report="ganhadores" data-type="Excel">.xlsx</button><button class="btn btn-outline btn-sm report-btn" data-report="ganhadores" data-type="PDF">.pdf</button></div></div>
-            <div class="panel" style="margin:0; box-shadow:none; border:1px solid var(--border);"><h3 style="font-size:13.5px;">Distribuição por setor/filial</h3><p class="hint" style="margin-bottom:12px;">Verificação de equidade nas premiações</p><div style="display:flex; gap:8px;"><button class="btn btn-outline btn-sm report-btn" data-report="distribuicao" data-type="Excel">.xlsx</button><button class="btn btn-outline btn-sm report-btn" data-report="distribuicao" data-type="PDF">.pdf</button></div></div>
-            <div class="panel" style="margin:0; box-shadow:none; border:1px solid var(--border);"><h3 style="font-size:13.5px;">Registro de auditoria do sorteio</h3><p class="hint" style="margin-bottom:12px;">Critérios aplicados, número aleatório e responsável</p><div style="display:flex; gap:8px;"><button class="btn btn-outline btn-sm report-btn" data-report="auditoria" data-type="Excel">.xlsx</button><button class="btn btn-outline btn-sm report-btn" data-report="auditoria" data-type="PDF">.pdf</button></div></div>
-            <div class="panel" style="margin:0; box-shadow:none; border:1px solid var(--border);"><h3 style="font-size:13.5px;">Histórico completo</h3><p class="hint" style="margin-bottom:12px;">Todas as campanhas já realizadas</p><div style="display:flex; gap:8px;"><button class="btn btn-outline btn-sm report-btn" data-report="historico" data-type="Excel">.xlsx</button><button class="btn btn-outline btn-sm report-btn" data-report="historico" data-type="PDF">.pdf</button></div></div>
-            <div class="panel" style="margin:0; box-shadow:none; border:1px solid var(--border);"><h3 style="font-size:13.5px;">Comparativo entre campanhas</h3><p class="hint" style="margin-bottom:12px;">Participantes, elegíveis e média lado a lado — .pdf inclui gráfico</p><div style="display:flex; gap:8px;"><button class="btn btn-outline btn-sm report-btn" data-report="comparativo" data-type="Excel">.xlsx</button><button class="btn btn-outline btn-sm report-btn" data-report="comparativo" data-type="PDF">.pdf</button></div></div>
-            <div class="panel" style="margin:0; box-shadow:none; border:1px solid var(--border);"><h3 style="font-size:13.5px;">Evolução histórica</h3><p class="hint" style="margin-bottom:12px;">Tendência de participação e acertos ao longo do tempo — .pdf inclui gráfico</p><div style="display:flex; gap:8px;"><button class="btn btn-outline btn-sm report-btn" data-report="evolucao" data-type="Excel">.xlsx</button><button class="btn btn-outline btn-sm report-btn" data-report="evolucao" data-type="PDF">.pdf</button></div></div>
-          </div>
-        </div>
-      </section>
+    <div class="section-head"><div><h2>Relatórios</h2><p>O resumo da rodada, o que merece atenção e a exportação dos dados — tudo numa tela, também no celular.</p></div></div>
+    <div class="panel rel-topo"><div class="field"><label>Rodada</label><select id="selectCampanhaRelatorio"></select></div><div class="rel-periodo" id="relPeriodo"></div></div>
+    <div id="relConteudo"></div>
+    <div class="panel rel-export"><h3>Exportar dados</h3><p class="hint">.xlsx baixa um arquivo; .pdf abre a visualização de impressão. Os relatórios de rodada usam a rodada escolhida acima.</p><div class="rel-exp"><div class="rel-exp-row"><div><b>Lista de participantes</b><span>Todos os que responderam à rodada</span></div><div class="rel-exp-bt"><button class="btn btn-outline btn-sm report-btn" data-report="participantes" data-type="Excel">.xlsx</button><button class="btn btn-outline btn-sm report-btn" data-report="participantes" data-type="PDF">.pdf</button></div></div><div class="rel-exp-row"><div><b>Elegíveis ao sorteio</b><span>Depois de aplicar as regras de elegibilidade</span></div><div class="rel-exp-bt"><button class="btn btn-outline btn-sm report-btn" data-report="elegiveis" data-type="Excel">.xlsx</button><button class="btn btn-outline btn-sm report-btn" data-report="elegiveis" data-type="PDF">.pdf</button></div></div><div class="rel-exp-row"><div><b>Ganhadores sorteados</b><span>Com data e hora do sorteio</span></div><div class="rel-exp-bt"><button class="btn btn-outline btn-sm report-btn" data-report="ganhadores" data-type="Excel">.xlsx</button><button class="btn btn-outline btn-sm report-btn" data-report="ganhadores" data-type="PDF">.pdf</button></div></div><div class="rel-exp-row"><div><b>Distribuição por setor e filial</b><span>Verificação de equidade nas premiações</span></div><div class="rel-exp-bt"><button class="btn btn-outline btn-sm report-btn" data-report="distribuicao" data-type="Excel">.xlsx</button><button class="btn btn-outline btn-sm report-btn" data-report="distribuicao" data-type="PDF">.pdf</button></div></div><div class="rel-exp-row"><div><b>Registro de auditoria do sorteio</b><span>Critérios aplicados, número aleatório e responsável</span></div><div class="rel-exp-bt"><button class="btn btn-outline btn-sm report-btn" data-report="auditoria" data-type="Excel">.xlsx</button><button class="btn btn-outline btn-sm report-btn" data-report="auditoria" data-type="PDF">.pdf</button></div></div><div class="rel-exp-row"><div><b>Histórico completo</b><span>Todas as campanhas já realizadas</span></div><div class="rel-exp-bt"><button class="btn btn-outline btn-sm report-btn" data-report="historico" data-type="Excel">.xlsx</button><button class="btn btn-outline btn-sm report-btn" data-report="historico" data-type="PDF">.pdf</button></div></div><div class="rel-exp-row"><div><b>Comparativo entre campanhas</b><span>Participantes, elegíveis e média lado a lado (o .pdf inclui gráfico)</span></div><div class="rel-exp-bt"><button class="btn btn-outline btn-sm report-btn" data-report="comparativo" data-type="Excel">.xlsx</button><button class="btn btn-outline btn-sm report-btn" data-report="comparativo" data-type="PDF">.pdf</button></div></div><div class="rel-exp-row"><div><b>Evolução histórica</b><span>Média de acertos de cada campanha ao longo do tempo</span></div><div class="rel-exp-bt"><button class="btn btn-outline btn-sm report-btn" data-report="evolucao" data-type="Excel">.xlsx</button><button class="btn btn-outline btn-sm report-btn" data-report="evolucao" data-type="PDF">.pdf</button></div></div></div></div>
+  </section>
 
       <!-- ================= HISTÓRICO (Qualidade) ================= -->
       <section class="section qualidade-only" id="sec-historico">
@@ -2336,26 +2579,46 @@ body .sidebar .menu-item, body .sidebar .menu-group-header{ transition:backgroun
 
       <!-- ================= FALE COM A QUALIDADE (ambos os perfis, conteúdo diferente) ================= -->
       <section class="section" id="sec-fale-conosco">
-        <div class="section-head colaborador-only"><div><h2>Fale com a Qualidade</h2><p>Dúvidas, sugestões ou problemas com o PPG? Manda pra gente.</p></div></div>
-        <div class="section-head qualidade-only"><div><h2>Mensagens recebidas</h2><p>Dúvidas enviadas pelos colaboradores através do aplicativo.</p></div></div>
+    <div class="section-head colaborador-only"><div><h2>Fale com a Qualidade</h2><p>Dúvidas, sugestões ou problemas com o PPG? Manda pra gente.</p></div></div>
+    <div class="section-head qualidade-only"><div><h2>Mensagens recebidas</h2><p>Dúvidas enviadas pelos colaboradores através do aplicativo.</p></div></div>
 
-        <div class="panel colaborador-only email-gate" id="fcPrecisaEmail" style="display:none;"><div class="email-ico"><i data-lucide="at-sign"></i></div><div><h3>Vincule seu e-mail para falar com a Qualidade</h3><p class="hint" style="margin:4px 0 12px;">É por ele que você recebe a resposta e os avisos importantes. Pode ser pessoal ou da empresa — leva 10 segundos.</p><button type="button" class="btn btn-primary" id="btnFcVincular"><i data-lucide="at-sign"></i> Vincular e-mail</button></div></div>
-        <div class="hint colaborador-only email-info" id="fcEmailInfo"></div>
-        <form class="panel colaborador-only" id="formFaleConosco">
-          <div class="field" style="margin-bottom:12px;"><label>Assunto</label><input type="text" id="fcAssunto" placeholder="Ex: Dúvida sobre o sorteio" required></div>
-          <div class="field" style="margin-bottom:6px;"><label>Mensagem</label><textarea id="fcMensagem" rows="5" placeholder="Escreva sua dúvida ou sugestão..." required></textarea></div>
-          <div class="login-error" id="fcErro"></div>
-          <button type="submit" class="btn btn-primary" style="margin-top:12px;"><i data-lucide="send"></i> Enviar para a Qualidade</button>
-        </form>
+    <div class="panel colaborador-only email-gate" id="fcPrecisaEmail" style="display:none;"><div class="email-ico"><i data-lucide="at-sign"></i></div><div><h3>Vincule seu e-mail para falar com a Qualidade</h3><p class="hint" style="margin:4px 0 12px;">É por ele que você recebe a resposta e os avisos importantes. Pode ser pessoal ou da empresa — leva 10 segundos.</p><button type="button" class="btn btn-primary" id="btnFcVincular"><i data-lucide="at-sign"></i> Vincular e-mail</button></div></div>
 
-        <div class="colaborador-only">
-          <h3 style="font-size:15px; margin:20px 0 10px;">Minhas mensagens</h3>
-          <div id="listaMinhasDuvidas"></div>
+    <div class="msg-colab colaborador-only">
+      <form class="panel msg-compor" id="formFaleConosco">
+        <h3>Nova mensagem</h3>
+        <div class="hint email-info" id="fcEmailInfo"></div>
+        <div class="msg-assuntos" role="group" aria-label="Assuntos frequentes">
+          <button type="button" data-assunto="Dúvida sobre o meu resultado">Meu resultado</button>
+          <button type="button" data-assunto="Problema para acessar o PPG">Acesso</button>
+          <button type="button" data-assunto="Dado do meu cadastro está errado">Meu cadastro</button>
+          <button type="button" data-assunto="Dúvida sobre o sorteio">Sorteio</button>
+          <button type="button" data-assunto="Sugestão para o PPG">Sugestão</button>
         </div>
+        <div class="field"><label>Assunto</label><input type="text" id="fcAssunto" maxlength="90" placeholder="Ex: Dúvida sobre o sorteio" required></div>
+        <div class="field"><label>Mensagem</label><textarea id="fcMensagem" rows="6" maxlength="1200" placeholder="Conte o que aconteceu ou o que você gostaria de saber…" required></textarea><div class="msg-cont"><span id="fcCont">0 / 1200</span></div></div>
+        <div class="login-error" id="fcErro"></div>
+        <button type="submit" class="btn btn-primary"><i data-lucide="send"></i> Enviar para a Qualidade</button>
+      </form>
+      <div class="msg-historico">
+        <div class="msg-hist-topo"><h3>Minhas conversas</h3></div>
+        <div id="listaMinhasDuvidas"></div>
+      </div>
+    </div>
 
-        <div class="qualidade-only" id="listaDuvidas"></div>
-        <button class="btn btn-outline btn-sm qualidade-only" id="btnAtualizarDuvidas" style="margin-top:12px;"><i data-lucide="refresh-cw"></i> Atualizar lista</button>
-      </section>
+    <div class="qualidade-only msg-inbox">
+      <div class="msg-barra">
+        <div class="seg-tabs" id="msgFiltro">
+          <button type="button" class="on" data-f="pendente">Aguardando <b id="msgCtPend">0</b></button>
+          <button type="button" data-f="respondida">Respondidas <b id="msgCtResp">0</b></button>
+          <button type="button" data-f="todas">Todas <b id="msgCtTodas">0</b></button>
+        </div>
+        <input type="search" id="msgBusca" placeholder="Buscar por nome, matrícula ou assunto…" autocomplete="off">
+        <button class="btn btn-outline btn-sm" id="btnAtualizarDuvidas" type="button"><i data-lucide="refresh-cw"></i> Atualizar</button>
+      </div>
+      <div id="listaDuvidas"></div>
+    </div>
+  </section>
       <section class="section" id="sec-config">
         <div class="section-head"><div><h2>Configurações</h2><p id="configSubtitle">Preferências pessoais e parâmetros do sistema.</p></div></div>
         <div class="panel"><h3><i data-lucide="sun-moon"></i> Aparência</h3><div class="hint">Disponível para todos os perfis — "Automático" segue o tema do seu aparelho</div>
@@ -6176,8 +6439,11 @@ function goToSection(target){
   else renderSectionContent(target);
 }
 function renderSectionContent(target){
+  if(target !== 'participantes'){ const t = document.getElementById('tblParticipantes'); if(t && t.children.length){ t.innerHTML = ''; t._rows = null; } }   // libera as tabelas gigantes ao sair da tela
+  if(target !== 'elegiveis') ['tblElegiveis', 'tblExcluidos'].forEach(id=>{ const t = document.getElementById(id); if(t && t.children.length){ t.innerHTML = ''; t._rows = null; } });
   if(target==="inicio") renderDashboard();
   if(target==="campanhas") renderCampaignGrid();
+  if(target==="relatorios") renderRelatorios();
   if(target==="historico") renderPaneHistorico();
   if(target==="participantes") renderParticipantsTable();
   if(target==="elegiveis") renderEligibleTable();
@@ -6270,7 +6536,7 @@ function linkCampanha(id){ return `${APP_URL}${APP_URL.includes('?') ? '&' : '?'
 /* ======================= LOGIN ======================= */
 /* A autenticação de verdade agora mora na planilha (via Google Apps Script).
    Não existe mais senha nenhuma escrita aqui no código. */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwKEGLYX2siezx2T53QR66WjO7s57g8i9sMYGsSzd0C_JhxVDkkmur_jUfHqc__x43XpQ/exec";
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxNTmLbDf_qQwwohT4GE5mw9vHgw72bAe__f7Het_cYibLvbdhD7aDiIA7ZCGaEkoXfWQ/exec";
 
 function urlDoApp(){ try{ return APP_URL.split('#')[0].split('?')[0]; }catch(e){ return ''; } }
 
@@ -6542,68 +6808,115 @@ document.getElementById('formFaleConosco')?.addEventListener('submit', async fun
   renderMinhasDuvidas();
 });
 
+const _vistaKey = ()=> 'ppg_msgs_vistas::' + (currentUser ? currentUser.matricula : '_');
+function _lerVista(){ try{ return Number(localStorage.getItem(_vistaKey())) || 0; }catch(e){ return 0; } }
+function _gravarVista(){ try{ localStorage.setItem(_vistaKey(), String(Date.now())); }catch(e){} }
+function atualizarBadgeMsgs(){
+  const q = document.getElementById('badgeMsgsQ'), c = document.getElementById('badgeMsgsC');
+  if(q){ q.textContent = _msgsPendentes > 99 ? '99+' : _msgsPendentes; q.hidden = !(currentRole === 'qualidade' && _msgsPendentes > 0); }
+  if(c){ c.textContent = _respostasNovas > 99 ? '99+' : _respostasNovas; c.hidden = !(currentRole === 'colaborador' && _respostasNovas > 0); }
+}
+let _respostasNovas = 0, _respostasTs = 0;
+async function carregarRespostasNovas(){
+  if(currentRole !== 'colaborador' || !currentUser || !currentUser.token) return;
+  const agora = Date.now(); if(_respostasTs && agora - _respostasTs < 300000) return; _respostasTs = agora;
+  const r = await backendCall('getMinhasDuvidas', {matricula: currentUser.matricula});
+  if(r && r.ok){ const vista = _lerVista(); _respostasNovas = (r.duvidas || []).filter(d=>d.resposta && new Date(d.respondidoEm).getTime() > vista).length; atualizarBadgeMsgs(); }
+}
 async function renderMinhasDuvidas(){
   const lista = document.getElementById('listaMinhasDuvidas');
   if(!lista || !currentUser) return;
-  lista.innerHTML = `<p class="hint">Carregando…</p>`;
+  lista.innerHTML = `<div class="skel skel-l1"></div><div class="skel skel-bar"></div>`;
   const resp = await backendCall('getMinhasDuvidas', {matricula: currentUser.matricula});
-  if(!resp.ok){ lista.innerHTML = `<p class="hint" style="color:var(--error);">${resp.erro || 'Não foi possível carregar.'}</p>`; return; }
+  if(!resp.ok){ lista.innerHTML = `<p class="hint" style="color:var(--error);">${escH(resp.erro || 'Não foi possível carregar.')}</p>`; return; }
   const minhas = (resp.duvidas || []).sort((a,b)=> new Date(b.dataHora) - new Date(a.dataHora));
-  if(!minhas.length){ lista.innerHTML = `<p class="hint">Você ainda não enviou nenhuma mensagem.</p>`; return; }
-  lista.innerHTML = minhas.map(d=>`
-    <div class="panel duvida-card">
-      <div class="duvida-head">
-        <b>${escH(d.assunto)}</b>
-        <span class="badge ${d.status==='pendente'?'programada':'finalizada'}">${d.status==='pendente'?'Aguardando resposta':'Respondida'}</span>
-      </div>
-      <p class="hint" style="margin:8px 0 ${d.resposta?'12px':'0'};">${escH(d.mensagem)}</p>
-      ${d.resposta ? `<div class="duvida-resposta"><b>Resposta de ${escH(d.respondidoPor)} em ${fmtDateTime(new Date(d.respondidoEm))}:</b><p>${escH(d.resposta)}</p></div>` : ''}
-    </div>
-  `).join('');
+  const vista = _lerVista();
+  if(!minhas.length){ lista.innerHTML = `<div class="msg-vazio"><i data-lucide="messages-square"></i><b>Nenhuma conversa ainda</b><span>Quando você enviar uma mensagem, ela e a resposta da Qualidade aparecem aqui.</span></div>`; if(window.lucide) lucide.createIcons(); _gravarVista(); _respostasNovas = 0; atualizarBadgeMsgs(); return; }
+  lista.innerHTML = minhas.map(d=>{
+    const pend = d.status === 'pendente', novo = !!d.resposta && new Date(d.respondidoEm).getTime() > vista;
+    return `<div class="panel msg-thread ${novo ? 'novo' : ''}">
+      <div class="msg-th-topo"><b>${escH(d.assunto)}</b><span class="msg-st ${pend ? 'pend' : 'ok'}">${novo ? '<em>Nova</em> ' : ''}${pend ? 'Aguardando resposta' : 'Respondida'}</span></div>
+      <div class="msg-bolha eu"><div class="msg-meta">Você · ${escH(fmtDateTime(new Date(d.dataHora)))}</div><p>${escH(d.mensagem)}</p></div>
+      ${d.resposta ? `<div class="msg-bolha eles"><div class="msg-meta"><i data-lucide="shield-check"></i> ${escH(d.respondidoPor)} · Qualidade · ${escH(fmtDateTime(new Date(d.respondidoEm)))}</div><p>${escH(d.resposta)}</p></div>`
+        : `<div class="msg-espera"><i data-lucide="clock"></i> Você será avisado(a) por e-mail e a resposta também aparece aqui.</div>`}
+    </div>`;
+  }).join('');
+  if(window.lucide) lucide.createIcons();
+  _gravarVista(); _respostasNovas = 0; atualizarBadgeMsgs();
 }
+/* contador de caracteres e assuntos rápidos (colaborador) */
+document.getElementById('fcMensagem')?.addEventListener('input', e=>{ const c = document.getElementById('fcCont'); if(c) c.textContent = e.target.value.length + ' / ' + (e.target.maxLength || 1200); });
+document.querySelector('.msg-assuntos')?.addEventListener('click', e=>{
+  const b = e.target.closest('button[data-assunto]'); if(!b) return;
+  const campo = document.getElementById('fcAssunto'); campo.value = b.dataset.assunto; campo.dispatchEvent(new Event('input', {bubbles:true}));
+  b.parentElement.querySelectorAll('button').forEach(x=>x.classList.toggle('on', x === b)); document.getElementById('fcMensagem').focus();
+});
 
 let _duvidasAtuais = [];
+let _msgFiltro = 'pendente', _msgBusca = '';
+const MODELOS_RESPOSTA = ['Recebemos a sua mensagem e já estamos verificando. Retornamos em breve.', 'O seu resultado aparece em “Minhas participações” assim que a rodada é finalizada.', 'Atualizamos o seu cadastro. Se algo ainda estiver errado, é só responder por aqui.'];
+function waLink_(tel){ let d = String(tel || '').replace(/\D/g, ''); if(!d) return ''; if(d.length <= 11) d = '55' + d; return 'https://wa.me/' + d; }
 async function renderDuvidas(){
   const lista = document.getElementById('listaDuvidas');
   if(!lista) return;
-  lista.innerHTML = `<p class="hint" style="padding:16px; text-align:center;">Carregando…</p>`;
+  if(!_duvidasAtuais || !_duvidasAtuais.length) lista.innerHTML = `<div class="skel skel-l1"></div><div class="skel skel-bar"></div><div class="skel skel-l2"></div>`;
   const resp = await backendCall('listarDuvidas');
-  if(!resp.ok){
-    lista.innerHTML = `<p class="hint" style="padding:16px; text-align:center; color:var(--error);">${resp.erro || 'Não foi possível carregar as mensagens.'}</p>`;
-    return;
-  }
+  if(!resp.ok){ lista.innerHTML = `<p class="hint" style="padding:16px; text-align:center; color:var(--error);">${escH(resp.erro || 'Não foi possível carregar as mensagens.')}</p>`; return; }
   _duvidasAtuais = (resp.duvidas || []).sort((a,b)=> new Date(b.dataHora) - new Date(a.dataHora));
-  if(!_duvidasAtuais.length){
-    lista.innerHTML = `<div class="panel fun-empty"><div class="fe-icon"><i data-lucide="inbox"></i></div>Nenhuma mensagem recebida ainda.</div>`;
-    if(window.lucide) lucide.createIcons();
-    return;
+  _msgsPendentes = _duvidasAtuais.filter(d=>d.status === 'pendente').length; atualizarBadgeMsgs();
+  desenharDuvidas();
+}
+function desenharDuvidas(){
+  const lista = document.getElementById('listaDuvidas'); if(!lista) return;
+  const todas = _duvidasAtuais || [], pend = todas.filter(d=>d.status === 'pendente').length;
+  const set = (id, v)=>{ const e = document.getElementById(id); if(e) e.textContent = v; };
+  set('msgCtPend', pend); set('msgCtResp', todas.length - pend); set('msgCtTodas', todas.length);
+  document.querySelectorAll('#msgFiltro button').forEach(b=> b.classList.toggle('on', b.dataset.f === _msgFiltro));
+  const norm = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(), termo = norm(_msgBusca).trim();
+  let itens = todas.map((d, i)=>({d, i})).filter(({d})=> _msgFiltro === 'todas' || d.status === _msgFiltro);
+  if(termo) itens = itens.filter(({d})=> norm([d.nome, d.matricula, d.assunto, d.mensagem, d.setor, d.filial].join(' ')).includes(termo));
+  itens.sort((a, b)=> _msgFiltro === 'pendente' ? new Date(a.d.dataHora) - new Date(b.d.dataHora) : new Date(b.d.dataHora) - new Date(a.d.dataHora));   // pendentes: a mais antiga primeiro
+  if(!itens.length){
+    lista.innerHTML = `<div class="msg-vazio"><i data-lucide="${todas.length ? 'search-x' : 'inbox'}"></i><b>${todas.length ? 'Nada encontrado' : 'Nenhuma mensagem recebida ainda'}</b><span>${todas.length ? 'Troque o filtro ou a busca.' : 'Quando um colaborador escrever pelo aplicativo, a mensagem aparece aqui.'}</span></div>`;
+    if(window.lucide) lucide.createIcons(); return;
   }
-  lista.innerHTML = _duvidasAtuais.map((d,i)=>`
-    <div class="panel duvida-card">
-      <div class="duvida-head">
-        <div><b>${escH(d.nome)}</b> <span class="hint">· ${escH(d.matricula)} · ${fmtDateTime(new Date(d.dataHora))}${d.emailContato ? ` · <a href="mailto:${escH(d.emailContato)}">${escH(d.emailContato)}</a>` : ''}</span></div>
-        <span class="badge ${d.status==='pendente'?'programada':'finalizada'}">${d.status==='pendente'?'Aguardando resposta':'Respondida'}</span>
-      </div>
-      <p style="margin:10px 0 4px;"><b>${escH(d.assunto)}</b></p>
-      <p class="hint" style="margin:0 0 12px;">${escH(d.mensagem)}</p>
+  lista.innerHTML = itens.map(({d, i})=>{
+    const pendente = d.status === 'pendente', tel = String(d.telefone || '').trim(), wa = (tel && d.whatsapp) ? waLink_(tel) : '';
+    const ctx = [d.matricula, d.setor, d.filial, d.funcao].filter(Boolean).map(escH).join(' · ');
+    const contatos = [
+      d.emailContato ? `<a class="msg-ct" href="mailto:${escH(d.emailContato)}?subject=${encodeURIComponent('Re: ' + d.assunto)}"><i data-lucide="mail"></i>${escH(d.emailContato)}</a>` : '',
+      tel ? `<a class="msg-ct" href="tel:${escH(tel.replace(/[^\d+]/g, ''))}"><i data-lucide="phone"></i>${escH(tel)}</a>` : '',
+      wa ? `<a class="msg-ct wa" href="${escH(wa)}" target="_blank" rel="noopener"><i data-lucide="message-circle"></i>WhatsApp</a>` : '',
+      (!d.emailContato && !tel) ? '<span class="msg-ct sem"><i data-lucide="user-x"></i>Sem contato cadastrado</span>' : ''].join('');
+    return `<div class="panel duvida-card msg-card ${pendente ? 'pend' : ''}">
+      <div class="msg-c-topo"><span class="msg-av">${escH(String(d.nome || '?').trim().charAt(0).toUpperCase())}</span>
+        <div class="msg-c-quem"><b>${escH(d.nome)}</b><span>${ctx}</span></div>
+        <div class="msg-c-dir"><span class="msg-st ${pendente ? 'pend' : 'ok'}">${pendente ? 'Aguardando resposta' : 'Respondida'}</span><small>${escH(fmtDateTime(new Date(d.dataHora)))}</small></div></div>
+      <div class="msg-contatos">${contatos}</div>
+      <p class="msg-assunto">${escH(d.assunto)}</p>
+      <div class="msg-bolha eles"><p>${escH(d.mensagem)}</p></div>
       ${d.resposta
-        ? `<div class="duvida-resposta"><b>Resposta de ${escH(d.respondidoPor)} em ${fmtDateTime(new Date(d.respondidoEm))}:</b><p>${escH(d.resposta)}</p></div>`
-        : `<div class="duvida-responder">
-            <textarea id="respTexto_${i}" rows="2" placeholder="Escreva uma resposta para ${escH(d.nome.split(' ')[0])}..."></textarea>
-            <button class="btn btn-primary btn-sm" onclick="enviarRespostaDuvida(${i})" style="margin-top:8px;"><i data-lucide="send"></i> Enviar resposta</button>
-          </div>`
-      }
-    </div>
-  `).join('');
+        ? `<div class="msg-bolha eu"><div class="msg-meta">Resposta de ${escH(d.respondidoPor)} · ${escH(fmtDateTime(new Date(d.respondidoEm)))}</div><p>${escH(d.resposta)}</p></div>`
+        : `<div class="msg-resp"><div class="msg-modelos">${MODELOS_RESPOSTA.map((m, k)=>`<button type="button" onclick="usarModeloResposta(${i},${k})">${escH(m.length > 38 ? m.slice(0, 36) + '…' : m)}</button>`).join('')}</div>
+            <textarea id="respTexto_${i}" rows="3" placeholder="Escreva uma resposta para ${escH(String(d.nome || '').split(' ')[0])}…"></textarea>
+            <button class="btn btn-primary btn-sm msg-enviar" type="button" onclick="enviarRespostaDuvida(${i})"><i data-lucide="send"></i> Enviar resposta</button></div>`}
+    </div>`;
+  }).join('');
   if(window.lucide) lucide.createIcons();
   try{ Rasc.ligarRespostas(); }catch(e){}
 }
+window.usarModeloResposta = function(i, k){
+  const ta = document.getElementById('respTexto_' + i); if(!ta) return;
+  ta.value = (ta.value.trim() ? ta.value.trim() + '\n' : '') + MODELOS_RESPOSTA[k]; ta.dispatchEvent(new Event('input', {bubbles:true})); ta.focus();
+};
+document.getElementById('msgFiltro')?.addEventListener('click', e=>{ const b = e.target.closest('button[data-f]'); if(!b) return; _msgFiltro = b.dataset.f; desenharDuvidas(); });
+document.getElementById('msgBusca')?.addEventListener('input', e=>{ _msgBusca = e.target.value; clearTimeout(window._msgBuscaT); window._msgBuscaT = setTimeout(desenharDuvidas, 180); });
 window.enviarRespostaDuvida = async function(i){
   const d = _duvidasAtuais[i];
   const textarea = document.getElementById(`respTexto_${i}`);
   const resposta = textarea.value.trim();
   if(!resposta){ showToast("Escreva uma resposta antes de enviar.", "warning"); return; }
-  const btn = textarea.nextElementSibling;
+  const btn = (textarea.closest('.msg-resp') && textarea.closest('.msg-resp').querySelector('.msg-enviar')) || textarea.nextElementSibling;
   btn.disabled = true; btn.textContent = "Enviando...";
   const resp = await backendCall('responderDuvida', {id: d.id, resposta});
   if(!resp.ok){ if(resp.precisaEmail){ MEU_EMAIL.vinculado = false; abrirModalEmail({obrigatorio: currentRole === 'qualidade'}); } showToast(resp.erro || "Não foi possível enviar a resposta.", "warning"); btn.disabled = false; btn.innerHTML = '<i data-lucide="send"></i> Enviar resposta'; return; }
@@ -6811,6 +7124,24 @@ function fillCampaignSelects(){
 }
 
 /* ======================= DASHBOARD (com drill-down) ======================= */
+/* rótulo curto da rodada para o gráfico: "PPG 2026.3 – Teste" -> "2026.3" */
+function rotuloCurto(c){ let t = String(c.nome || '').split(/\s[–-]\s/)[0].replace(/^PPG\s*/i, '').trim(); return t.length > 13 ? t.slice(0, 12) + '…' : (t || '—'); }
+/* Evolução das rodadas: barras = participantes; linha = % que acertou 100% (só onde há nota). Inclui as importadas. */
+function renderEvolucao(){
+  const el = document.getElementById('chartEvolucao'); if(!el) return;
+  const rodadas = ordenarPorFim(todasCampanhas()).filter(c=>c.status !== 'programada' && campaignAccessStatus(c) !== 'nao_iniciada').slice(-10);
+  const dados = rodadas.map(c=>{ const ps = campaignParticipants(c.id), cn = ps.filter(p=>p.pct != null); return {c, n: ps.length, p100: cn.length ? Math.round(cn.filter(p=>p.pct === 100).length / cn.length * 100) : null}; }).filter(d=>d.n > 0);
+  if(!dados.length){ el.innerHTML = '<p class="hint">Ainda não há rodadas com participantes.</p>'; return; }
+  const W = Math.max(320, Math.min(900, el.clientWidth || 460)), H = 270, ml = 34, mr = 40, mt = 18, mb = 56, iw = W - ml - mr, ih = H - mt - mb, maxN = Math.max(...dados.map(d=>d.n), 1);
+  const passo = iw / dados.length, bw = Math.min(52, passo * .6), x = i => ml + passo * i + passo / 2, yN = v => mt + ih - v / maxN * ih, yP = v => mt + ih - v / 100 * ih;
+  const grade = [0, .5, 1].map(f=>`<line x1="${ml}" x2="${W - mr}" y1="${(mt + ih - f * ih).toFixed(1)}" y2="${(mt + ih - f * ih).toFixed(1)}" class="evo-g"/><text x="${ml - 6}" y="${(mt + ih - f * ih + 4).toFixed(1)}" text-anchor="end" class="evo-t">${Math.round(maxN * f)}</text><text x="${W - mr + 6}" y="${(mt + ih - f * ih + 4).toFixed(1)}" class="evo-t">${Math.round(100 * f)}%</text>`).join('');
+  const barras = dados.map((d, i)=>`<g><rect x="${(x(i) - bw / 2).toFixed(1)}" y="${yN(d.n).toFixed(1)}" width="${bw.toFixed(1)}" height="${(mt + ih - yN(d.n)).toFixed(1)}" rx="6" class="evo-b"><title>${escH(d.c.nome)}: ${d.n} participante(s)</title></rect><text x="${x(i).toFixed(1)}" y="${(yN(d.n) - 5).toFixed(1)}" text-anchor="middle" class="evo-v">${d.n}</text><text x="${x(i).toFixed(1)}" y="${H - mb + 18}" text-anchor="middle" class="evo-x">${escH(rotuloCurto(d.c))}</text></g>`).join('');
+  const pts = dados.map((d, i)=> d.p100 == null ? null : [x(i), yP(d.p100), d]).filter(Boolean);
+  const linha = pts.length > 1 ? `<polyline points="${pts.map(p=>p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ')}" class="evo-l"/>` : '';
+  const bolas = pts.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="4.5" class="evo-p"><title>${escH(p[2].c.nome)}: ${p[2].p100}% acertaram 100%</title></circle>`).join('');
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Evolução das rodadas: participantes e percentual que acertou tudo">${grade}${barras}${linha}${bolas}</svg>
+    <div class="evo-leg"><span><i class="sq"></i> Participantes</span><span><i class="dt"></i> % que acertou 100%${pts.length ? '' : ' (sem notas nas rodadas importadas)'}</span></div>`;
+}
 function renderDashboard(){
   renderHomeExtras();
   const todas = todasCampanhas();
@@ -6824,25 +7155,24 @@ function renderDashboard(){
   const comSorteio = todas.filter(c=>c.ganhadores && c.ganhadores.length);
   set('kpiGanhadores', comSorteio.reduce((a,c)=>a + c.ganhadores.length, 0));
   set('kpiRodadasSorteadas', comSorteio.length);
+  renderEvolucao();
 
-  // Acertos da última rodada JÁ ENCERRADA (inclui as finalizadas pelo sorteio)
+  // Acertos da última rodada JÁ ENCERRADA (do sistema, que tem a nota de cada pessoa): barra única, em vez do anel solitário
   const encerradas = ordenarPorFim(todas).filter(c=>!c.importada && campaignAccessStatus(c) === 'encerrada');
-  const refD = encerradas[encerradas.length - 1], donutEl = document.getElementById('chartDonut');
-  const donutRef = document.getElementById('donutRef');
+  const refD = encerradas[encerradas.length - 1], donutEl = document.getElementById('chartDonut'), donutRef = document.getElementById('donutRef');
   if(donutEl){
-    if(!refD){ if(donutRef) donutRef.textContent = 'Ainda não há rodada encerrada.'; donutEl.innerHTML = ''; }
+    const refP = refD ? campaignParticipants(refD.id).filter(p=>p.pct != null) : [];
+    if(!refD || !refP.length){ if(donutRef) donutRef.textContent = ''; donutEl.innerHTML = '<p class="hint">Ainda não há rodada encerrada com notas.</p>'; }
     else {
-      const refP = campaignParticipants(refD.id), total = refP.length || 1;
+      const total = refP.length;
       const faixas = [
         {rot:'100%', v:refP.filter(p=>p.pct === 100).length, c:'var(--success)'},
         {rot:'80% a 99%', v:refP.filter(p=>p.pct >= 80 && p.pct < 100).length, c:'var(--primary)'},
         {rot:'60% a 79%', v:refP.filter(p=>p.pct >= 60 && p.pct < 80).length, c:'var(--warning)'},
         {rot:'Abaixo de 60%', v:refP.filter(p=>p.pct < 60).length, c:'var(--error)'}];
-      if(donutRef) donutRef.textContent = refD.nome;
-      let acc = 0;
-      const stops = faixas.map(s=>{ const ini = acc / total * 360; acc += s.v; return `${s.c} ${ini}deg ${acc / total * 360}deg`; }).join(', ');
-      donutEl.innerHTML = `<div class="donut" style="background:conic-gradient(${stops});"><div class="donut-miolo"><b>${refP.length}</b><span>respostas</span></div></div>
-        <div class="donut-legend">${faixas.map(s=>`<div><span class="legend-dot" style="background:${s.c}"></span>${s.rot} — <b>${s.v}</b></div>`).join('')}</div>`;
+      if(donutRef) donutRef.textContent = '· ' + refD.nome;
+      donutEl.innerHTML = `<div class="stk">${faixas.filter(s=>s.v).map(s=>`<span style="width:${(s.v / total * 100).toFixed(2)}%;background:${s.c}" title="${s.rot}: ${s.v}"></span>`).join('')}</div>
+        <div class="donut-legend stk-leg">${faixas.map(s=>`<div><span class="legend-dot" style="background:${s.c}"></span>${s.rot} — <b>${s.v}</b> <small>(${Math.round(s.v / total * 100)}%)</small></div>`).join('')}</div>`;
     }
   }
 
@@ -6851,12 +7181,12 @@ function renderDashboard(){
   renderHBarChart('chartFilial', allWinners, 'filial', [...new Set(allWinners.map(w=>w.filial).filter(Boolean))]);
 
   const ultimas = ordenarPorFim(todas).reverse().slice(0, 8);
-  const maxN = Math.max(1, ...ultimas.map(c=>c.importada ? 0 : campaignParticipants(c.id).length));
+  const maxN = Math.max(1, ...ultimas.map(c=>campaignParticipants(c.id).length));
   const tb = document.getElementById('tblUltimasCampanhas');
   if(tb) tb.innerHTML = ultimas.map(c=>{
-    const n = c.importada ? null : campaignParticipants(c.id).length;
+    const n = campaignParticipants(c.id).length;
     return `<tr><td><b class="tb-nome">${escH(c.nome)}</b><span class="tb-per">${escH(fmtPeriodoValor(c.inicio))} – ${escH(fmtPeriodoValor(c.fim))}</span></td>
-      <td>${n == null ? '<span class="hint">—</span>' : `<div class="tb-bar"><span style="width:${Math.max(4, Math.round(n / maxN * 100))}%"></span><b>${n}</b></div>`}</td><td>${statusBadge(c.status)}</td></tr>`;
+      <td>${!n ? '<span class="hint">—</span>' : `<div class="tb-bar"><span style="width:${Math.max(4, Math.round(n / maxN * 100))}%"></span><b>${n}</b></div>`}</td><td>${statusBadge(c.status)}</td></tr>`;
   }).join('') || '<tr><td colspan="3" class="hint" style="text-align:center;padding:16px;">Nenhuma campanha ainda.</td></tr>';
 }
 
@@ -6943,13 +7273,39 @@ window.goToParticipants = function(id){
 };
 
 /* ======================= PARTICIPANTES / RESULTADOS ======================= */
+/* ======================= TABELAS GRANDES: 60 linhas por vez, com busca ======================= */
+const _pag = {}, PASSO_TABELA = 60;
+const _normBusca = s => String(s == null ? '' : s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+function _campoBusca(id){ return document.getElementById(id === 'tblParticipantes' ? 'buscaParticipantes' : 'buscaElegiveis'); }
+function _chavePag(id){ const sel = document.getElementById(id === 'tblParticipantes' ? 'selectCampanhaParticipantes' : 'selectCampanhaElegiveis'); return id + '|' + (sel ? sel.value : '') + '|' + ((_campoBusca(id) || {}).value || ''); }
+function _maisHtml(k, mostrando, total, colspan){ const resto = total - mostrando; return `<tr class="mais-linhas"><td colspan="${colspan}"><span class="hint">Mostrando ${mostrando} de ${total}</span> <button type="button" class="btn btn-outline btn-sm" data-mais="${escH(k)}">Mostrar mais ${Math.min(PASSO_TABELA, resto)}</button> <button type="button" class="btn btn-ghost btn-sm" data-todas="${escH(k)}">Mostrar todas</button></td></tr>`; }
+function _setLinhas(id, colspan, html){
+  const tb = document.getElementById(id); if(!tb) return;
+  let rows = String(html).split('</tr>').filter(s=>s.trim()).map(s=>s + '</tr>');
+  const unica = rows.length === 1 && /colspan=/.test(rows[0]);   // a linha única "Nenhum… ainda"
+  const termo = _normBusca((_campoBusca(id) || {}).value || '').trim();
+  if(!unica && termo){ rows = rows.filter(r=>_normBusca(r.replace(/<[^>]+>/g, ' ')).includes(termo)); if(!rows.length) rows = [`<tr><td colspan="${colspan}" style="text-align:center; color:var(--ink-soft); padding:20px;">Nada encontrado para “${escH(termo)}”.</td></tr>`]; }
+  const k = _chavePag(id); if(!_pag[k] || _pag[k] < PASSO_TABELA) _pag[k] = PASSO_TABELA;
+  const ate = Math.min(_pag[k], rows.length);
+  tb.innerHTML = rows.slice(0, ate).join('') + (rows.length > ate ? _maisHtml(k, ate, rows.length, colspan) : '');
+  tb._rows = rows; tb._colspan = colspan;
+}
+document.addEventListener('click', e=>{
+  const b = e.target.closest && e.target.closest('[data-mais], [data-todas]'); if(!b) return;
+  const tb = b.closest('tbody'), rows = tb && tb._rows; if(!rows) return;
+  const k = b.dataset.mais || b.dataset.todas, atual = tb.querySelectorAll('tr:not(.mais-linhas)').length, ate = b.dataset.todas ? rows.length : Math.min(rows.length, atual + PASSO_TABELA);
+  const maisTr = tb.querySelector('.mais-linhas'); if(maisTr) maisTr.remove();
+  tb.insertAdjacentHTML('beforeend', rows.slice(atual, ate).join('') + (rows.length > ate ? _maisHtml(k, ate, rows.length, tb._colspan) : ''));
+  _pag[k] = ate; if(window.lucide) lucide.createIcons();
+});
+['buscaParticipantes', 'buscaElegiveis'].forEach(id=> document.addEventListener('input', e=>{ if(e.target && e.target.id === id){ clearTimeout(window['_bt_' + id]); window['_bt_' + id] = setTimeout(()=>{ if(id === 'buscaParticipantes') renderParticipantsTable(); else renderEligibleTable(); }, 220); } }));
 function renderParticipantsTable(){
   const sel = document.getElementById('selectCampanhaParticipantes');
   const id = sel.value;
   const list = campaignParticipants(id).sort((a,b)=>(b.pct||0)-(a.pct||0));
-  document.getElementById('tblParticipantes').innerHTML = list.map(p=>`
-    <tr><td>${p.nome}</td><td>${p.matricula}</td><td>${p.cargo}</td><td>${p.setor}</td><td>${p.filial}</td><td>${celulaContato(p)}</td><td>${fmtDateTime(p.data)}</td><td><span class="${p.pct===100?'pct100':'pctless'}">${pctTxt(p.pct)}</span></td></tr>`).join('') ||
-    `<tr><td colspan="8" style="text-align:center; color:var(--ink-soft); padding:20px;">Nenhum participante ainda.</td></tr>`;
+  _setLinhas('tblParticipantes', 8, list.map(p=>`
+    <tr><td>${escH(p.nome)}</td><td>${escH(p.matricula)}</td><td>${escH(p.cargo || p.funcao || '')}</td><td>${escH(p.setor || '')}</td><td>${escH(p.filial || '')}</td><td>${celulaContato(p)}</td><td>${fmtDateTime(p.data)}</td><td><span class="${p.pct===100?'pct100':'pctless'}">${pctTxt(p.pct)}</span></td></tr>`).join('') ||
+    `<tr><td colspan="8" style="text-align:center; color:var(--ink-soft); padding:20px;">Nenhum participante ainda.</td></tr>`);
   const media = list.length ? Math.round(list.reduce((a,p)=>a+p.pct,0)/list.length) : 0;
   const {eligible} = evaluateEligibility(id);
   document.getElementById('participantesStats').innerHTML = `
@@ -6988,6 +7344,7 @@ function renderEligibleTable(){
   let info = document.getElementById('elegSorteioInfo');
   if(!info){ info = document.createElement('div'); info.id = 'elegSorteioInfo'; (sel.closest('.field') || sel.parentElement).insertAdjacentElement('afterend', info); }
   info.innerHTML = gan.length ? `<div class="sorteio-info"><i data-lucide="trophy"></i><div><b>Sorteio realizado — ${gan.length} ganhador(es)</b><span>${gan.map(w=>escH(w.nome)).join(' · ')}${camp.randomSeed ? ` · semente <code>${escH(camp.randomSeed)}</code>` : ''}</span></div></div>` : '';
+  if(!document.getElementById('buscaElegiveis')){ const f = document.createElement('div'); f.className = 'field'; f.style.cssText = 'min-width:220px; max-width:340px; margin:0 0 12px;'; f.innerHTML = '<label>Buscar</label><input type="search" id="buscaElegiveis" placeholder="Nome, matrícula, setor ou filial…" autocomplete="off">'; (info.nextElementSibling ? info.parentElement.insertBefore(f, info.nextElementSibling) : info.insertAdjacentElement('afterend', f)); }
   const ordenados = [...eligible].sort((a,b)=> (ganSet.has(String(b.matricula)) ? 1 : 0) - (ganSet.has(String(a.matricula)) ? 1 : 0));
   const linhas = ordenados.map((p,i)=>{
     const s = ganSet.has(String(p.matricula));
@@ -6997,10 +7354,10 @@ function renderEligibleTable(){
   gan.filter(w=>!presentes.has(String(w.matricula))).forEach(w=>{   // sorteado que não consta entre as respostas (ex.: substituição feita pela Qualidade)
     linhas.push(`<tr class="linha-sorteado"><td>${linhas.length + 1}</td><td>${escH(w.nome)} <span class="chip"><i data-lucide="trophy"></i> sorteado(a)</span></td><td>${escH(w.matricula)}</td><td>${escH(w.funcao || '')}</td><td>${escH(w.setor || '')}</td><td>${escH(w.filial || '')}</td><td>${celulaContato(contatoDe(w.matricula))}</td><td>—</td></tr>`);
   });
-  document.getElementById('tblElegiveis').innerHTML = linhas.join('') ||
-    `<tr><td colspan="8" style="text-align:center; color:var(--ink-soft); padding:20px;">Nenhum colaborador elegível nesta campanha.</td></tr>`;
-  document.getElementById('tblExcluidos').innerHTML = excluded.map(p=>`<tr><td>${escH(p.nome)}</td><td>${escH(p.matricula)}</td><td>${escH(p.cargo || p.funcao || '')}</td><td>${escH(p.setor)}</td><td><span class="badge excluido">${escH(p.motivo)}</span></td></tr>`).join('') ||
-    `<tr><td colspan="5" style="text-align:center; color:var(--ink-soft); padding:20px;">Nenhuma exclusão automática nesta campanha.</td></tr>`;
+  _setLinhas('tblElegiveis', 8, linhas.join('') ||
+    `<tr><td colspan="8" style="text-align:center; color:var(--ink-soft); padding:20px;">Nenhum colaborador elegível nesta campanha.</td></tr>`);
+  _setLinhas('tblExcluidos', 5, excluded.map(p=>`<tr><td>${escH(p.nome)}</td><td>${escH(p.matricula)}</td><td>${escH(p.cargo || p.funcao || '')}</td><td>${escH(p.setor)}</td><td><span class="badge excluido">${escH(p.motivo)}</span></td></tr>`).join('') ||
+    `<tr><td colspan="5" style="text-align:center; color:var(--ink-soft); padding:20px;">Nenhuma exclusão automática nesta campanha.</td></tr>`);
   if(window.lucide) lucide.createIcons();
 }
 document.getElementById('selectCampanhaElegiveis').addEventListener('change', renderEligibleTable);
@@ -8114,6 +8471,79 @@ function buildReportData(reportType, campaignId){
     return {title:"Evolução histórica — média de acertos por campanha ao longo do tempo", headers:["Início","Campanha","Participantes","Média de acertos"], rows, chartSvg};
   }
 }
+/* ======================= RELATÓRIOS: a informação na tela (a exportação fica logo abaixo) ======================= */
+let _relEscolhido = false;
+const _pc = (a, b)=> b ? Math.round(a / b * 100) : 0;
+function relGrupos(c, campo){
+  const ps = campaignParticipants(c.id);
+  if(c.importada){ const g = {}; ps.forEach(p=>{ const k = p[campo] || '(não informado)'; g[k] = (g[k] || 0) + 1; }); return Object.entries(g).map(([k, n])=>({k, resp:n, total:null, pct:null})).sort((a, b)=> b.resp - a.resp); }
+  const st = statusRodada(c), g = {};
+  st.roster.forEach(r=>{ const k = r[campo] || '(não informado)'; (g[k] = g[k] || {total:0, resp:0}).total++; });
+  st.respondeu.forEach(r=>{ g[r[campo] || '(não informado)'].resp++; });
+  return Object.entries(g).map(([k, v])=>({k, resp:v.resp, total:v.total, pct:_pc(v.resp, v.total)})).sort((a, b)=> a.pct - b.pct || b.total - a.total);   // quem menos participou primeiro
+}
+function relPerguntas(c){
+  if(c.importada) return [];
+  const qs = c.questoes || [], ps = campaignParticipants(c.id).filter(p=>Array.isArray(p.respostasCorretas) && p.respostasCorretas.length === qs.length);
+  if(!qs.length || !ps.length) return [];
+  return qs.map((q, i)=>{ const ok = ps.filter(p=>p.respostasCorretas[i]).length; return {i, texto:q.texto, ok, total:ps.length, pct:_pc(ok, ps.length)}; }).sort((a, b)=> a.pct - b.pct);   // a mais errada primeiro
+}
+function renderRelatorios(){
+  const box = document.getElementById('relConteudo'), sel = document.getElementById('selectCampanhaRelatorio'); if(!box || !sel) return;
+  if(!_dadosCarregados){ box.innerHTML = '<div class="panel"><div class="skel skel-l1"></div><div class="skel skel-bar"></div><div class="skel skel-l2"></div></div>'; return; }
+  let c = _relEscolhido ? campanhaPorId(sel.value) : null;
+  if(!c){ c = rodadaDestaque() || todasCampanhas()[0]; if(c){ try{ sel.value = c.id; }catch(e){} } }
+  if(!c){ box.innerHTML = '<div class="msg-vazio"><i data-lucide="file-text"></i><b>Ainda não há campanhas</b><span>Os relatórios aparecem assim que a primeira rodada for criada.</span></div>'; if(window.lucide) lucide.createIcons(); return; }
+  const per = document.getElementById('relPeriodo'); if(per) per.textContent = `${fmtPeriodoValor(c.inicio)} → ${fmtPeriodoValor(c.fim)}${c.importada ? ' · rodada importada do Excel' : ''}`;
+  const imp = !!c.importada, ps = campaignParticipants(c.id), n = ps.length, notas = ps.filter(p=>p.pct != null);
+  const st = imp ? null : statusRodada(c), base = st ? st.roster.length : 0, ev = imp ? null : evaluateEligibility(c.id), ganh = c.ganhadores || [];
+  const media = notas.length ? Math.round(notas.reduce((a, p)=>a + p.pct, 0) / notas.length) : null, n100 = notas.filter(p=>p.pct === 100).length;
+  const comTel = ps.filter(p=>String(p.telefone || '').trim()).length, terminou = campanhaTerminou(c);
+  const tile = (rot, val, sub, cls)=>`<div class="rel-tile ${cls || ''}"><span>${rot}</span><b>${val}</b><small>${sub}</small></div>`;
+  const tiles = [
+    tile('Participantes', n, base ? `de ${base} colaboradores (${_pc(n, base)}%)` : (imp ? 'rodada importada' : 'carregando o quadro…')),
+    tile('Média de acertos', media == null ? '—' : media + '%', `${notas.length} com nota`),
+    tile('Acertaram 100%', n100, notas.length ? `${_pc(n100, notas.length)}% de quem tem nota` : 'sem notas'),
+    tile('Elegíveis', ev ? ev.eligible.length : '—', ev ? `${ev.excluded.length} fora pelas regras` : 'não se aplica'),
+    tile('Ganhadores', ganh.length, ganh.length ? escH(c.premio || 'sorteio realizado') : (terminou && !imp ? 'sorteio pendente' : 'ainda sem sorteio'), (terminou && !imp && !ganh.length) ? 'alerta' : ''),
+    tile('Contato dos participantes', imp ? '—' : _pc(comTel, n) + '%', imp ? 'não consta no arquivo' : `${comTel} de ${n} com telefone`)].join('');
+  // o que merece atenção
+  const al = [];
+  if(!imp && terminou && !ganh.length && c.status !== 'programada') al.push({n:'warn', i:'dices', t:'Rodada encerrada <b>sem sorteio registrado</b>. Vá em “Sorteio” para concluir.'});
+  const semTel = ganh.filter(g=>{ const p = ps.find(x=>matK(x.matricula) === matK(g.matricula)); return p && !String(p.telefone || '').trim(); });
+  if(semTel.length) al.push({n:'warn', i:'phone-off', t:`<b>${semTel.length} ganhador(es) sem telefone</b>: ${semTel.slice(0, 4).map(g=>escH(g.nome)).join(', ')}${semTel.length > 4 ? '…' : ''}. Entre em contato por e-mail.`});
+  const fracas = imp ? [] : relGrupos(c, 'setor').filter(g=>g.total >= 3 && g.pct < 50).slice(0, 3);
+  if(fracas.length && campaignAccessStatus(c) !== 'nao_iniciada') al.push({n:'info', i:'building-2', t:`Setores com <b>menos de 50%</b> de participação: ${fracas.map(g=>`${escH(g.k)} (${g.pct}%)`).join(', ')}.`});
+  const pq = relPerguntas(c), pior = pq[0];
+  if(pior && pior.pct < 60) al.push({n:'info', i:'graduation-cap', t:`A pergunta “${escH(String(pior.texto).slice(0, 90))}${String(pior.texto).length > 90 ? '…' : ''}” teve só <b>${pior.pct}% de acerto</b> — pode indicar um tema para reforçar em treinamento.`});
+  const roster = (EMPRESA.colaboradores || []).filter(x=>!x.qualidade), semEmail = roster.filter(x=>!x.temEmail).length;
+  if(!imp && semEmail) al.push({n:'info', i:'mail-x', t:`<b>${semEmail} colaborador(es) sem e-mail</b> — não recebem o aviso de finalização da rodada.`});
+  if(!al.length) al.push({n:'ok', i:'check-circle-2', t:'Nada fora do normal nesta rodada.'});
+  const alertas = al.map(a=>`<div class="rel-alerta ${a.n}"><i data-lucide="${a.i}"></i><span>${a.t}</span></div>`).join('');
+  // participação por setor / filial
+  const tab = campo => { const gs = relGrupos(c, campo); if(!gs.length) return '<p class="hint">Sem dados para esta rodada.</p>';
+    return `<div class="table-wrap"><table class="rel-tab"><thead><tr><th>${campo === 'setor' ? 'Setor' : 'Filial'}</th><th>${imp ? 'Participantes' : 'Responderam'}</th></tr></thead><tbody>${gs.slice(0, 60).map(g=>`<tr><td>${escH(g.k)}</td><td>${g.total == null ? `<b>${g.resp}</b>` : `<div class="tb-bar ${g.pct < 50 ? 'baixo' : ''}"><span style="width:${Math.max(3, g.pct)}%"></span><b>${g.resp}/${g.total} · ${g.pct}%</b></div>`}</td></tr>`).join('')}</tbody></table></div>${gs.length > 60 ? `<p class="hint">Mostrando 60 de ${gs.length}. A lista completa está em “Distribuição por setor e filial” (exportar).</p>` : ''}`; };
+  const perguntas = pq.length ? `<div class="table-wrap"><table class="rel-tab"><thead><tr><th>Pergunta</th><th>Acertos</th></tr></thead><tbody>${pq.map(q=>`<tr><td><span class="rel-nq">${q.i + 1}</span> ${escH(q.texto)}</td><td><div class="tb-bar ${q.pct < 60 ? 'baixo' : 'bom'}"><span style="width:${Math.max(3, q.pct)}%"></span><b>${q.pct}%</b></div></td></tr>`).join('')}</tbody></table></div><p class="hint">Do que mais errou para o que menos errou — base: ${pq[0].total} participante(s).</p>` : `<p class="hint">${imp ? 'Rodadas importadas não trazem o acerto por pergunta.' : 'As notas por pergunta aparecem quando houver respostas.'}</p>`;
+  // comparativo entre rodadas (inclui as importadas)
+  const todas = ordenarPorFim(todasCampanhas()).filter(x=>x.status !== 'programada' && campaignAccessStatus(x) !== 'nao_iniciada');
+  const maxN = Math.max(1, ...todas.map(x=>campaignParticipants(x.id).length));
+  const linhasC = todas.slice().reverse().map((x, k, arr)=>{ const pp = campaignParticipants(x.id), cn = pp.filter(p=>p.pct != null), ant = arr[k + 1] ? campaignParticipants(arr[k + 1].id).length : null;
+    const seta = ant == null || !pp.length ? '' : pp.length > ant ? '<em class="sobe" title="mais que a rodada anterior">▲</em>' : pp.length < ant ? '<em class="desce" title="menos que a rodada anterior">▼</em>' : '';
+    return `<tr class="${x.id === c.id ? 'sel' : ''}"><td><b class="tb-nome">${escH(x.nome)}</b><span class="tb-per">${escH(fmtPeriodoValor(x.inicio))} – ${escH(fmtPeriodoValor(x.fim))}</span></td><td>${pp.length ? `<div class="tb-bar"><span style="width:${Math.max(4, Math.round(pp.length / maxN * 100))}%"></span><b>${pp.length}</b></div>` : '—'} ${seta}</td><td>${cn.length ? _pc(cn.filter(p=>p.pct === 100).length, cn.length) + '%' : '—'}</td><td>${cn.length ? Math.round(cn.reduce((a, p)=>a + p.pct, 0) / cn.length) + '%' : '—'}</td><td>${(x.ganhadores || []).length || '—'}</td></tr>`; }).join('');
+  box.innerHTML = `<div class="rel-tiles">${tiles}</div>
+    <div class="panel rel-atencao"><h3>O que merece atenção</h3><div class="rel-alertas">${alertas}</div></div>
+    <div class="two-col">
+      <div class="panel"><div class="panel-topo"><div><h3>${imp ? 'Participantes' : 'Participação'}</h3><div class="hint">${imp ? 'Quem respondeu, por grupo' : 'Quem menos participou aparece primeiro'}</div></div>
+        <div class="seg-tabs"><button type="button" class="on" data-pane="relSetor">Setor</button><button type="button" data-pane="relFilial">Filial</button></div></div>
+        <div id="relSetor" class="tab-pane">${tab('setor')}</div><div id="relFilial" class="tab-pane" hidden>${tab('filial')}</div></div>
+      <div class="panel"><h3>Perguntas que mais erraram</h3><div class="hint">Onde o treinamento pode reforçar</div>${perguntas}</div>
+    </div>
+    <div class="panel"><h3>Comparativo entre rodadas</h3><div class="hint">Todas as rodadas, inclusive as importadas do Excel — a rodada escolhida está destacada</div>
+      <div class="table-wrap"><table class="rel-tab"><thead><tr><th>Rodada</th><th>Participantes</th><th>100%</th><th>Média</th><th>Ganhad.</th></tr></thead><tbody>${linhasC}</tbody></table></div></div>`;
+  if(window.lucide) lucide.createIcons();
+}
+document.getElementById('selectCampanhaRelatorio')?.addEventListener('change', ()=>{ _relEscolhido = true; renderRelatorios(); });
+
 document.querySelectorAll('.report-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     const campaignId = document.getElementById('selectCampanhaRelatorio').value;
@@ -8280,7 +8710,9 @@ function abrirMiniPagina(o){
 }
 function tabelaHtml(cabecalhos, linhas, vazio){
   if(!linhas.length) return `<p class="hint" style="padding:10px 0;">${escH(vazio||'Nada para mostrar.')}</p>`;
-  return `<div class="table-wrap"><table><thead><tr>${cabecalhos.map(h=>`<th>${escH(h)}</th>`).join('')}</tr></thead><tbody>${linhas.map(l=>`<tr>${l.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  const total = linhas.length, LIM = 150; let aviso = '';
+  if(total > LIM){ linhas = linhas.slice(0, LIM); aviso = `<p class="hint" style="padding:10px 0 0;">Mostrando ${LIM} de ${total}. A lista completa está em Relatórios (exportar .xlsx).</p>`; }
+  return `<div class="table-wrap"><table><thead><tr>${cabecalhos.map(h=>`<th>${escH(h)}</th>`).join('')}</tr></thead><tbody>${linhas.map(l=>`<tr>${l.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>${aviso}`;
 }
 
 /* ======================= IMPORTAR CAMPANHAS ANTIGAS (qualquer arquivo) ======================= */
@@ -8565,7 +8997,7 @@ async function carregarMsgsPendentes(){
   if(currentRole !== 'qualidade' || !currentUser || !currentUser.token) return;
   const agora = Date.now(); if(_msgsTs && agora - _msgsTs < 60000) return; _msgsTs = agora;
   const r = await backendCall('listarDuvidas');
-  if(r && r.ok){ _msgsPendentes = (r.duvidas || []).filter(d=>d.status === 'pendente').length; renderHomeAtalhos(); if(window.lucide) lucide.createIcons(); }
+  if(r && r.ok){ _msgsPendentes = (r.duvidas || []).filter(d=>d.status === 'pendente').length; atualizarBadgeMsgs(); renderHomeAtalhos(); if(window.lucide) lucide.createIcons(); }
 }
 function renderHomeExtras(){
   try{ renderHomeQualidade(); renderHomeAtalhos(); renderHomeSetorFilial(); carregarMsgsPendentes(); }catch(e){ console.warn('Painel inicial (extras):', e); }
@@ -8756,6 +9188,7 @@ async function sincronizarDadosDoServidor(){
 function iniciarSincronizacao(){
   _falhasSync = 0;
   try{ Rasc.iniciar(); }catch(e){ console.warn('Rascunhos:', e); }
+  try{ carregarRespostasNovas(); if(currentRole === 'qualidade') carregarMsgsPendentes(); }catch(e){}
   if(_aplicouNoLogin){ _aplicouNoLogin = false; if(currentRole === 'qualidade') sincronizarDadosDoServidor(); }   // os dados já vieram no login; a Qualidade pede já o quadro de colaboradores (participação, quem falta)
   else sincronizarDadosDoServidor();
   if(window._syncAtivo) return;
@@ -9470,6 +9903,17 @@ document.addEventListener('click', e=>{
   b.parentElement.querySelectorAll('button').forEach(x=>x.classList.toggle('on', x === b));
   const painel = b.closest('.panel'); if(painel) painel.querySelectorAll('.tab-pane').forEach(p=>{ p.hidden = p.id !== b.dataset.pane; });
 });
+
+
+/* ======================= NADA TRAVA: solta a rolagem se nenhuma janela estiver aberta ======================= */
+(function(){
+  const visivel = el => { try{ const cs = getComputedStyle(el); return cs.display !== 'none' && cs.visibility !== 'hidden' && cs.pointerEvents !== 'none' && parseFloat(cs.opacity || '1') > 0.05 && el.getClientRects().length > 0; }catch(e){ return false; } };
+  const temJanela = ()=> Array.from(document.querySelectorAll('[id$="Backdrop"], [class*="backdrop"]')).some(visivel);
+  const soltar = ()=>{ if(document.body.classList.contains('modal-aberto') && !temJanela()) document.body.classList.remove('modal-aberto'); };
+  new MutationObserver(()=> setTimeout(soltar, 350)).observe(document.body, {childList:true, subtree:false, attributes:true, attributeFilter:['class']});
+  setInterval(soltar, 2000);
+  window.__soltarRolagem = soltar;
+})();
 
 /* ======================= RASCUNHOS (salvos sozinhos, só neste aparelho) =======================
    Valem para tudo o que se ESCREVE no sistema (nova campanha, perguntas do banco, exceções, mensagens e respostas).
