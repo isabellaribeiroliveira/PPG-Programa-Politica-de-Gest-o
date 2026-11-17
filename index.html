@@ -2407,6 +2407,38 @@ button, a, .icon-btn, .pop-close, .sac-close{ touch-action:manipulation; -webkit
 /* ===== v17b — ajustes da varredura de aparelhos ===== */
 .rr-met small{ font-size:11px; } .ri-pct small{ font-size:11px; } .rel-tile .rt-rot{ font-size:11px; } .sz-sw .sz-sw-t{ font-size:12px; }
 .share-actions{ display:flex; gap:10px; flex-wrap:wrap; } .share-actions .btn{ flex:1 1 140px; justify-content:center; min-width:0; white-space:normal; }
+
+/* ===== v18 ===== */
+body .login-tema{ width:40px; height:40px; border-radius:50%; background:#fff !important; color:#0F2A28 !important; border:1px solid rgba(0,0,0,.06); box-shadow:0 6px 18px -8px rgba(0,0,0,.5); display:flex; align-items:center; justify-content:center; } body .login-tema svg{ width:18px; height:18px; }
+body:not(.dark) .login-screen{ background:radial-gradient(120% 90% at 15% 8%, #22C4B8 0%, #0E9A92 46%, #087670 100%) !important; }
+.login-screen .sz-emblema.local, .login-hero .sz-emblema.local{ position:fixed; left:18px; bottom:16px; z-index:40; }
+.two-col{ align-items:start; }
+body[data-sz-hero] .qh:not(.qh-carregando), body[data-sz-hero] .home-hero:not(.hh-ganhou){ background:var(--sz-pat) 0 0 / 84px 84px repeat, var(--sz-hero) !important; }
+.home-hero .sz-selo{ right:auto; left:30px; top:16px; } .home-hero:has(.sz-selo){ padding-top:62px; } .home-hero .sz-enfeite{ right:150px; }
+@media(max-width:700px){ .home-hero .sz-selo{ left:20px; top:14px; } .home-hero:has(.sz-selo){ padding-top:58px; } .home-hero .sz-enfeite{ right:120px; } }
+.dt-top{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
+.dt-kpis{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-bottom:14px; }
+.dt-kpi{ display:flex; flex-direction:column; align-items:flex-start; gap:2px; padding:12px; border-radius:14px; background:rgba(2,163,157,.08); border:1px solid var(--border); } .dt-kpi svg{ width:16px; height:16px; color:var(--secondary); } .dt-kpi b{ font-size:22px; line-height:1.1; } .dt-kpi span{ font-size:11px; color:var(--ink-soft); font-weight:700; }
+.dt-sec{ border:1px solid var(--border); border-radius:14px; padding:0 14px; margin-top:10px; background:var(--card); } .dt-sec > summary{ cursor:pointer; padding:13px 0; font-weight:800; font-size:14px; display:flex; align-items:center; gap:8px; } .dt-sec > summary em{ font-style:normal; font-size:11px; padding:2px 8px; border-radius:99px; background:rgba(2,163,157,.14); color:var(--secondary); } .dt-sec[open]{ padding-bottom:12px; }
+.dt-q{ border-top:1px solid var(--border); } .dt-q summary{ cursor:pointer; padding:10px 0; display:flex; gap:10px; list-style:none; } .dt-q summary::-webkit-details-marker{ display:none; }
+.dt-n{ flex:0 0 auto; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; background:rgba(2,163,157,.14); color:var(--secondary); } .dt-t{ font-size:13px; font-weight:700; line-height:1.4; min-width:0; overflow-wrap:anywhere; }
+.dt-certa{ display:flex; align-items:center; gap:6px; margin-top:4px; font-weight:700; font-size:12px; color:#1B7A3F; } body.dark .dt-certa{ color:#8CE0A0; } .dt-certa svg{ width:14px; height:14px; flex:0 0 auto; }
+.dt-ops{ list-style:none; margin:0 0 10px 34px; padding:0; display:flex; flex-direction:column; gap:6px; } .dt-ops li{ display:flex; gap:8px; align-items:flex-start; font-size:12.5px; padding:7px 10px; border-radius:10px; } .dt-ops li.ok{ background:rgba(46,158,99,.12); color:#1B7A3F; font-weight:700; } body.dark .dt-ops li.ok{ color:#8CE0A0; } .dt-ops li.x{ background:rgba(0,0,0,.04); color:var(--ink-soft); } body.dark .dt-ops li.x{ background:rgba(255,255,255,.05); } .dt-ops svg{ width:14px; height:14px; flex:0 0 auto; margin-top:2px; }
+.dt-lista{ list-style:none; margin:0 0 8px; padding:0; } .dt-lista li{ display:flex; justify-content:space-between; gap:12px; padding:8px 0; border-top:1px solid var(--border); font-size:13px; } .dt-lista li span{ color:var(--ink-soft); font-size:12px; text-align:right; }
+@media(max-width:560px){ .dt-kpis{ grid-template-columns:repeat(2,1fr); } }
+.sz-parabens{ text-align:center; padding:8px 6px 4px; } .sz-pb-ic{ width:64px; height:64px; border-radius:50%; margin:0 auto 12px; display:flex; align-items:center; justify-content:center; background:var(--acc); color:#fff; box-shadow:0 12px 26px -12px var(--acc); } .sz-pb-ic svg{ width:30px; height:30px; } .sz-parabens h3{ margin:0 0 8px; font-size:20px; } .sz-parabens p{ margin:0 0 10px; line-height:1.55; color:var(--ink-soft); } .sz-parabens small{ font-weight:700; color:var(--secondary); }
+
+/* ===== v19 — banco inteligente e formulário ===== */
+.prev-sim{ display:flex; align-items:flex-start; gap:10px; margin:8px 0; padding:10px 12px; border-radius:12px; font-size:12.5px; border:1px solid rgba(229,161,0,.45); background:rgba(245,196,83,.14); } .prev-sim.dup{ border-color:rgba(217,54,62,.4); background:rgba(217,54,62,.08); }
+.prev-sim > svg{ flex:0 0 auto; width:16px; height:16px; margin-top:2px; } .prev-sim > div{ flex:1; min-width:0; } .prev-sim b{ font-weight:800; } .prev-sim span{ display:block; color:var(--ink-soft); margin-top:2px; overflow-wrap:anywhere; } .prev-sim em{ font-style:normal; font-weight:700; }
+.prev-q.prev-ignorada{ opacity:.55; } .prev-q.prev-ignorada textarea, .prev-q.prev-ignorada .prev-alt{ pointer-events:none; }
+.rep-par{ display:flex; gap:12px; align-items:flex-start; padding:12px 0; border-top:1px solid var(--border); } .rep-par:first-child{ border-top:0; }
+.rep-score{ flex:0 0 auto; width:62px; text-align:center; padding:8px 4px; border-radius:12px; background:rgba(245,196,83,.18); } .rep-score.dup{ background:rgba(217,54,62,.12); } .rep-score b{ display:block; font-size:17px; } .rep-score small{ font-size:10.5px; font-weight:800; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.3px; }
+.rep-qs{ flex:1; min-width:0; display:flex; flex-direction:column; gap:8px; font-size:13px; line-height:1.4; } .rep-qs > div{ overflow-wrap:anywhere; }
+.fm-q{ padding:14px 14px 10px; margin-bottom:12px; border:1px solid var(--border); border-radius:16px; background:var(--card); } .fm-head{ display:flex; align-items:flex-start; gap:10px; margin-bottom:10px; flex-wrap:wrap; } .fm-head b{ flex:1; min-width:200px; font-size:14px; line-height:1.4; overflow-wrap:anywhere; } .fm-tipo{ font-style:normal; font-size:11px; font-weight:800; padding:3px 9px; border-radius:99px; background:rgba(2,163,157,.12); color:var(--secondary); }
+.fm-ops{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; } .fm-ops li{ display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:12px; font-size:13px; background:rgba(0,0,0,.035); } body.dark .fm-ops li{ background:rgba(255,255,255,.05); }
+.fm-ops li.ok{ background:rgba(46,158,99,.14); outline:1.5px solid rgba(46,158,99,.5); font-weight:700; } .fm-l{ flex:0 0 auto; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11.5px; font-weight:800; background:rgba(2,163,157,.16); color:var(--secondary); } .fm-ops li.ok .fm-l{ background:#2E9E63; color:#fff; } .fm-t{ flex:1; min-width:0; overflow-wrap:anywhere; }
+.fm-ok{ flex:0 0 auto; display:inline-flex; align-items:center; gap:4px; font-size:11.5px; font-weight:800; color:#1B7A3F; } body.dark .fm-ok{ color:#8CE0A0; } .fm-ok svg{ width:13px; height:13px; }
 </style>
 </head>
 <body data-app-url="<?= urlApp ?>" data-campanha="<?= campanhaParam ?>">
@@ -2815,6 +2847,7 @@ button, a, .icon-btn, .pop-close, .sac-close{ touch-action:manipulation; -webkit
             <label class="btn btn-outline btn-sm" style="cursor:pointer;">
               <i data-lucide="upload"></i> Importar perguntas de qualquer arquivo <input type="file" id="bqImportFile" accept=".xlsx,.xlsm,.xlsb,.xls,.ods,.csv,.tsv,.txt,.docx,.pdf,.html,.htm,.png,.jpg,.jpeg,.webp,.bmp,.gif,.tif,.tiff" style="display:none;">
             </label>
+ <button type="button" class="btn btn-outline btn-sm" id="bqRepetidasBtn"><i data-lucide="copy"></i> Procurar perguntas repetidas</button>
           </div>
           <div class="table-wrap">
             <table>
@@ -3161,6 +3194,33 @@ button, a, .icon-btn, .pop-close, .sac-close{ touch-action:manipulation; -webkit
   };
   lucide.__rapido = true;
 })();
+
+/* medidor de parecença entre perguntas (enunciado + alternativas + gabarito) — sem servidor */
+const Sim = (function(){
+  const STOP = new Set('a o as os um uma uns umas de do da dos das em no na nos nas num numa por para pra com sem sob sobre entre e ou que qual quais quem como onde quando se ao aos à às é são ser foi era esta este isso essa esse seu sua seus suas pelo pela pelos pelas deve devem pode podem ter tem tambem mais menos muito apenas todo toda todos todas'.split(' '));
+  const norm = s => String(s == null ? '' : s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+  const radical = w => w.length > 4 ? w.replace(/(amente|mente|acoes|icoes|coes|cao|sao|oes|ais|eis|ois|ados|adas|ado|ada|ar|er|ir|as|es|os|a|e|o|s)$/, '') : w;
+  const SIN = { limite:'maxim', maximo:'maxim', maxima:'maxim', obrigatorio:'obrig', obrigatoria:'obrig', obrigado:'obrig', obrigada:'obrig', exigido:'obrig', exigida:'obrig', carro:'veicul', automovel:'veicul', onibus:'veicul', caminhao:'veicul', condutor:'motorist', motorista:'motorist' };
+  const toks = s => norm(s).split(' ').filter(w => w.length > 2 && !STOP.has(w)).map(w => SIN[w] || radical(w)).filter(w => w.length > 1);
+  const trig = s => { const t = ' ' + norm(s) + ' ', m = new Map(); for(let i = 0; i < t.length - 2; i++){ const g = t.slice(i, i + 3); m.set(g, (m.get(g) || 0) + 1); } return m; };
+  const dice = (a, b) => { let inter = 0, ta = 0, tb = 0; a.forEach(v => ta += v); b.forEach(v => tb += v); a.forEach((v, k) => { if(b.has(k)) inter += Math.min(v, b.get(k)); }); return ta + tb ? 2 * inter / (ta + tb) : 0; };
+  const jac = (a, b) => { const A = new Set(a), B = new Set(b); let i = 0; A.forEach(x => { if(B.has(x)) i++; }); const u = A.size + B.size - i; return u ? i / u : 0; };
+  const cob = (a, b) => { const A = new Set(a), B = new Set(b); if(!A.size || !B.size) return 0; let i = 0; A.forEach(x => { if(B.has(x)) i++; }); return i / Math.min(A.size, B.size); };
+  function perfil(q){ const ops = (q && q.options) || []; return { tk: toks(q && q.texto), tg: trig(q && q.texto), alts: toks(ops.map(o => o.text).join(' ')), cor: toks(ops.filter(o => o.correct).map(o => o.text).join(' ')), exato: norm(q && q.texto) }; }
+  function comparar(a, b){
+    if(!a.exato || !b.exato) return 0; if(a.exato === b.exato) return 1;
+    const e = Math.max(jac(a.tk, b.tk), cob(a.tk, b.tk) * .85, dice(a.tg, b.tg) * .9), alt = jac(a.alts, b.alts), cor = a.cor.length && b.cor.length ? jac(a.cor, b.cor) : 0;
+    const base = Math.min(1, e * .78 + alt * .12 + cor * .10), igualAlt = alt >= .8 && new Set(a.alts).size >= 3 && new Set(b.alts).size >= 3;   // mesmas alternativas (não só Sim/Não) + enunciado do mesmo assunto
+    return igualAlt && e >= .35 ? Math.max(base, .62 + e * .2) : base;
+  }
+  const score = (qa, qb) => comparar(perfil(qa), perfil(qb));
+  const DUPLICADA = 0.80, PARECIDA = 0.52;
+  function repetidasNaRodada(lista, limite){ limite = limite == null ? PARECIDA : limite; const ps = lista.map(perfil), out = []; for(let i = 0; i < ps.length; i++) for(let j = i + 1; j < ps.length; j++){ const s = comparar(ps[i], ps[j]); if(s >= limite) out.push({ a:i, b:j, score:s }); } return out.sort((x, y) => y.score - x.score); }
+  function melhorEntre(q, lista, ignorarIndice){ const p = perfil(q); let m = null; lista.forEach((o, i) => { if(i === ignorarIndice) return; const s = comparar(p, perfil(o)); if(!m || s > m.score) m = { score:s, i, q:o }; }); return m; }
+  return { score, perfil, comparar, repetidasNaRodada, melhorEntre, norm, DUPLICADA, PARECIDA, toks };
+})();
+window.Sim = Sim;
+
 /* qrcode-generator 1.4.4 (MIT) — gera o QR Code aqui mesmo, sem serviço externo */
 //---------------------------------------------------------------------
 //
@@ -6079,6 +6139,18 @@ window.EMPRESA_CONFIG.sortearColaboradores = function(qtd, excluirMatriculas){
     const toks = String(v == null ? '' : v).split(/[^A-Za-z0-9\u00C0-\u00FF]+/).filter(Boolean);
     return toks.length > 0 && toks.every(t => /^[a-hA-H1-8]$/.test(t) || /^[A-H]{2,5}$/.test(t) || /^(alternativa|alternativas|opcao|opcoes|letra|letras|item|itens|correta|corretas|certa|ou|e)$/.test(norm(t)));
   }
+  /* gabarito escrito de várias formas: "B", "Alternativa C", "4" (letra OU o próprio texto) e "Brasília" (texto por extenso) */
+  function casarGabarito(q, bruto) {
+    const n = s => norm(String(s == null ? '' : s)).replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim(), alvo = n(bruto);
+    const iguais = q.options.map((o, k) => n(o.text) === alvo ? k : -1).filter(k => k >= 0);
+    if (iguais.length === 1) { q.options.forEach((o, k) => { o.correct = k === iguais[0]; }); return true; }
+    const letras = letrasDoGabarito(bruto);
+    if (letras.length) { q.options.forEach((o, k) => { o.correct = letras.indexOf(String.fromCharCode(97 + k)) !== -1; }); return true; }
+    const achados = new Set();
+    String(bruto).split(/\s*(?:;|\be\b|\/|,|\|)\s*/i).map(n).concat([alvo]).forEach(p => { if (p.length < 2) return; q.options.forEach((o, k) => { const t = n(o.text); if (t && (t === p || (p.length >= 4 && t.length >= 3 && (t.indexOf(p) !== -1 || p.indexOf(t) !== -1)))) achados.add(k); }); });
+    if (achados.size) { q.options.forEach((o, k) => { o.correct = achados.has(k); }); return true; }
+    return false;
+  }
   function fecharQuestao(q, lista, avisos) {
     if (!q) return;
     q.texto = q.texto.replace(/\s+/g, ' ').trim();
@@ -6238,8 +6310,7 @@ window.EMPRESA_CONFIG.sortearColaboradores = function(qtd, excluirMatriculas){
       if (mCat && (!q || q.options.length >= 2)) { catAtual = mCat[2].trim(); return; }
       const g = RE_GAB.exec(t);
       if (g && q && q.options.length >= 2) {
-        const letras = letrasDoGabarito(g[1]);
-        if (letras.length) { q.options.forEach((o, k) => { o.correct = letras.indexOf(String.fromCharCode(97 + k)) !== -1; }); q._gabarito = true; return; }
+        if (casarGabarito(q, g[1])) { q._gabarito = true; return; }
       }
       let mAlt = null;
       if (altPorLetra) mAlt = RE_ALT_LETRA.exec(t);
@@ -6287,8 +6358,10 @@ window.EMPRESA_CONFIG.sortearColaboradores = function(qtd, excluirMatriculas){
     const lista = [], avisos = [];
     blocos.forEach(bl => {
       if (bl.length < 3 || bl.length > 9) return;
-      const q = { texto: bl[0].t.replace(RE_Q_NUM, '$2'), options: [], categoria: '' };
-      bl.slice(1).forEach(l => { const m = limparMarcadores(l.t.replace(RE_ALT_LETRA, '$2').replace(RE_ALT_BULLET, '$1')); q.options.push({ text: m.texto, correct: m.marcada || !!l.b }); });
+      const q = { texto: bl[0].t.replace(RE_Q_NUM, '$2'), options: [], categoria: '' }; let gabLinha = null;
+      bl.slice(1).forEach(l => {
+        const mg = /^\s*(?:gabarito(?:\s+oficial)?|respostas?(?:\s+correta)?|alternativa\s+correta|letra\s+correta|correta)\s*[:=\-\u2013]\s*(\S.*)$/i.exec(l.t); if (mg) { gabLinha = mg[1]; return; } const m = limparMarcadores(l.t.replace(RE_ALT_LETRA, '$2').replace(RE_ALT_BULLET, '$1')); q.options.push({ text: m.texto, correct: m.marcada || !!l.b }); });
+      if (gabLinha != null && q.options.length >= 2) casarGabarito(q, gabLinha);
       fecharQuestao(q, lista, avisos);
     });
     lista.forEach(p => { const n = p.options.filter(o => o.correct).length; if (n === p.options.length) p.options.forEach(o => { o.correct = false; }); const n2 = p.options.filter(o => o.correct).length; p.type = n2 > 1 ? 'multiplas_respostas' : 'unica'; p.semGabarito = n2 === 0; });
@@ -6296,6 +6369,18 @@ window.EMPRESA_CONFIG.sortearColaboradores = function(qtd, excluirMatriculas){
   }
 
   /* Tenta todas as leituras possíveis e fica com a que entendeu MAIS perguntas (e mais gabaritos). */
+  /* planilha "vertical": a pergunta numa linha e as alternativas nas linhas de baixo, com um "x"/✓ na coluna da certa */
+  function linhasVertical(folha) {
+    const out = [], marca = c => /^(x|\u2713|\u2714|sim|s|certa|correta|certo|verdadeiro|true|1)$/i.test(String(c).trim());
+    (folha.linhas || []).forEach(row => {
+      const cels = row.map(txt).filter(Boolean);
+      if (!cels.length) { out.push({ t: '', b: false }); return; }
+      const mk = cels.length >= 2 && marca(cels[cels.length - 1]), partes = mk ? cels.slice(0, -1) : cels, numQ = partes.length >= 2 && /^\d{1,3}$/.test(partes[0]);
+      if (numQ) out.push({ t: '', b: false });
+      out.push({ t: (numQ ? partes[0] + ') ' + partes.slice(1).join(' ') : partes.join(' ')) + (mk ? ' \u2713' : ''), b: false });
+    });
+    return out;
+  }
   PPGImport.parsearPerguntas = function (documento) {
     const cand = [];
     const tabelas = [];
@@ -6312,8 +6397,13 @@ window.EMPRESA_CONFIG.sortearColaboradores = function(qtd, excluirMatriculas){
     }
     let linhas = documento.textoLinhas && documento.textoLinhas.length ? documento.textoLinhas : null;
     if (!linhas) { linhas = []; (documento.folhas || []).forEach(f => f.linhas.forEach(r => { const t = r.map(txt).filter(Boolean).join(' '); if (t) linhas.push({ t, b: false }); })); }
+    /* ✓ / (X) / [x] / ( ) viram uma marca no fim da alternativa, para qualquer leitura entender */
+    linhas = linhas.map(l => { const o = typeof l === 'string' ? { t: l, b: false } : l; let t = String(o.t || '');
+      t = t.replace(/^\s*[\u2713\u2714\u2705\u2611]\s*(\S.*)$/, '- $1 \u2713').replace(/^\s*(?:\(\s*[xX]\s*\)|\[\s*[xX]\s*\])\s*(\S.*)$/, '- $1 \u2713').replace(/^\s*(?:\(\s*\)|\[\s*\]|\u2610|\u25A1)\s*(\S.*)$/, '- $1');
+      return Object.assign({}, o, { t }); });
     try { cand.push(parsearTexto(linhas)); } catch (e) {}
     try { cand.push(parsearBlocos(linhas)); } catch (e) {}
+    try { const lv = []; (documento.folhas || []).forEach(f => { linhasVertical(f).forEach(x => lv.push(x)); lv.push({ t: '', b: false }); }); if (lv.length) { const rv = parsearBlocos(lv); rv.estrategia = 'tabela vertical (alternativas nas linhas de baixo)'; cand.push(rv); } } catch (e) {}
     const pontos = r => r.perguntas.length * 3 + r.perguntas.filter(p => !p.semGabarito).length * 2 - r.avisos.length;
     let melhor = cand[0];
     cand.forEach((r, i) => { if (i > 0 && pontos(r) > pontos(melhor)) melhor = r; });
@@ -6984,7 +7074,7 @@ function linkCampanha(id){ return `${APP_URL}${APP_URL.includes('?') ? '&' : '?'
 /* ======================= LOGIN ======================= */
 /* A autenticação de verdade agora mora na planilha (via Google Apps Script).
    Não existe mais senha nenhuma escrita aqui no código. */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbyoiAInl4YRboX_ko-q2QYLgNiX823B5fMuCeE0PmfrzPbt4HLvDojdynf6U1j9t6rPxA/exec";
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxNTmLbDf_qQwwohT4GE5mw9vHgw72bAe__f7Het_cYibLvbdhD7aDiIA7ZCGaEkoXfWQ/exec";
 
 function urlDoApp(){ try{ return APP_URL.split('#')[0].split('?')[0]; }catch(e){ return ''; } }
 
@@ -7679,6 +7769,41 @@ window.goToElegiveisLatest = function(){
 window.goToHistoricoAdmin = function(){ document.querySelector('[data-target="historico"]').click(); };
 
 /* ======================= CAMPANHAS / RODADAS (Qualidade) ======================= */
+/* detalhes da campanha: resumo em KPIs e, para quem quiser, cada bloco abre com mais informações */
+function htmlFormularioImpressao(c){
+  const qs = c.questoes || [], L = i=> String.fromCharCode(65 + i);
+  return `<!doctype html><html><head><meta charset="utf-8"><title>Formulário — ${escH(c.nome)}</title><style>@page{ size:A4; margin:16mm; } body{ font-family:Arial,Helvetica,sans-serif; color:#12302d; } h1{ font-size:20px; margin:0 0 4px; } .sub{ color:#587571; font-size:12px; margin-bottom:16px; } .q{ break-inside:avoid; margin:0 0 14px; padding:10px 12px; border:1px solid #d6e4e2; border-radius:10px; } .q b{ font-size:13.5px; } ul{ list-style:none; margin:8px 0 0; padding:0; } li{ font-size:12.5px; padding:4px 8px; border-radius:6px; } li.ok{ background:#e3f5ea; font-weight:bold; }</style></head><body><h1>${escH(c.nome)}</h1><div class="sub">${escH(fmtPeriodoValor(c.inicio))} → ${escH(fmtPeriodoValor(c.fim))} · ${qs.length} pergunta(s) · documento interno da Qualidade (contém o gabarito)</div>${qs.map((q, i)=> `<div class="q"><b>${i + 1}. ${escH(q.texto)}</b><ul>${(q.options || []).filter(o=> String(o && o.text || '').trim()).map((o, j)=> `<li class="${o.correct ? 'ok' : ''}">${L(j)}) ${escH(o.text)}${o.correct ? ' &nbsp;✓ correta' : ''}</li>`).join('')}</ul></div>`).join('')}</body></html>`;
+}
+function verFormularioCampanha(id){
+  const c = todasCampanhas().find(x=>x.id === id); if(!c) return; const qs = c.questoes || [];
+  if(!qs.length){ abrirMiniPagina({ titulo:'Formulário · ' + c.nome, corpo:`<p class="hint" style="padding:12px 2px;">${c.importada ? 'Esta é uma rodada importada do histórico: o arquivo não trazia as perguntas.' : 'Esta rodada ainda não tem perguntas.'}</p>` }); return; }
+  const L = i=> String.fromCharCode(65 + i);
+  const corpo = qs.map((q, i)=>{ const ops = (q.options || []).filter(o=> String(o && o.text || '').trim()), multi = ops.filter(o=>o.correct).length > 1;
+    return `<div class="fm-q"><div class="fm-head"><span class="dt-n">${i + 1}</span><b>${escH(q.texto)}</b><em class="fm-tipo">${multi ? 'Várias corretas' : 'Resposta única'}</em></div><ul class="fm-ops">${ops.map((o, j)=> `<li class="${o.correct ? 'ok' : ''}"><span class="fm-l">${L(j)}</span><span class="fm-t">${escH(o.text)}</span>${o.correct ? '<span class="fm-ok"><i data-lucide="check"></i> certa</span>' : ''}</li>`).join('')}</ul></div>`; }).join('');
+  const rodape = document.createElement('div'); rodape.className = 'pop-actions';
+  rodape.innerHTML = `<span class="hint">${qs.length} pergunta(s) · a alternativa certa aparece em verde</span><div style="display:flex; gap:8px;"><button type="button" class="btn btn-outline" id="fmImprimir"><i data-lucide="printer"></i> Imprimir / PDF</button><button type="button" class="btn btn-primary" id="fmFechar">Fechar</button></div>`;
+  abrirMiniPagina({ titulo:'Formulário · ' + c.nome, subtitulo:`${statusBadge(c.status).replace(/<[^>]+>/g, '')} · ${fmtPeriodoValor(c.inicio)} → ${fmtPeriodoValor(c.fim)} · visível só para a Qualidade`, corpo, rodape, largura:820 });
+  rodape.querySelector('#fmFechar').addEventListener('click', fecharMiniPagina);
+  rodape.querySelector('#fmImprimir').addEventListener('click', ()=>{ const html = htmlFormularioImpressao(c); imprimirHtml(html).then(ok=>{ if(!ok) abrirHtmlEmAba(html); }); });
+  if(window.lucide) lucide.createIcons();
+}
+function verDetalhesCampanha(id){
+  const c = todasCampanhas().find(x=>x.id === id); if(!c) return;
+  const parts = campaignParticipants(id), notas = parts.filter(p=>p.pct != null), media = notas.length ? Math.round(notas.reduce((a, p)=>a + p.pct, 0) / notas.length) : null;
+  const ev = c.importada ? null : evaluateEligibility(id), gan = c.ganhadores || [], qs = c.questoes || [];
+  const kpi = (ic, n, rot)=> `<div class="dt-kpi"><i data-lucide="${ic}"></i><b>${n}</b><span>${rot}</span></div>`;
+  const perguntas = qs.length ? qs.map((q, i)=>{ const ops = (q.options || []).filter(o=> String(o && o.text || '').trim()), certa = ops.filter(o=>o.correct).map(o=>escH(o.text)).join(' / ');
+    return `<details class="dt-q"><summary><span class="dt-n">${i + 1}</span><span class="dt-t">${escH(q.texto)}<small class="dt-certa"><i data-lucide="check-circle-2"></i> ${certa || '—'}</small></span></summary><ul class="dt-ops">${ops.map(o=> `<li class="${o.correct ? 'ok' : 'x'}"><i data-lucide="${o.correct ? 'check' : 'x'}"></i> ${escH(o.text)}</li>`).join('')}</ul></details>`; }).join('') : `<p class="hint">${c.importada ? 'Rodada importada: o arquivo não traz as perguntas.' : 'Sem perguntas cadastradas.'}</p>`;
+  const ganh = gan.length ? `<ol class="dt-lista">${gan.map(w=> `<li><b>${escH(w.nome)}</b><span>${escH([w.setor, w.filial].filter(Boolean).join(' · '))}</span></li>`).join('')}</ol>` : '<p class="hint">Ainda sem sorteio.</p>';
+  const ordem = parts.slice().sort((a, b)=> (b.pct == null ? -1 : b.pct) - (a.pct == null ? -1 : a.pct));
+  const lista = parts.length ? `<ul class="dt-lista">${ordem.slice(0, 8).map(p=> `<li><b>${escH(p.nome)}</b><span>${escH(p.setor || '')} · ${escH(pctTxt(p.pct))}</span></li>`).join('')}</ul>${parts.length > 8 ? `<button type="button" class="btn btn-ghost btn-sm" onclick="fecharMiniPagina(); goToParticipants('${escH(id)}')">Ver todos os ${parts.length} participantes</button>` : ''}` : '<p class="hint">Ninguém respondeu ainda.</p>';
+  abrirMiniPagina({ titulo:c.nome, corpo:`<div class="dt-top">${statusBadge(c.status)} <span class="hint">${escH(fmtPeriodoValor(c.inicio))} → ${escH(fmtPeriodoValor(c.fim))}${c.premio ? ' · Prêmio: ' + escH(c.premio) : ''}</span></div>
+    <div class="dt-kpis">${kpi('users', parts.length, 'participantes')}${kpi('user-check', ev ? ev.eligible.length : '—', 'elegíveis')}${kpi('trophy', gan.length, 'ganhadores')}${kpi('trending-up', media == null ? '—' : media + '%', 'média de acertos')}</div>
+    <details class="dt-sec" open><summary>Perguntas e gabarito <em>${qs.length}</em></summary>${perguntas}</details>
+    <details class="dt-sec"><summary>Ganhadores <em>${gan.length}</em></summary>${ganh}</details>
+    <details class="dt-sec"><summary>Participantes <em>${parts.length}</em></summary>${lista}</details>` });
+  if(window.lucide) lucide.createIcons();
+}
 function renderCampaignGrid(){
   const antigas = ordenarPorFim(campanhasAntigas).reverse();
   const cartao = c=>{
@@ -7693,7 +7818,7 @@ function renderCampaignGrid(){
           <span><i data-lucide="users"></i> ${n} participantes · <i data-lucide="trophy"></i> ${gan} ganhador(es)</span>
         </div>
         <div class="actions">
-          <button class="btn btn-ghost btn-sm" onclick="goToParticipants('${escH(c.id)}')">Ver participantes</button>
+          <button class="btn btn-primary btn-sm" onclick="verDetalhesCampanha('${escH(c.id)}')">Ver detalhes</button> <button class="btn btn-outline btn-sm" onclick="verFormularioCampanha('${escH(c.id)}')"><i data-lucide="clipboard-list"></i> Ver formulário</button> <button class="btn btn-ghost btn-sm" onclick="goToParticipants('${escH(c.id)}')">Ver participantes</button>
           <button class="btn btn-outline btn-sm" onclick="abrirHistoricoCampanha('${escH(c.id)}')">Ver detalhes</button>
           ${gan ? `<button class="btn btn-outline btn-sm" onclick="irParaBannerGanhadores('${escH(c.id)}')"><i data-lucide="trophy"></i> Banner dos ganhadores</button>` : ''}
           <button class="btn btn-outline btn-sm" onclick="openShareModal('${escH(c.id)}')"><i data-lucide="share-2"></i> Divulgar</button>
@@ -7710,8 +7835,8 @@ function renderCampaignGrid(){
         <span><i data-lucide="users"></i> ${n} participantes · <i data-lucide="check-circle-2"></i> ${eligible.length} elegíveis</span>
       </div>
       <div class="actions">
-        <button class="btn btn-ghost btn-sm" onclick="goToParticipants('${escH(c.id)}')">Ver participantes</button>
-        <button class="btn btn-outline btn-sm" onclick="loadCampaignForEdit('${escH(c.id)}')">Editar</button>
+        <button class="btn btn-primary btn-sm" onclick="verDetalhesCampanha('${escH(c.id)}')">Ver detalhes</button> <button class="btn btn-outline btn-sm" onclick="verFormularioCampanha('${escH(c.id)}')"><i data-lucide="clipboard-list"></i> Ver formulário</button> <button class="btn btn-ghost btn-sm" onclick="goToParticipants('${escH(c.id)}')">Ver participantes</button>
+        ${campanhaTerminou(c) ? '' : `<button class="btn btn-outline btn-sm" onclick="loadCampaignForEdit('${escH(c.id)}')">Editar</button>`}
         <button class="btn btn-outline btn-sm" onclick="openShareModal('${escH(c.id)}')"><i data-lucide="share-2"></i> Compartilhar</button>
         ${(c.ganhadores && c.ganhadores.length) ? `<button class="btn btn-outline btn-sm" onclick="irParaBannerGanhadores('${escH(c.id)}')"><i data-lucide="trophy"></i> Banner dos ganhadores</button>` : ''}
       </div>
@@ -7952,7 +8077,7 @@ function collectQuestionsFromForm(){
 document.getElementById('formCampanha').addEventListener('submit', async function(e){
   e.preventDefault();
   const f = new FormData(this);
-  const questoes = collectQuestionsFromForm();
+  const questoes = collectQuestionsFromForm(); if(checarRepetidasRodada(questoes)) return;
   const erroQ = validarQuestoes(questoes);
   if(erroQ){ showToast(erroQ, "warning"); return; }
   if(!f.get('inicio') || !f.get('fim') || new Date(f.get('fim')) <= new Date(f.get('inicio'))){ showToast("Informe o início e o encerramento — o encerramento precisa ser depois do início.", "warning"); return; }
@@ -8005,6 +8130,7 @@ document.getElementById('formCampanha').addEventListener('submit', async functio
 });
 
 window.loadCampaignForEdit = function(id){
+  { const _c = campaigns.find(x=>x.id === id); if(_c && campanhaTerminou(_c)){ showToast('Campanha finalizada não pode ser editada.', 'warning'); return; } }
   const c = campaigns.find(x=>x.id===id);
   if(!c) return;
   editingCampaignId = id;
@@ -8032,6 +8158,15 @@ document.getElementById('btnCancelEdit').addEventListener('click', ()=>{
 });
 
 /* ======================= BANCO DE PERGUNTAS (Qualidade) ======================= */
+/* varre o banco inteiro atrás de perguntas repetidas ou do mesmo assunto */
+function bqRepetidas(){
+  const todas = questionBank.slice(0, 1500), pares = Sim.repetidasNaRodada(todas.map(q=>({ texto:q.texto, options:q.options })), Sim.PARECIDA).slice(0, 80);
+  const ed = cod=> `<button type="button" class="btn btn-ghost btn-sm" onclick="fecharMiniPagina(); editBQ('${escH(cod)}')">Editar</button>`;
+  abrirMiniPagina({ titulo:'Perguntas repetidas ou parecidas', subtitulo:`${pares.length} par(es) entre ${todas.length} perguntas do banco. Edite ou exclua uma delas para não repetir assunto.`, largura:860,
+    corpo: pares.length ? pares.map(p=>{ const A = todas[p.a], B = todas[p.b], dup = p.score >= Sim.DUPLICADA; return `<div class="rep-par"><div class="rep-score ${dup ? 'dup' : 'sim'}"><b>${Math.round(p.score * 100)}%</b><small>${dup ? 'repetida' : 'parecida'}</small></div><div class="rep-qs"><div><span class="hint">${escH(A.codigo)}</span> ${escH(A.texto)} ${ed(A.codigo)}</div><div><span class="hint">${escH(B.codigo)}</span> ${escH(B.texto)} ${ed(B.codigo)}</div></div></div>`; }).join('') : '<p class="hint" style="padding:18px 4px;">Nenhuma pergunta repetida ou parecida no banco.</p>' });
+  if(window.lucide) lucide.createIcons();
+}
+document.addEventListener('click', e=>{ if(e.target.closest && e.target.closest('#bqRepetidasBtn')) bqRepetidas(); });
 function renderBanco(){
   const tbody = document.getElementById('bqTableBody');
   if(!tbody) return;
@@ -8735,15 +8870,27 @@ function confeteSorteio(){
 }
 document.addEventListener('click', e=>{ if(!(e.target.closest && e.target.closest('#btnCopiarSemente'))) return; const s = (document.getElementById('randomSeedValue') || {}).textContent || ''; try{ navigator.clipboard.writeText(s); showToast('Semente copiada.', 'success'); }catch(x){ showToast('Não consegui copiar: ' + s, 'warning'); } });
 document.getElementById('selectCampanhaSorteio').addEventListener('change', renderSorteioSetup);
+function sorteioJaFeito(id){ const c = campaigns.find(x=>x.id === id); return !!(c && !c.importada && c.ganhadores && c.ganhadores.length); }
 function buildEmptySlots(campaignId){
-  const c = campaigns.find(x=>x.id === campaignId);
-  const n = (c && c.qtdGanhadores) || 4;
-  const slotsEl = document.getElementById('slots');
-  slotsEl.innerHTML = Array.from({length:n}, (_, i)=> `<div class="slot" id="slot${i}"><span class="slot-medalha m${Math.min(i + 1, 4)}">${i + 1}º</span><div class="slot-av">?</div><div class="pos">GANHADOR(A) ${i + 1}</div><div class="name">—</div><div class="info">aguardando sorteio</div></div>`).join('');
-  document.getElementById('sorteioResultActions').style.display = "none";
-  atualizarPassosSorteio();
+  const c = campaigns.find(x=>x.id === campaignId), feito = sorteioJaFeito(campaignId), btn = document.getElementById('btnSortear'), reset = document.getElementById('btnResetSorteio'), slotsEl = document.getElementById('slots'), ra = document.getElementById('sorteioResultActions');
+  const botoes = ['btnValidarSorteio', 'btnRegistrarHistorico'].map(i=> document.getElementById(i));
+  if(feito){
+    slotsEl.innerHTML = c.ganhadores.map((w, i)=> `<div class="slot won" id="slot${i}"><span class="slot-medalha m${Math.min(i + 1, 4)}">${i + 1}º</span><div class="slot-av">${escH(iniciaisDe(w.nome) || '?')}</div><div class="pos">GANHADOR(A) ${i + 1}</div><div class="name">${escH(w.nome)}</div><div class="info">${escH([w.matricula, w.setor, w.filial].filter(Boolean).join(' · '))}</div></div>`).join('');
+    document.getElementById('randomSeedValue').textContent = c.randomSeed || '—'; document.getElementById('randomSeedWrap').style.display = c.randomSeed ? '' : 'none';
+    window._lastSorteio = { campaignId, winners:c.ganhadores, seed:c.randomSeed, fair:true, distinctSetores:new Set(c.ganhadores.map(w=>w.setor)).size, eligibleCount:(evaluateEligibility(campaignId).eligible || []).length, justificativa:c.justificativa || '', criterios:c.criterios || '', validado:true, registrado:true };
+    ra.style.display = 'flex'; botoes.forEach(b=>{ if(b) b.style.display = 'none'; });
+    btn.disabled = true; btn.innerHTML = '<i data-lucide="badge-check"></i> Sorteio já realizado'; if(reset) reset.style.display = 'none';
+  } else {
+    const n = (c && c.qtdGanhadores) || 4;
+    slotsEl.innerHTML = Array.from({length:n}, (_, i)=> `<div class="slot" id="slot${i}"><span class="slot-medalha m${Math.min(i + 1, 4)}">${i + 1}º</span><div class="slot-av">?</div><div class="pos">GANHADOR(A) ${i + 1}</div><div class="name">—</div><div class="info">aguardando sorteio</div></div>`).join('');
+    ra.style.display = 'none'; botoes.forEach(b=>{ if(b) b.style.display = ''; });
+    if(window._lastSorteio && window._lastSorteio.registrado) window._lastSorteio = null;
+    btn.disabled = false; btn.innerHTML = '<i data-lucide="dices"></i> Iniciar sorteio'; if(reset) reset.style.display = '';
+  }
+  if(window.lucide) lucide.createIcons(); atualizarPassosSorteio();
 }
 document.getElementById('btnSortear').addEventListener('click', ()=>{
+  if(sorteioJaFeito(document.getElementById('selectCampanhaSorteio').value)){ showToast('Esta rodada já tem sorteio registrado. Não é possível sortear de novo.', 'warning'); return; }
   if(sorteioRunning) return;
   const id = document.getElementById('selectCampanhaSorteio').value;
   const {eligible} = evaluateEligibility(id);
@@ -9577,6 +9724,7 @@ function renderHomeQualidade(){
         <button type="button" class="qh-btn" onclick="abrirQuemFalta()"><i data-lucide="user-x"></i> Quem falta responder</button>
         <button type="button" class="qh-btn ghost" onclick="kpiPopup('participantes')"><i data-lucide="users"></i> Quem já respondeu</button>
         <button type="button" class="qh-btn ghost" onclick="openShareModal('${escH(c.id)}')"><i data-lucide="share-2"></i> Divulgar</button>
+        <button type="button" class="qh-btn ghost" onclick="verFormularioCampanha('${escH(c.id)}')"><i data-lucide="clipboard-list"></i> Ver formulário</button>
       </div>
     </div>
     ${relogio}
@@ -9881,6 +10029,7 @@ async function bqImportarArquivo(file, preset){
 }
 function abrirPreviaPerguntas(r, doc, preset){
   PREV.lista = r.perguntas.map(p=>({texto:p.texto, categoria:p.categoria || '', options:p.options.map(o=>({text:o.text, correct:!!o.correct}))}));
+  prevCalcSim();
   PREV.categoria = ''; PREV.tema = ''; PREV.arquivo = doc.nome; PREV.avisos = [].concat(r.avisos || [], doc.avisos || []);
   const p = preset || {};
   PREV.usada = !!p.usada; PREV.campanhaUso = p.campanha || ''; PREV.dataUso = p.data || '';
@@ -9899,10 +10048,29 @@ function impPerguntasDoArquivo(){
   if(!r.perguntas.length){ showToast('Não encontrei perguntas neste arquivo. Se elas estão em outro arquivo, use “Importar perguntas” no Banco de Perguntas e marque que já foram usadas.', 'warning'); return; }
   abrirPreviaPerguntas(r, IMP.doc, {usada:true, campanha:IMP.nome, data:IMP.fim});
 }
+/* repetidas e parecidas: contra o banco e contra as anteriores do mesmo arquivo */
+function prevCalcSim(){
+  const banco = typeof questionBank !== 'undefined' ? questionBank : [];
+  PREV.lista.forEach((p, i)=>{
+    const q = { texto:p.texto, options:p.options }, b = banco.length ? Sim.melhorEntre(q, banco) : null, ant = PREV.lista.slice(0, i).filter(x=> !x._ignorar), a = ant.length ? Sim.melhorEntre(q, ant) : null;
+    p._sim = { banco:b, arquivo:a ? { score:a.score, n:PREV.lista.indexOf(ant[a.i]) + 1, q:a.q } : null };
+    if(p._ignorar === undefined) p._ignorar = Math.max(b ? b.score : 0, a ? a.score : 0) >= Sim.DUPLICADA;   // repetida: já nasce "não importar" (dá para desfazer)
+  });
+}
+function prevMarcarSim(c){
+  c.querySelectorAll('.prev-q').forEach((el, i)=>{
+    const p = PREV.lista[i]; if(!p || !p._sim) return; el.classList.toggle('prev-ignorada', !!p._ignorar);
+    const b = p._sim.banco, a = p._sim.arquivo, m = (b && (!a || b.score >= a.score)) ? { s:b.score, q:b.q, onde:`já no banco (${escH(b.q.codigo || '')})` } : a ? { s:a.score, q:a.q, onde:`pergunta ${a.n} deste mesmo arquivo` } : null;
+    if(!m || m.s < Sim.PARECIDA) return;
+    const dup = m.s >= Sim.DUPLICADA, d = document.createElement('div'); d.className = 'prev-sim ' + (dup ? 'dup' : 'sim');
+    d.innerHTML = `<i data-lucide="copy"></i><div><b>${dup ? 'Repetida' : 'Parecida'} · ${Math.round(m.s * 100)}%</b> ${p._ignorar ? '— não será importada' : ''}<span>${escH(String(m.q.texto).slice(0, 140))} <em>(${m.onde})</em></span></div><button type="button" class="btn btn-ghost btn-sm" data-prev="ign" data-i="${i}">${p._ignorar ? 'Importar mesmo assim' : 'Não importar esta'}</button>`;
+    const head = el.querySelector('.prev-q-head'); if(head) head.after(d); else el.prepend(d);
+  });
+}
 function prevResumo(){
   const sem = PREV.lista.filter(p=>!p.options.some(o=>o.correct)).length;
   const el = document.getElementById('prevResumo');
-  if(el) el.innerHTML = `<b>${PREV.lista.length}</b> pergunta(s)${sem ? ` · <span style="color:var(--warning)"><b>${sem}</b> sem gabarito (serão salvas como inativas)</span>` : ''}`;
+  if(el) el.innerHTML = `<b>${PREV.lista.filter(p=>!p._ignorar).length}</b> pergunta(s) para importar${PREV.lista.some(p=>p._ignorar) ? ` · <b>${PREV.lista.filter(p=>p._ignorar).length}</b> repetida(s) ignorada(s)` : ''}${sem ? ` · <span style="color:var(--warning)"><b>${sem}</b> sem gabarito (serão salvas como inativas)</span>` : ''}`;
 }
 function prevRender(){
   const c = document.getElementById('prevCorpo'); if(!c) return;
@@ -9920,6 +10088,7 @@ function prevRender(){
         <button type="button" class="btn btn-ghost btn-sm" data-prev="addalt" data-i="${i}"><i data-lucide="plus"></i> alternativa</button>
       </div>`;
     }).join('');
+  prevMarcarSim(c);
   if(c.parentElement) c.parentElement.scrollTop = sc;
   prevResumo();
   if(window.lucide) lucide.createIcons();
@@ -9933,12 +10102,14 @@ function prevOnInput(e){
 }
 function prevOnChange(e){
   const t = e.target;
+  if(t.dataset.prev === 'qtexto' || t.dataset.prev === 'atexto'){ prevCalcSim(); prevRender(); return; }
   if(t.dataset.prev === 'ok'){ PREV.lista[+t.dataset.i].options[+t.dataset.j].correct = t.checked; prevRender(); }
   else if(t.dataset.prev === 'usada'){ PREV.usada = t.checked; prevRender(); }
   else if(t.dataset.prev === 'datauso'){ PREV.dataUso = t.value; }
 }
 function prevOnClick(e){
   const b = e.target.closest('button[data-prev]'); if(!b) return;
+  if(b.dataset.prev === 'ign'){ const p = PREV.lista[+b.dataset.i]; p._ignorar = !p._ignorar; prevCalcSim(); prevRender(); return; }
   const i = +b.dataset.i, j = +b.dataset.j, k = b.dataset.prev;
   if(k === 'delq') PREV.lista.splice(i, 1);
   else if(k === 'delalt') PREV.lista[i].options.splice(j, 1);
@@ -9947,7 +10118,7 @@ function prevOnClick(e){
   prevRender();
 }
 async function prevSalvar(){
-  const validas = PREV.lista.filter(p=>p.texto.trim() && p.options.filter(o=>o.text.trim()).length >= 2);
+  const validas = PREV.lista.filter(p=>!p._ignorar && p.texto.trim() && p.options.filter(o=>o.text.trim()).length >= 2);
   if(!validas.length){ showToast('Nenhuma pergunta válida para salvar (cada uma precisa de enunciado e 2+ alternativas).', 'warning'); return; }
   if(PREV.usada && !PPGImport.normalizarData(PREV.dataUso)){ showToast('Informe quando a campanha antiga terminou — é assim que o sistema sabe há quanto tempo a pergunta foi usada.', 'warning'); return; }
   const uso = PREV.usada
@@ -10349,6 +10520,17 @@ function mostrarSenhaTemporaria(o){
 
 /* ======================= BANCO DE PERGUNTAS → NOVA CAMPANHA ======================= */
 const SELBANCO = {busca:'', cat:'', soNovas:false, marcadas:new Set()};
+/* a mesma rodada não pode ter perguntas parecidas (repetir assunto): mostra quais são e não deixa seguir */
+const LIMITE_RODADA = 0.60;
+function checarRepetidasRodada(questoes, apenasNovasAPartirDe){
+  let rep = Sim.repetidasNaRodada(questoes.map(q=>({ texto:q.texto, options:q.options || [] })), LIMITE_RODADA);
+  if(apenasNovasAPartirDe != null) rep = rep.filter(r=> r.b >= apenasNovasAPartirDe || r.a >= apenasNovasAPartirDe);
+  if(!rep.length) return false;
+  const cort = t=> String(t).length > 110 ? String(t).slice(0, 107) + '…' : String(t);
+  abrirMiniPagina({ titulo:'Perguntas parecidas na mesma rodada', subtitulo:'Perguntas do mesmo assunto na mesma rodada repetem o conteúdo. Troque ou reescreva uma de cada par para continuar.', largura:760,
+    corpo: rep.slice(0, 12).map(r=> `<div class="rep-par"><div class="rep-score ${r.score >= Sim.DUPLICADA ? 'dup' : 'sim'}"><b>${Math.round(r.score * 100)}%</b><small>${r.score >= Sim.DUPLICADA ? 'repetida' : 'parecida'}</small></div><div class="rep-qs"><div><span class="hint">Pergunta ${r.a + 1}</span> ${escH(cort(questoes[r.a].texto))}</div><div><span class="hint">Pergunta ${r.b + 1}</span> ${escH(cort(questoes[r.b].texto))}</div></div></div>`).join('') + (rep.length > 12 ? `<p class="hint">…e mais ${rep.length - 12} par(es).</p>` : '') });
+  if(window.lucide) lucide.createIcons(); return true;
+}
 function bancoCodigosDoForm(){ return Array.from(document.querySelectorAll('#questionList .qcard[data-bq]')).map(c=>c.dataset.bq); }
 function fillBQPicker(){
   const info = document.getElementById('bqPickerInfo'); if(!info) return;
@@ -10399,6 +10581,7 @@ function abrirSeletorBanco(){
   });
   rodape.querySelector('#sbCancelar').addEventListener('click', fecharMiniPagina);
   rodape.querySelector('#sbInserir').addEventListener('click', ()=>{
+    { const ja = collectQuestionsFromForm(), novas = questionBank.filter(q=> SELBANCO.marcadas.has(q.codigo)).map(q=>({ texto:q.texto, options:q.options })); if(novas.length && checarRepetidasRodada(ja.concat(novas), ja.length)) return; }
     const escolhidas = ativas.filter(q=>SELBANCO.marcadas.has(String(q.codigo)));
     if(!escolhidas.length) return;
     // cartões vazios que vieram prontos no formulário saem para dar lugar às perguntas escolhidas
@@ -10578,13 +10761,13 @@ function iniciarFundo(){
   const lb = document.querySelector('.login-bg');
   if(lb){ const c = document.createElement('div'); c.className = 'lb-orbes'; lb.insertBefore(c, lb.firstChild); Orbes.montar(c, { n:4, min:360, max:540, durMin:24000, durMax:42000 }); }
   setTimeout(()=> Orbes.flutuarIcones(document.querySelector('.login-bg')), 400);
-  const bt = document.getElementById('themeToggleLogin'); if(bt) bt.addEventListener('click', ()=> document.getElementById('themeToggleTop').click());
+  const bt = document.getElementById('themeToggleLogin'); if(bt){ bt.innerHTML = document.getElementById('themeToggleTop').innerHTML; bt.addEventListener('click', ()=> document.getElementById('themeToggleTop').click()); }
 }
 
 /* ======================= DATAS COMEMORATIVAS: o visual acompanha o calendário ======================= */
 /* ======================= ÍCONE DO SITE: o da aba acompanha a data (no Natal ganha gorro) ======================= */
 const FAVICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#14BDB1"/><stop offset="1" stop-color="#00695C"/></linearGradient><radialGradient id="h" cx=".25" cy=".12" r=".85"><stop offset="0" stop-color="#fff" stop-opacity=".30"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><rect width="512" height="512" rx="116" fill="url(#g)"/><rect width="512" height="512" rx="116" fill="url(#h)"/><g transform="translate(78 112) scale(.84) translate(-698 -29)"><path fill="#FFFFFF" fill-rule="evenodd" d="M760.9 54.1C758.5 56.9 754.8 61.5 752.4 64.6C750.0 67.8 749.6 68.2 746.4 73.1C743.2 78.0 738.7 84.9 733.1 94.1C727.6 103.4 717.2 121.1 713.1 128.6C709.0 136.1 709.5 136.2 708.4 139.1C707.2 142.1 706.7 144.0 706.1 146.4C705.5 148.8 705.1 151.2 704.9 153.6C704.6 156.1 704.4 158.2 704.6 161.1C704.8 164.0 705.5 168.3 706.1 170.9C706.7 173.4 706.8 173.7 708.1 176.4C709.5 179.1 712.4 184.2 714.4 187.1C716.4 190.0 718.0 191.7 720.1 193.9C722.2 196.1 721.2 195.6 726.9 200.4C732.6 205.2 744.4 214.9 754.4 222.6C764.4 230.3 773.7 237.3 786.9 246.6C800.1 256.0 820.9 270.2 833.6 278.6C846.3 287.1 858.1 294.0 863.1 297.4C868.1 300.8 863.6 298.9 863.6 298.9C863.6 298.9 861.6 299.4 861.6 299.4C861.6 299.4 862.0 300.0 862.4 300.1C862.7 300.2 863.2 300.3 863.6 300.1C864.1 299.9 863.5 299.0 865.1 298.9C866.7 298.8 870.4 299.0 873.1 299.4C875.9 299.8 879.0 300.3 881.6 301.1C884.2 301.9 886.7 303.0 888.6 304.1C890.6 305.2 892.1 306.8 893.4 307.9C894.6 309.0 895.2 309.5 896.1 310.9C897.0 312.2 898.3 314.6 898.9 315.9C899.4 317.1 899.0 317.7 899.4 318.4C899.7 319.0 896.2 317.3 900.9 319.9C905.6 322.5 920.9 330.5 927.6 333.9C934.3 337.2 934.7 337.4 941.1 339.9C947.5 342.4 958.3 346.4 966.1 348.9C974.0 351.4 981.1 353.3 988.1 354.9C995.2 356.4 1001.8 357.5 1008.4 358.1C1014.9 358.7 1022.9 358.4 1027.4 358.4C1031.8 358.3 1032.1 358.3 1035.1 357.9C1038.2 357.5 1042.0 356.9 1045.6 355.9C1049.3 354.9 1054.1 353.1 1057.1 351.9C1060.1 350.7 1061.3 350.0 1063.6 348.6C1066.0 347.3 1068.2 346.2 1071.1 343.9C1074.1 341.5 1078.5 337.7 1081.4 334.6C1084.3 331.5 1086.2 329.1 1088.6 325.4C1091.0 321.7 1094.1 315.9 1095.9 312.4C1097.7 308.8 1098.0 308.0 1099.4 304.1C1100.7 300.2 1102.8 293.3 1103.9 289.1C1105.0 285.0 1105.2 283.3 1105.9 279.1C1106.5 275.0 1107.5 268.8 1107.9 264.1C1108.3 259.5 1108.4 257.6 1108.4 251.4C1108.4 245.1 1108.3 233.6 1107.9 226.6C1107.5 219.7 1107.2 217.9 1105.9 209.6C1104.5 201.3 1101.6 186.4 1099.6 176.9C1097.6 167.3 1095.5 158.9 1093.9 152.4C1092.2 145.9 1091.3 143.1 1089.6 137.9C1087.9 132.6 1085.2 125.2 1083.6 120.9C1082.0 116.6 1081.9 116.2 1079.9 112.1C1077.9 108.0 1073.7 100.1 1071.6 96.4C1069.6 92.7 1068.5 91.2 1067.6 89.9C1066.7 88.5 1066.7 88.8 1066.1 88.4C1065.6 88.0 1065.0 87.6 1064.4 87.4C1063.8 87.2 1063.3 87.0 1062.4 87.1C1061.4 87.3 1059.7 87.8 1058.6 88.4C1057.6 88.9 1057.5 89.0 1056.1 90.4C1054.8 91.8 1052.6 93.8 1050.6 96.6C1048.6 99.5 1045.9 104.2 1044.1 107.4C1042.4 110.6 1041.8 111.9 1040.1 115.9C1038.5 119.9 1036.0 126.2 1034.4 131.4C1032.8 136.5 1031.4 141.8 1030.4 146.6C1029.3 151.5 1028.5 155.7 1028.1 160.4C1027.7 165.1 1027.7 170.7 1027.9 174.9C1028.0 179.0 1028.7 182.7 1029.1 185.4C1029.6 188.0 1028.8 186.3 1030.6 190.9C1032.4 195.5 1037.3 205.9 1039.9 212.9C1042.5 219.8 1044.5 226.2 1046.1 232.6C1047.8 239.0 1049.1 246.1 1049.9 251.1C1050.7 256.1 1050.8 258.2 1050.9 262.6C1050.9 267.1 1050.6 273.6 1050.1 277.9C1049.6 282.2 1048.9 285.0 1047.9 288.4C1046.9 291.7 1045.5 295.1 1044.1 297.9C1042.8 300.7 1039.6 305.1 1039.6 305.1C1039.6 305.1 1039.5 305.8 1037.9 305.1C1036.2 304.5 1033.1 303.0 1029.9 301.1C1026.7 299.3 1022.1 296.5 1018.6 294.1C1015.1 291.8 1012.8 290.2 1008.9 287.1C1005.0 284.1 999.5 279.7 995.1 275.9C990.7 272.1 987.2 269.0 982.4 264.4C977.5 259.8 972.8 255.3 966.1 248.4C959.5 241.4 951.0 232.4 942.4 222.6C933.8 212.8 924.8 202.4 914.6 189.6C904.4 176.9 890.2 158.2 881.1 146.1C872.0 134.0 867.0 126.7 860.1 116.9C853.3 107.1 845.8 96.0 840.1 87.4C834.5 78.8 829.5 70.7 826.1 65.1C822.8 59.6 821.5 56.8 819.9 54.1C818.2 51.4 817.8 50.9 816.1 48.9C814.4 46.8 811.5 43.6 809.6 41.9C807.8 40.2 806.9 39.6 805.1 38.6C803.4 37.6 801.5 36.5 799.1 35.9C796.8 35.2 793.5 34.8 791.1 34.9C788.8 34.9 786.7 35.6 784.9 36.1C783.0 36.7 782.0 37.1 780.1 38.1C778.2 39.2 775.6 40.7 773.4 42.4C771.1 44.0 768.7 46.2 766.6 48.1C764.5 50.1 763.2 51.4 760.9 54.1Z"/><path fill="#BFF6F1" fill-rule="evenodd" d="M1062.4 87.1C1061.4 87.3 1060.5 87.0 1058.6 88.4C1056.8 89.8 1053.4 93.2 1051.4 95.6C1049.4 98.0 1048.5 99.5 1046.6 102.9C1044.8 106.2 1042.2 111.1 1040.1 115.9C1038.1 120.6 1036.0 126.2 1034.4 131.4C1032.8 136.5 1031.4 141.8 1030.4 146.6C1029.3 151.5 1028.5 155.7 1028.1 160.4C1027.7 165.1 1027.8 171.3 1027.9 174.9C1027.9 178.4 1028.0 179.1 1028.4 181.6C1028.8 184.2 1028.8 185.8 1030.4 190.1C1032.0 194.5 1035.6 201.8 1037.9 207.6C1040.1 213.4 1042.2 219.3 1043.9 224.9C1045.6 230.4 1047.1 236.2 1048.1 240.9C1049.2 245.6 1049.7 248.5 1050.1 253.1C1050.6 257.8 1050.9 264.5 1050.9 268.9C1050.8 273.3 1050.4 276.4 1049.9 279.6C1049.4 282.9 1048.5 286.3 1047.9 288.4C1047.3 290.4 1046.6 290.7 1046.4 291.9C1046.1 293.0 1046.6 294.5 1046.4 295.4C1046.2 296.2 1045.5 296.4 1045.1 297.1C1044.8 297.8 1044.8 299.0 1044.4 299.6C1044.0 300.2 1043.5 299.8 1042.9 300.9C1042.2 301.9 1040.6 305.9 1040.6 305.9C1040.6 305.9 1043.3 307.3 1045.6 308.1C1048.0 308.9 1051.2 310.1 1054.6 310.6C1058.0 311.1 1063.5 311.2 1066.1 311.1C1068.8 311.1 1069.0 310.8 1070.6 310.4C1072.3 309.9 1074.0 309.5 1076.1 308.4C1078.2 307.2 1081.3 305.4 1083.4 303.6C1085.4 301.9 1087.1 299.5 1088.4 297.9C1089.7 296.2 1089.8 296.1 1091.1 293.6C1092.4 291.1 1094.5 287.6 1096.1 282.9C1097.8 278.2 1099.7 271.5 1100.9 265.4C1102.1 259.2 1102.8 253.0 1103.4 245.9C1104.0 238.8 1104.3 229.6 1104.4 222.6C1104.4 215.7 1103.6 204.1 1103.6 204.1C1103.6 204.1 1104.4 203.6 1104.4 203.6C1104.4 203.6 1101.0 184.1 1099.6 176.9C1098.2 169.7 1097.5 166.9 1095.9 160.4C1094.2 153.9 1091.3 143.5 1089.6 137.9C1088.0 132.3 1087.5 131.2 1085.9 126.9C1084.2 122.6 1082.5 117.7 1079.9 112.1C1077.2 106.5 1072.2 97.3 1069.9 93.4C1067.6 89.4 1067.0 89.4 1066.1 88.4C1065.2 87.4 1065.0 87.6 1064.4 87.4C1063.8 87.2 1063.3 87.0 1062.4 87.1Z"/></g><circle cx="404" cy="408" r="50" fill="#E2082D" stroke="#fff" stroke-width="12"/></svg>', FAVICON_NATAL_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#14BDB1"/><stop offset="1" stop-color="#00695C"/></linearGradient><radialGradient id="h" cx=".25" cy=".12" r=".85"><stop offset="0" stop-color="#fff" stop-opacity=".30"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><rect width="512" height="512" rx="116" fill="url(#g)"/><rect width="512" height="512" rx="116" fill="url(#h)"/><g transform="translate(78 112) scale(.84) translate(-698 -29)"><path fill="#FFFFFF" fill-rule="evenodd" d="M760.9 54.1C758.5 56.9 754.8 61.5 752.4 64.6C750.0 67.8 749.6 68.2 746.4 73.1C743.2 78.0 738.7 84.9 733.1 94.1C727.6 103.4 717.2 121.1 713.1 128.6C709.0 136.1 709.5 136.2 708.4 139.1C707.2 142.1 706.7 144.0 706.1 146.4C705.5 148.8 705.1 151.2 704.9 153.6C704.6 156.1 704.4 158.2 704.6 161.1C704.8 164.0 705.5 168.3 706.1 170.9C706.7 173.4 706.8 173.7 708.1 176.4C709.5 179.1 712.4 184.2 714.4 187.1C716.4 190.0 718.0 191.7 720.1 193.9C722.2 196.1 721.2 195.6 726.9 200.4C732.6 205.2 744.4 214.9 754.4 222.6C764.4 230.3 773.7 237.3 786.9 246.6C800.1 256.0 820.9 270.2 833.6 278.6C846.3 287.1 858.1 294.0 863.1 297.4C868.1 300.8 863.6 298.9 863.6 298.9C863.6 298.9 861.6 299.4 861.6 299.4C861.6 299.4 862.0 300.0 862.4 300.1C862.7 300.2 863.2 300.3 863.6 300.1C864.1 299.9 863.5 299.0 865.1 298.9C866.7 298.8 870.4 299.0 873.1 299.4C875.9 299.8 879.0 300.3 881.6 301.1C884.2 301.9 886.7 303.0 888.6 304.1C890.6 305.2 892.1 306.8 893.4 307.9C894.6 309.0 895.2 309.5 896.1 310.9C897.0 312.2 898.3 314.6 898.9 315.9C899.4 317.1 899.0 317.7 899.4 318.4C899.7 319.0 896.2 317.3 900.9 319.9C905.6 322.5 920.9 330.5 927.6 333.9C934.3 337.2 934.7 337.4 941.1 339.9C947.5 342.4 958.3 346.4 966.1 348.9C974.0 351.4 981.1 353.3 988.1 354.9C995.2 356.4 1001.8 357.5 1008.4 358.1C1014.9 358.7 1022.9 358.4 1027.4 358.4C1031.8 358.3 1032.1 358.3 1035.1 357.9C1038.2 357.5 1042.0 356.9 1045.6 355.9C1049.3 354.9 1054.1 353.1 1057.1 351.9C1060.1 350.7 1061.3 350.0 1063.6 348.6C1066.0 347.3 1068.2 346.2 1071.1 343.9C1074.1 341.5 1078.5 337.7 1081.4 334.6C1084.3 331.5 1086.2 329.1 1088.6 325.4C1091.0 321.7 1094.1 315.9 1095.9 312.4C1097.7 308.8 1098.0 308.0 1099.4 304.1C1100.7 300.2 1102.8 293.3 1103.9 289.1C1105.0 285.0 1105.2 283.3 1105.9 279.1C1106.5 275.0 1107.5 268.8 1107.9 264.1C1108.3 259.5 1108.4 257.6 1108.4 251.4C1108.4 245.1 1108.3 233.6 1107.9 226.6C1107.5 219.7 1107.2 217.9 1105.9 209.6C1104.5 201.3 1101.6 186.4 1099.6 176.9C1097.6 167.3 1095.5 158.9 1093.9 152.4C1092.2 145.9 1091.3 143.1 1089.6 137.9C1087.9 132.6 1085.2 125.2 1083.6 120.9C1082.0 116.6 1081.9 116.2 1079.9 112.1C1077.9 108.0 1073.7 100.1 1071.6 96.4C1069.6 92.7 1068.5 91.2 1067.6 89.9C1066.7 88.5 1066.7 88.8 1066.1 88.4C1065.6 88.0 1065.0 87.6 1064.4 87.4C1063.8 87.2 1063.3 87.0 1062.4 87.1C1061.4 87.3 1059.7 87.8 1058.6 88.4C1057.6 88.9 1057.5 89.0 1056.1 90.4C1054.8 91.8 1052.6 93.8 1050.6 96.6C1048.6 99.5 1045.9 104.2 1044.1 107.4C1042.4 110.6 1041.8 111.9 1040.1 115.9C1038.5 119.9 1036.0 126.2 1034.4 131.4C1032.8 136.5 1031.4 141.8 1030.4 146.6C1029.3 151.5 1028.5 155.7 1028.1 160.4C1027.7 165.1 1027.7 170.7 1027.9 174.9C1028.0 179.0 1028.7 182.7 1029.1 185.4C1029.6 188.0 1028.8 186.3 1030.6 190.9C1032.4 195.5 1037.3 205.9 1039.9 212.9C1042.5 219.8 1044.5 226.2 1046.1 232.6C1047.8 239.0 1049.1 246.1 1049.9 251.1C1050.7 256.1 1050.8 258.2 1050.9 262.6C1050.9 267.1 1050.6 273.6 1050.1 277.9C1049.6 282.2 1048.9 285.0 1047.9 288.4C1046.9 291.7 1045.5 295.1 1044.1 297.9C1042.8 300.7 1039.6 305.1 1039.6 305.1C1039.6 305.1 1039.5 305.8 1037.9 305.1C1036.2 304.5 1033.1 303.0 1029.9 301.1C1026.7 299.3 1022.1 296.5 1018.6 294.1C1015.1 291.8 1012.8 290.2 1008.9 287.1C1005.0 284.1 999.5 279.7 995.1 275.9C990.7 272.1 987.2 269.0 982.4 264.4C977.5 259.8 972.8 255.3 966.1 248.4C959.5 241.4 951.0 232.4 942.4 222.6C933.8 212.8 924.8 202.4 914.6 189.6C904.4 176.9 890.2 158.2 881.1 146.1C872.0 134.0 867.0 126.7 860.1 116.9C853.3 107.1 845.8 96.0 840.1 87.4C834.5 78.8 829.5 70.7 826.1 65.1C822.8 59.6 821.5 56.8 819.9 54.1C818.2 51.4 817.8 50.9 816.1 48.9C814.4 46.8 811.5 43.6 809.6 41.9C807.8 40.2 806.9 39.6 805.1 38.6C803.4 37.6 801.5 36.5 799.1 35.9C796.8 35.2 793.5 34.8 791.1 34.9C788.8 34.9 786.7 35.6 784.9 36.1C783.0 36.7 782.0 37.1 780.1 38.1C778.2 39.2 775.6 40.7 773.4 42.4C771.1 44.0 768.7 46.2 766.6 48.1C764.5 50.1 763.2 51.4 760.9 54.1Z"/><path fill="#BFF6F1" fill-rule="evenodd" d="M1062.4 87.1C1061.4 87.3 1060.5 87.0 1058.6 88.4C1056.8 89.8 1053.4 93.2 1051.4 95.6C1049.4 98.0 1048.5 99.5 1046.6 102.9C1044.8 106.2 1042.2 111.1 1040.1 115.9C1038.1 120.6 1036.0 126.2 1034.4 131.4C1032.8 136.5 1031.4 141.8 1030.4 146.6C1029.3 151.5 1028.5 155.7 1028.1 160.4C1027.7 165.1 1027.8 171.3 1027.9 174.9C1027.9 178.4 1028.0 179.1 1028.4 181.6C1028.8 184.2 1028.8 185.8 1030.4 190.1C1032.0 194.5 1035.6 201.8 1037.9 207.6C1040.1 213.4 1042.2 219.3 1043.9 224.9C1045.6 230.4 1047.1 236.2 1048.1 240.9C1049.2 245.6 1049.7 248.5 1050.1 253.1C1050.6 257.8 1050.9 264.5 1050.9 268.9C1050.8 273.3 1050.4 276.4 1049.9 279.6C1049.4 282.9 1048.5 286.3 1047.9 288.4C1047.3 290.4 1046.6 290.7 1046.4 291.9C1046.1 293.0 1046.6 294.5 1046.4 295.4C1046.2 296.2 1045.5 296.4 1045.1 297.1C1044.8 297.8 1044.8 299.0 1044.4 299.6C1044.0 300.2 1043.5 299.8 1042.9 300.9C1042.2 301.9 1040.6 305.9 1040.6 305.9C1040.6 305.9 1043.3 307.3 1045.6 308.1C1048.0 308.9 1051.2 310.1 1054.6 310.6C1058.0 311.1 1063.5 311.2 1066.1 311.1C1068.8 311.1 1069.0 310.8 1070.6 310.4C1072.3 309.9 1074.0 309.5 1076.1 308.4C1078.2 307.2 1081.3 305.4 1083.4 303.6C1085.4 301.9 1087.1 299.5 1088.4 297.9C1089.7 296.2 1089.8 296.1 1091.1 293.6C1092.4 291.1 1094.5 287.6 1096.1 282.9C1097.8 278.2 1099.7 271.5 1100.9 265.4C1102.1 259.2 1102.8 253.0 1103.4 245.9C1104.0 238.8 1104.3 229.6 1104.4 222.6C1104.4 215.7 1103.6 204.1 1103.6 204.1C1103.6 204.1 1104.4 203.6 1104.4 203.6C1104.4 203.6 1101.0 184.1 1099.6 176.9C1098.2 169.7 1097.5 166.9 1095.9 160.4C1094.2 153.9 1091.3 143.5 1089.6 137.9C1088.0 132.3 1087.5 131.2 1085.9 126.9C1084.2 122.6 1082.5 117.7 1079.9 112.1C1077.2 106.5 1072.2 97.3 1069.9 93.4C1067.6 89.4 1067.0 89.4 1066.1 88.4C1065.2 87.4 1065.0 87.6 1064.4 87.4C1063.8 87.2 1063.3 87.0 1062.4 87.1Z"/></g><circle cx="404" cy="408" r="50" fill="#E2082D" stroke="#fff" stroke-width="12"/><g transform="translate(318 50) rotate(18 70 60) scale(.8)"><path d="M10 112C14 56 52 20 110 26c-26 10-32 36-32 58l44 36z" fill="#B3263E"/><path d="M2 108c20 14 96 18 130 2l8 16c-44 18-110 16-146-2z" fill="#FDFBF6"/><circle cx="112" cy="26" r="19" fill="#FDFBF6"/></g></svg>';
-const VERSAO_APP = '15.0';
+const VERSAO_APP = '15.2';
 const _est = (cx, cy, r)=>{ let p = ''; for(let k = 0; k < 10; k++){ const a = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? r * .45 : r; p += `${(cx + rr * Math.cos(a)).toFixed(0)},${(cy + rr * Math.sin(a)).toFixed(0)} `; } return `<polygon points="${p.trim()}"/>`; };
 const _cor = (cx, cy, s)=> `<path d="M${cx} ${cy + s}C${cx - 2 * s} ${cy - s * .2} ${cx - 1.1 * s} ${cy - 1.3 * s} ${cx} ${cy - s * .3}C${cx + 1.1 * s} ${cy - 1.3 * s} ${cx + 2 * s} ${cy - s * .2} ${cx} ${cy + s}Z"/>`;
 const _spk = (cx, cy, r)=> `<path d="M${cx} ${cy - r}C${cx + r * .1} ${cy - r * .3} ${cx + r * .3} ${cy - r * .1} ${cx + r} ${cy}C${cx + r * .3} ${cy + r * .1} ${cx + r * .1} ${cy + r * .3} ${cx} ${cy + r}C${cx - r * .1} ${cy + r * .3} ${cx - r * .3} ${cy + r * .1} ${cx - r} ${cy}C${cx - r * .3} ${cy - r * .1} ${cx - r * .1} ${cy - r * .3} ${cx} ${cy - r}Z"/>`;
@@ -10625,11 +10808,12 @@ const Sazonal = (function(){
     pais:{ nome:'Dia dos Pais', icone:'heart-handshake', acc:'#5B93D1', acc2:'#E8C97A', pal:['#5B93D1', '#E8C97A', '#17427F', '#A9C8EC', '#2D7FD6'], chip:(d)=> FAL(d, 'Dia dos Pais', 'o', 'Feliz Dia dos Pais!', 'Feliz Dia dos Pais'), deco:{ topo:'estrelas', cores:['#5B93D1', '#E8C97A'], canto:'pais' } },
     amarelo:{ nome:'Setembro Amarelo', icone:'ribbon', acc:'#E8B04A', acc2:'#F5D58A', pal:['#E8B04A', '#F5D58A', '#F9B233', '#FFE9A8', '#D99A2B'], chip:()=> 'Setembro Amarelo — cuide da saúde mental', deco:{ topo:'fitas', cores:['#E8B04A'], canto:'fita' } },
     rosa:{ nome:'Outubro Rosa', icone:'ribbon', acc:'#E07A9E', acc2:'#F4B8CB', pal:['#E07A9E', '#F4B8CB', '#C9477A', '#FFC9D8', '#D6457A'], chip:()=> 'Outubro Rosa — prevenção salva vidas', deco:{ topo:'fitas', cores:['#E07A9E'], canto:'fita' } },
+    motorista:{ nome:'Dia do Motorista', icone:'bus', acc:'#F2A900', acc2:'#5B93D1', pal:['#F2A900', '#2D7FD6', '#143F73', '#FFD166', '#E0701A'], chip:(d)=> FAL(d, 'Dia do Motorista', 'o', 'Feliz Dia do Motorista!', 'Feliz Dia do Motorista'), deco:{ topo:'placas', cores:['#F2A900', '#2D7FD6', '#E0701A'], canto:'motorista' } },
     azul:{ nome:'Novembro Azul', icone:'ribbon', acc:'#5B93D1', acc2:'#A9C8EC', pal:['#5B93D1', '#A9C8EC', '#2D7FD6', '#8FB9E8', '#17427F'], chip:()=> 'Novembro Azul — prevenção também é cuidado', deco:{ topo:'fitas', cores:['#5B93D1'], canto:'fitabigode' } }
   };
-  const ORDEM = ['natal', 'anonovo', 'carnaval', 'pascoa', 'maes', 'junina', 'pais', 'amarelo', 'rosa', 'azul'];
-  const DATAS_PADRAO = { natal:['11-10', '12-26'], anonovo:['12-27', '01-06'], junina:['06-01', '06-30'], amarelo:['09-01', '09-30'], rosa:['10-01', '10-31'], azul:['11-01', '11-09'] };   // os outros têm data móvel
-  const ICONES_OK = ['tree-pine', 'sparkles', 'party-popper', 'egg', 'heart', 'flame', 'heart-handshake', 'ribbon', 'cake', 'gift', 'star', 'sun', 'snowflake', 'flower-2', 'leaf', 'trophy', 'bell', 'music', 'users', 'graduation-cap', 'megaphone', 'flag', 'shield-check', 'smile'];
+  const ORDEM = ['natal', 'anonovo', 'carnaval', 'pascoa', 'maes', 'junina', 'pais', 'motorista', 'amarelo', 'rosa', 'azul'];
+  const DATAS_PADRAO = { natal:['11-10', '12-26'], anonovo:['12-27', '01-06'], junina:['06-01', '06-30'], amarelo:['09-01', '09-30'], rosa:['10-01', '10-31'], azul:['11-01', '11-09'], motorista:['07-22', '07-26'] };   // os outros têm data móvel
+  const ICONES_OK = ['bus', 'truck', 'tree-pine', 'sparkles', 'party-popper', 'egg', 'heart', 'flame', 'heart-handshake', 'ribbon', 'cake', 'gift', 'star', 'sun', 'snowflake', 'flower-2', 'leaf', 'trophy', 'bell', 'music', 'users', 'graduation-cap', 'megaphone', 'flag', 'shield-check', 'smile'];
   const DECOS_OK = ['nenhuma', 'luzes', 'bandeiras', 'confete', 'coracoes', 'estrelas', 'ovos', 'fitas', 'canto', 'baloes'];
   const DECO_ROTULO = { nenhuma:'Sem decoração', luzes:'Luzinhas', bandeiras:'Bandeirinhas', confete:'Confete e serpentina', coracoes:'Corações', estrelas:'Estrelas', ovos:'Ovos coloridos', fitas:'Fitinhas', canto:'Selo grande no canto da tela', baloes:'Balões subindo' };
   const num = s=>{ const m = /^(\d{2})-(\d{2})$/.exec(s || ''); if(!m) return null; const mes = +m[1], d = +m[2]; return mes >= 1 && mes <= 12 && d >= 1 && d <= [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][mes - 1] ? mes * 100 + d : null; };
@@ -10658,7 +10842,7 @@ const Sazonal = (function(){
   const todos = ()=> [...ORDEM.map(id=>({ id, ...BASE[id] })), ...CFG.personalizados.map(c=>({ id:c.id, ...defCustom(c) }))];
   function diasEvento(id, t){
     if(id === 'natal') return diasNatal(t);
-    const a = t.getFullYear(), alvo = { anonovo:()=> t.getMonth() === 11 ? dia(a + 1, 1, 1) : dia(a, 1, 1), carnaval:()=> soma(pascoa(a), -47), pascoa:()=> pascoa(a), maes:()=> domingo(a, 5, 2), pais:()=> domingo(a, 8, 2), junina:()=> dia(a, 6, 24) }[id];
+    const a = t.getFullYear(), alvo = { anonovo:()=> t.getMonth() === 11 ? dia(a + 1, 1, 1) : dia(a, 1, 1), carnaval:()=> soma(pascoa(a), -47), pascoa:()=> pascoa(a), maes:()=> domingo(a, 5, 2), pais:()=> domingo(a, 8, 2), junina:()=> dia(a, 6, 24), motorista:()=> dia(a, 7, 25) }[id];
     return alvo ? Math.round((alvo().getTime() - t.getTime()) / 864e5) : null;
   }
   const diasNatal = t => t.getMonth() === 0 ? -1 : Math.round((dia(t.getFullYear(), 12, 25).getTime() - t.getTime()) / 864e5);
@@ -10711,6 +10895,7 @@ const Sazonal = (function(){
   }
   /* a guirlanda: os arcos cabem EXATAMENTE na largura (nada de ponta cortada), com um pino em cada ponta */
   const PECAS2 = {
+    placas:(x, y, cor)=> `<path d="M${x} 6.5V10" stroke="rgba(120,140,136,.7)" stroke-width="1"/><rect x="${(x - 3.7).toFixed(1)}" y="10" width="7.4" height="7.4" rx="1.4" transform="rotate(45 ${x} 13.7)" fill="${cor}"/><path d="M${(x - 1.7).toFixed(1)} 13.7h3.4" stroke="#fff" stroke-width="1.1" stroke-linecap="round"/>`,
     estrelas:(x, y, cor)=> `<path d="M${x} 6.5V9.8" stroke="rgba(120,140,136,.7)" stroke-width="1"/>${estrela(x, 14.5, 5.2, cor)}`,
     coracoes:(x, y, cor)=> `<path d="M${x} 6.5V10" stroke="rgba(120,140,136,.7)" stroke-width="1"/>${coracao(x, 13.5, 5.6, cor)}`,
     ovos:(x, y, cor)=> `<path d="M${x} 6.5V8" stroke="rgba(120,140,136,.7)" stroke-width="1"/><ellipse cx="${x}" cy="13.4" rx="4.1" ry="5.4" fill="${cor}"/><path d="M${(x - 4.1).toFixed(1)} 13.4q2.05-2.4 4.1 0t4.1 0" stroke="#fff" stroke-width="1" fill="none" opacity=".85"/>`,
@@ -10720,15 +10905,17 @@ const Sazonal = (function(){
   const peca2 = (g, x, y, cor, i)=> PECAS2[g] ? PECAS2[g](+x.toFixed(1), y, cor, i) : peca(g, x, y, cor, i);
   function guirlanda(pai, deco, o){
     if(!pai || !deco || pai.querySelector(':scope > .sz-luzes')) return; o = o || {};
-    const larg = Math.max(160, Math.min(Math.round(o.largura || pai.getBoundingClientRect().width) || innerWidth, 2000)), alvo = deco.g === 'luzes' ? (larg < 600 ? 38 : 50) : (larg < 600 ? 46 : 64), n = Math.max(3, Math.round(larg / alvo)), passo = larg / n;
-    let d = 'M0 2'; for(let i = 0; i < n; i++) d += ` Q${((i + .5) * passo).toFixed(1)} ${deco.g === 'luzes' ? 15 : 11} ${((i + 1) * passo).toFixed(1)} 2`;
+    const lt = Math.max(160, Math.min(Math.round(o.largura || pai.getBoundingClientRect().width) || innerWidth, 2000)), ini = o.inset != null ? o.inset : 14, util = lt - ini * 2,
+      alvo = deco.g === 'luzes' ? (lt < 600 ? 38 : 50) : (lt < 600 ? 46 : 64), n = Math.max(3, Math.round(util / alvo)), passo = util / n;
+    let d = `M${ini} 2`; for(let i = 0; i < n; i++) d += ` Q${(ini + (i + .5) * passo).toFixed(1)} ${deco.g === 'luzes' ? 15 : 11} ${(ini + (i + 1) * passo).toFixed(1)} 2`;
     const cores = deco.cores, c = document.createElement('div'); c.className = 'sz-luzes' + (deco.g === 'luzes' ? ' grande' : ''); c.setAttribute('aria-hidden', 'true');
-    if(o.esq != null){ c.style.left = o.esq + 'px'; c.style.right = 'auto'; c.style.width = larg + 'px'; c.style.top = o.topo + 'px'; c.style.bottom = 'auto'; }
-    const pino = `<circle cx="1.5" cy="2" r="1.6" fill="#9aa8a5"/><circle cx="${(larg - 1.5).toFixed(1)}" cy="2" r="1.6" fill="#9aa8a5"/>`;
+    if(o.esq != null){ c.style.left = o.esq + 'px'; c.style.right = 'auto'; c.style.width = lt + 'px'; c.style.top = o.topo + 'px'; c.style.bottom = 'auto'; }
+    /* as duas pontas terminam num prendedor encostado na borda de cima: nada de fio solto para fora */
+    const pino = [ini, lt - ini].map(x=> `<path d="M${x} 0V2" stroke="#8d9d9a" stroke-width="1.6"/><circle cx="${x}" cy="2" r="2.3" fill="#8d9d9a"/>`).join('');
     if(deco.g === 'luzes'){
-      const g = [[], [], [], []]; for(let i = 0; i < n; i++) g[i % 4].push(`<i class="sz-b" style="left:${((i + .5) * passo - 4.5).toFixed(0)}px; --bc:${cores[i % cores.length]}"></i>`);
-      c.innerHTML = `<svg width="${larg}" height="34" viewBox="0 0 ${larg} 34"><path class="fio" d="${d}"/>${pino}</svg>` + g.map((l, k)=> `<div class="sz-g" style="animation-delay:-${(k * .7).toFixed(1)}s">${l.join('')}</div>`).join('');
-    } else { let s = ''; for(let i = 0; i < n; i++) s += peca2(deco.g, (i + .5) * passo, deco.g === 'bandeiras' ? 7.5 : 9, cores[i % cores.length], i); c.innerHTML = `<svg width="${larg}" height="28" viewBox="0 0 ${larg} 28"><path class="fio" d="${d}"/>${pino}${s}</svg>`; }
+      const g = [[], [], [], []]; for(let i = 0; i < n; i++) g[i % 4].push(`<i class="sz-b" style="left:${(ini + (i + .5) * passo - 4.5).toFixed(0)}px; --bc:${cores[i % cores.length]}"></i>`);
+      c.innerHTML = `<svg width="${lt}" height="34" viewBox="0 0 ${lt} 34"><path class="fio" d="${d}"/>${pino}</svg>` + g.map((l, k)=> `<div class="sz-g" style="animation-delay:-${(k * .7).toFixed(1)}s">${l.join('')}</div>`).join('');
+    } else { let s = ''; for(let i = 0; i < n; i++) s += peca2(deco.g, ini + (i + .5) * passo, deco.g === 'bandeiras' ? 7.5 : 9, cores[i % cores.length], i); c.innerHTML = `<svg width="${lt}" height="28" viewBox="0 0 ${lt} 28"><path class="fio" d="${d}"/>${pino}${s}</svg>`; }
     pai.appendChild(c);
   }
   function queda(pai, local, tipo){
@@ -10746,6 +10933,7 @@ const Sazonal = (function(){
   const laco = (cor)=> `<g class="sz-a sz-pulsa"><path d="M25 40C6 18 18 2 25 16C32 2 44 18 25 40" stroke="${cor}" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M25 38l-10 24M25 38l10 24" stroke="${cor}" stroke-width="5.5" stroke-linecap="round" fill="none"/><path d="M17 12c-3 3-4 6-3.4 9" stroke="#fff" stroke-width="1.6" stroke-linecap="round" fill="none" opacity=".55"/></g>`;
   const ARTE = {
     natal:()=>({ dir:S('0 0 80 104', 60, 78, `<defs><linearGradient id="szA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4DB98A"/><stop offset="1" stop-color="#0F6B50"/></linearGradient><linearGradient id="szB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3AA37A"/><stop offset="1" stop-color="#0B5A43"/></linearGradient><radialGradient id="szG"><stop offset="0" stop-color="#FFE9A8" stop-opacity=".95"/><stop offset="1" stop-color="#FFE9A8" stop-opacity="0"/></radialGradient></defs><ellipse cx="40" cy="100" rx="30" ry="3.4" fill="#000" opacity=".12"/><rect x="35" y="86" width="10" height="13" rx="2" fill="#7A5230"/><path d="M40 44C29 60 16 70 9 86Q24 96 40 88Q56 96 71 86C64 70 51 60 40 44Z" fill="url(#szB)"/><path d="M40 26C31 40 21 50 16 63Q28 71 40 65Q52 71 64 63C59 50 49 40 40 26Z" fill="url(#szA)"/><path d="M40 8C34 20 27 29 24 40Q32 46 40 42Q48 46 56 40C53 29 46 20 40 8Z" fill="url(#szA)"/><g fill="none" stroke="#fff" stroke-linecap="round"><path d="M9.5 86Q24 96 40 88Q56 96 70.5 86" stroke-width="2.6" opacity=".92"/><path d="M16.5 63Q28 71 40 65Q52 71 63.5 63" stroke-width="2.4" opacity=".9"/><path d="M24.5 40Q32 46 40 42Q48 46 55.5 40" stroke-width="2.2" opacity=".92"/><path d="M40 11C35 21 29 29 26 38M40 29C33 41 24 50 19 60M40 47C31 62 20 71 13 83" stroke-width="1.1" opacity=".2"/></g><g fill="none" stroke="#E8C97A" stroke-width="1.3" stroke-linecap="round"><path d="M27 34Q40 41 53 33"/><path d="M20 56Q40 66 60 55"/><path d="M13 79Q40 91 67 78"/></g><circle cx="40" cy="8" r="10" fill="url(#szG)"/><g class="sz-a sz-tw">${estrela(40, 8, 6, '#F6D77A')}</g><g class="sz-a sz-tw"><circle cx="31" cy="60" r="2.6" fill="#E2082D"/><circle cx="53" cy="58" r="2.6" fill="#F9B233"/><circle cx="22" cy="82" r="2.8" fill="#F9B233"/><circle cx="58" cy="82" r="2.8" fill="#E2082D"/><circle cx="35" cy="36" r="2.2" fill="#17CEC9"/></g><g class="sz-a sz-tw sz-tw2"><circle cx="43" cy="65" r="2.6" fill="#17CEC9"/><circle cx="37" cy="86" r="2.8" fill="#17CEC9"/><circle cx="46" cy="39" r="2.2" fill="#E2082D"/><circle cx="44" cy="76" r="2.4" fill="#F9B233"/></g><rect x="2" y="91" width="14" height="10" rx="1.5" fill="#E2082D"/><rect x="7.7" y="91" width="2.6" height="10" fill="#F9B233"/><rect x="2" y="94.7" width="14" height="2.6" fill="#F9B233"/><rect x="63" y="93" width="12" height="8" rx="1.5" fill="#F9B233"/><rect x="67.7" y="93" width="2.6" height="8" fill="#B3263E"/>`, 'alto'), esq:'' }),
+    motorista:()=>({ dir:S('0 0 96 56', 80, 47, `<rect x="4" y="8" width="88" height="32" rx="8" fill="#17CEC9"/><path d="M4 30h88v2a8 8 0 0 1-8 8H12a8 8 0 0 1-8-8z" fill="#00A09A"/><rect x="4" y="27.4" width="88" height="2.6" fill="#DD2033"/><rect x="10" y="14" width="14" height="11" rx="2.5" fill="#0B3B38"/><rect x="27" y="14" width="14" height="11" rx="2.5" fill="#0B3B38"/><rect x="44" y="14" width="14" height="11" rx="2.5" fill="#0B3B38"/><rect x="61" y="14" width="14" height="11" rx="2.5" fill="#0B3B38"/><path d="M78 14h8a4 4 0 0 1 4 4v7H78z" fill="#0B3B38"/><path d="M12 16h10M29 16h10M46 16h10M63 16h10" stroke="#fff" stroke-width="1.4" stroke-linecap="round" opacity=".35"/><circle cx="90.5" cy="33" r="2.1" fill="#FFE9A8"/><circle cx="26" cy="42" r="6.6" fill="#17262B"/><circle cx="26" cy="42" r="3" fill="#E6F3F2"/><circle cx="70" cy="42" r="6.6" fill="#17262B"/><circle cx="70" cy="42" r="3" fill="#E6F3F2"/>`, 'alto'), esq:'' }),
     fogos:(t)=>({ dir:'', esq:S('0 0 64 64', 52, 52, `<defs><linearGradient id="szgo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F7E2A3"/><stop offset="1" stop-color="#D9B25E"/></linearGradient></defs><g class="sz-fogo">${fagulha(26, 24, 15, 'url(#szgo)')}</g><g class="sz-a sz-tw">${fagulha(48, 12, 7, '#F2D58B')}</g><g class="sz-a sz-tw sz-tw2">${fagulha(10, 44, 5, '#F2D58B')}</g><text x="32" y="60" text-anchor="middle" font-family="Manrope,Arial,sans-serif" font-weight="700" font-size="10" letter-spacing="1.4" fill="#D9B25E">${t.mes === 12 ? t.ano + 1 : t.ano}</text>`) }),
     carnaval:()=>({ dir:S('0 0 72 52', 66, 48, `<g class="sz-a sz-balanca"><ellipse cx="62" cy="10" rx="2.4" ry="9" transform="rotate(35 62 10)" fill="#D2569E"/><ellipse cx="66" cy="16" rx="2.4" ry="9" transform="rotate(60 66 16)" fill="#F2B544"/><path d="M4 22C4 10 22 10 36 16C50 10 68 10 68 22C68 38 52 46 36 38C20 46 4 38 4 22Z" fill="#7B3FA0" stroke="#E8C97A" stroke-width="1.5"/><ellipse cx="22" cy="24" rx="8" ry="5" fill="#2B1055"/><ellipse cx="50" cy="24" rx="8" ry="5" fill="#2B1055"/><circle cx="36" cy="16" r="1.8" fill="#E8C97A"/></g>`), esq:'' }),
     pascoa:()=>({ dir:'', esq:S('0 0 74 56', 62, 47, `<g class="sz-a sz-balanca base"><ellipse cx="20" cy="36" rx="12" ry="16" fill="#F2B5CB"/><path d="M9 36q2.8-3 5.5 0t5.5 0 5.5 0 5.5 0" stroke="#fff" stroke-width="1.6" fill="none" opacity=".9"/></g><g class="sz-a sz-balanca base" style="animation-delay:-1.1s"><ellipse cx="37" cy="34" rx="12" ry="16" fill="#A9D6F5"/><path d="M26 30l5.5-4 5.5 4 5.5-4 5.5 4M26 40l5.5-4 5.5 4 5.5-4 5.5 4" stroke="#fff" stroke-width="1.5" fill="none" opacity=".9"/></g><g class="sz-a sz-balanca base" style="animation-delay:-2.2s"><ellipse cx="54" cy="38" rx="11" ry="15" fill="#F7E08A"/><circle cx="48" cy="33" r="1.8" fill="#fff"/><circle cx="58" cy="41" r="1.8" fill="#fff"/><circle cx="52" cy="47" r="1.8" fill="#fff"/></g>`) }),
@@ -10777,7 +10965,7 @@ const Sazonal = (function(){
     const hero = document.querySelector('.login-hero'), shell = document.querySelector('.login-shell');
     if(dc.topo){
       const topo = { g:dc.topo, cores:dc.cores }; guirlanda(document.querySelector('.topbar'), topo);
-      if(hero && shell){ const rh = hero.getBoundingClientRect(), rs = shell.getBoundingClientRect(); if(rs.width > 160) guirlanda(hero, topo, { largura:Math.round(rs.width), esq:Math.round(rs.left - rh.left), topo:Math.round(rs.top - rh.top) - 3 }); }
+      if(hero && shell){ const rh = hero.getBoundingClientRect(), rs = shell.getBoundingClientRect(); if(rs.width > 160) guirlanda(hero, topo, { largura:Math.round(rs.width), esq:Math.round(rs.left - rh.left), topo:Math.round(rs.top - rh.top) - 3, inset:32 }); }
     }
     emblema(dc, t); if(dc.flutua) flutuar(dc);
     if(dc.queda && t.fase !== 'chegando'){ queda(document.body, false, dc.queda); queda(hero, true, dc.queda); }
@@ -10792,7 +10980,7 @@ const Sazonal = (function(){
     const primeira = ultimaAssinatura === null; ultimaAssinatura = sig;
     atual = t; window.__sazonal = t; document.body.dataset.sazon = t ? t.id : ''; document.body.dataset.sazonFase = t && t.fase ? t.fase : '';
     let st = document.getElementById('szCustomCss'); if(!st){ st = document.createElement('style'); st.id = 'szCustomCss'; document.head.appendChild(st); } const novo = cssCustom(); if(st.textContent !== novo) st.textContent = novo;
-    decorar(); try{ atualizarFavicon(t); }catch(e){}
+    decorar(); try{ corHero(t); }catch(e){} try{ atualizarFavicon(t); }catch(e){}
     const tabs = document.getElementById('szTabs'); if(tabs) tabs.querySelectorAll('[data-sz]').forEach(b=> b.classList.toggle('active', b.dataset.sz === lerPref()));
     const sel = document.getElementById('szPrever'); if(sel){ sel.innerHTML = '<option value="">Automático (pelo calendário)</option>' + todos().map(k=> `<option value="${k.id}">${escH(k.nome)}</option>`).join(''); sel.value = lerPrever(); }
     /* as telas que mostram o selo/faixa (e a contagem "Faltam N dias") se atualizam sozinhas — sem mexer numa pergunta em andamento */
@@ -10845,10 +11033,42 @@ const Sazonal = (function(){
       else if(id === 'maes') s += coracao(x, y + 7, 8 - i * .6, cor(i));
       else if(id === 'pais') s += estrela(x, y + 9, 10 - i, cor(i));
       else if(['amarelo', 'rosa', 'azul'].includes(id)) s += `<path d="M${x} ${y + 17}C${x - 11} ${y + 3} ${x - 4} ${y - 1} ${x} ${y + 8}C${x + 4} ${y - 1} ${x + 11} ${y + 3} ${x} ${y + 17}" stroke="${cor(0)}" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M${x} ${y + 17}l-4 9M${x} ${y + 17}l4 9" stroke="${cor(0)}" stroke-width="3.4" stroke-linecap="round"/>`;
+      else if(id === 'motorista') s += `<rect x="${x - 6}" y="${y + 3}" width="12" height="12" rx="2.4" transform="rotate(45 ${x} ${y + 9})" fill="${cor(i)}"/><path d="M${x - 3} ${y + 9}h6" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>`;
       else s += fagulha(x, y + 9, 10 - i, cor(i));
     });
     return svg(s);
   }
+  /* cartões de destaque nas cores da data, com um padrão discreto de motivos */
+  const HERO = { natal:['#0C7C59', '#8F2236'], anonovo:['#17386B', '#A8812A'], carnaval:['#A62F6E', '#5A2D91'], pascoa:['#7B68B8', '#C4719A'], maes:['#C0456F', '#DE7F9B'], junina:['#C2581F', '#8F3B12'], pais:['#1F5FA8', '#123B6D'], motorista:['#143F73', '#C98A06'], amarelo:['#C78700', '#8C5A00'], rosa:['#C2457A', '#8E2B59'], azul:['#2467B3', '#123D72'] };
+  const mistura = (hex, k)=>{ const n = parseInt(String(hex).slice(1), 16), f = v=> Math.round(v * (1 - k)); return '#' + [n >> 16 & 255, n >> 8 & 255, n & 255].map(v=> f(v).toString(16).padStart(2, '0')).join(''); };
+  function padraoSvg(id){
+    const M = { natal:'<path d="M0-8V8M-7-4L7 4M-7 4L7-4" stroke="#fff" stroke-width="1.6" stroke-linecap="round" fill="none"/>', anonovo:'<path d="M0-8Q1-1 8 0Q1 1 0 8Q-1 1-8 0Q-1-1 0-8Z" fill="#fff"/>', carnaval:'<rect x="-1.6" y="-7" width="3.2" height="14" rx="1.6" transform="rotate(35)" fill="#fff"/><circle cx="8" cy="6" r="2" fill="#fff"/>', pascoa:'<ellipse rx="5.2" ry="7" fill="#fff"/>', maes:'<path d="M0 6C-9-1-5-8 0-3C5-8 9-1 0 6Z" fill="#fff"/>', junina:'<path d="M-6-5H6L0 7Z" fill="#fff"/>', pais:'<path d="M0-8L2.4-2.6 8-2 3.8 1.8 5 7.4 0 4.6-5 7.4-3.8 1.8-8-2-2.4-2.6Z" fill="#fff"/>', motorista:'<circle r="6" fill="none" stroke="#fff" stroke-width="2.2"/><circle r="1.8" fill="#fff"/>' }, ribbon = '<path d="M0 8C-8 1-4-4 0 1C4-4 8 1 0 8" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>';
+    const m = M[id] || (['amarelo', 'rosa', 'azul'].includes(id) ? ribbon : M.anonovo);
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="84" height="84" viewBox="0 0 84 84"><g opacity=".14"><g transform="translate(21 21)">${m}</g><g transform="translate(63 63)">${m}</g></g><g fill="#fff" opacity=".12"><circle cx="63" cy="21" r="2"/><circle cx="21" cy="63" r="2"/></g></svg>`;
+  }
+  function corHero(t){
+    const b = document.body; if(!t){ b.style.removeProperty('--sz-hero'); b.style.removeProperty('--sz-pat'); delete b.dataset.szHero; return; }
+    const hv = HERO[t.id] || (def(t.id) ? [mistura(acc(t.id)[0], .35), mistura(acc(t.id)[0], .6)] : null); if(!hv){ b.style.removeProperty('--sz-hero'); delete b.dataset.szHero; return; }
+    b.style.setProperty('--sz-hero', `linear-gradient(125deg, ${hv[0]} 0%, ${hv[1]} 100%)`); b.style.setProperty('--sz-pat', `url("data:image/svg+xml,${encodeURIComponent(padraoSvg(t.id))}")`); b.dataset.szHero = '1';
+  }
+  /* mensagem de parabéns: aparece uma vez por dia para quem entrar no dia da data (ou no dia seguinte) */
+  const PARABENS = {
+    natal:'Que este Natal traga paz, saúde e momentos especiais ao lado de quem você ama. Obrigado por fazer o PPG acontecer o ano inteiro.',
+    anonovo:'Que o novo ano seja de conquistas, segurança e muita saúde para você e para a sua família.',
+    carnaval:'Aproveite o descanso com alegria e responsabilidade. Quem se cuida, volta com energia total!',
+    pascoa:'Que esta Páscoa seja de renovação, união e muita paz para você e para quem você ama.',
+    maes:'Nossa homenagem a todas as mães, e a todas as pessoas que cuidam como uma mãe. Vocês fazem a diferença todos os dias.',
+    pais:'Nossa homenagem a todos os pais, e a todos que exercem esse papel com amor e dedicação.',
+    motorista:'Obrigado por levar a nossa operação, e quem está nela, em segurança todos os dias. Cada quilômetro seguro importa. Boa estrada!',
+    junina:'Aproveite a festa, o forró e a boa comida ao lado da família. Viva São João!'
+  };
+  function parabens(t){
+    if(!t || t.previa || !PARABENS[t.id] || !(t.dias === 0 || t.dias === -1)) return; if(typeof currentUser === 'undefined' || !currentUser || typeof abrirMiniPagina !== 'function') return;
+    const chave = `ppg_parabens_${t.id}_${new Date().toISOString().slice(0, 10)}`; try{ if(localStorage.getItem(chave)) return; localStorage.setItem(chave, '1'); }catch(e){}
+    const d = def(t.id), primeiro = escH(String(currentUser.nome || '').split(' ')[0]), a1 = acc(t.id)[0], tit = String(d.chip(t)).replace(/!$/, '');
+    setTimeout(()=>{ abrirMiniPagina({ titulo:tit + '!', corpo:`<div class="sz-parabens" style="--acc:${a1}"><div class="sz-pb-ic"><i data-lucide="${d.icone}"></i></div><h3>${escH(tit)}, ${primeiro}!</h3><p>${escH(PARABENS[t.id])}</p><small>Equipe de Qualidade · PPG</small></div>` }); if(window.lucide) lucide.createIcons(); }, 900);
+  }
+  setInterval(()=>{ try{ if(atual) parabens(atual); }catch(e){} }, 4000);
   const acc = id=>{ const b = BASE[id]; if(b) return [b.acc, b.acc2]; const c = CFG.personalizados.find(x=>x.id === id); return c ? [c.cor, clarear(c.cor, .4)] : ['#02A39D', '#17CEC9']; };
   return { acc, enfeite, temaDe, quando, def, todos, ORDEM, DATAS_PADRAO, ICONES_OK, DECOS_OK, DECO_ROTULO, iniciar, aplicar, configurar, previa, sairPrevia, verVersao, cfg:()=>CFG, atual:()=>atual, TEMAS:BASE };
 })();
