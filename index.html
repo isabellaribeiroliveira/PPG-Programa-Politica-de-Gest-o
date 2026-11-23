@@ -2662,6 +2662,50 @@ body .login-demo-toggle{ border-radius:14px; }
 
 /* v26b — respiro entre o título do login e os campos */
 body .login-card .lc-head{ margin-bottom:22px !important; }
+
+/* ================================================================================================
+   v27 — casca colada nas bordas, listas sem corte, listrinha do menu no ícone, login sem quebra de cor,
+         pisca-pisca dentro do cartão da rodada, sorteios realizados com busca por semente
+   ================================================================================================ */
+@media(min-width:881px){
+  body .sidebar{ top:0; left:0; bottom:0; width:268px; border-radius:0; border:0; border-right:1px solid var(--border); box-shadow:none; overflow:hidden; }
+  body .sidebar.collapsed{ width:80px; }
+  body .main{ margin-left:268px; width:calc(100% - 268px); } body .sidebar.collapsed ~ .main{ margin-left:80px; width:calc(100% - 80px); }
+  body .topbar{ top:0; margin:0; border-radius:0; border:0 !important; border-bottom:1px solid var(--border) !important; box-shadow:none; padding:13px 28px; }
+}
+/* listas da inicial: sem rolagem interna (os botões "Mostrar mais" nunca ficam cortados) */
+.part-lista, #chartSetor, #chartFilial{ max-height:none !important; overflow:visible !important; } div.lista-mais{ padding:10px 0 4px !important; flex-wrap:wrap; display:flex; justify-content:center; gap:8px; } .lista-mais .btn{ margin:0; }
+/* listrinha vermelha acompanha o ícone do item ativo */
+body .menu-item.active::before, body .sidebar .menu-item.active::before{ display:none !important; }
+.mi-ic, .si-ic{ position:relative; }
+body .menu-item.active:not(.sub) .mi-ic::before{ content:""; position:absolute; left:-13px; top:50%; width:3px; height:18px; transform:translateY(-50%); border-radius:0 3px 3px 0; background:var(--marca-vermelho); box-shadow:0 0 10px var(--red-glow); }
+body .menu-item.sub.active .si-ic::before{ content:""; position:absolute; left:-9px; top:50%; width:3px; height:14px; transform:translateY(-50%); border-radius:0 3px 3px 0; background:var(--marca-vermelho); }
+body .sidebar.collapsed .menu-item.active:not(.sub) .mi-ic::before{ left:-11px; }
+/* campos de data dos temas */
+.sz-datas .sz-dm{ width:66px; height:36px; padding:0 6px; text-align:center; font:700 13px/1 inherit; font-family:inherit; color:var(--ink); background:var(--card); border:1px solid var(--border) !important; border-radius:10px !important; box-shadow:none !important; outline:none !important; }
+.sz-datas .sz-dm:hover{ border-color:rgba(2,163,157,.5) !important; } .sz-datas .sz-dm:focus{ border-color:var(--primary) !important; box-shadow:0 0 0 3px rgba(2,163,157,.18) !important; }
+/* login: o fundo acompanha a tela inteira (sem corte reto ao rolar) e o pisca-pisca fica por cima de tudo */
+.login-bg{ position:fixed !important; inset:0; height:auto !important; } .login-hero{ overflow:visible; } .login-hero > .sz-luzes{ z-index:8; pointer-events:none; }
+/* pisca-pisca dentro do cartão */
+.sz-luzes.cartao{ position:absolute !important; left:0 !important; top:0 !important; right:auto !important; bottom:auto !important; z-index:3; pointer-events:none; }
+.sz-luzes.cartao .fio{ stroke:rgba(255,255,255,.6); } .sz-luzes.cartao svg circle{ fill:rgba(255,255,255,.75) !important; } .sz-luzes.cartao svg path[stroke^="#8d"], .sz-luzes.cartao svg path[stroke^="rgba(120"]{ stroke:rgba(255,255,255,.65) !important; }
+.qh:has(> .sz-luzes.cartao){ padding-top:86px; } .home-hero:has(> .sz-luzes.cartao){ padding-top:88px; }
+.qh:has(> .sz-luzes.cartao) .sz-selo, .home-hero:has(> .sz-luzes.cartao) .sz-selo{ top:44px; }
+/* sorteios realizados */
+.sh-busca{ position:relative; margin:4px 0 14px; } .sh-busca svg{ position:absolute; left:14px; top:50%; transform:translateY(-50%); width:18px; height:18px; color:var(--ink-soft); } .sh-busca input{ width:100%; height:46px; padding:0 14px 0 42px; border-radius:14px; border:1.5px solid var(--border); background:var(--bg); font-size:14px; color:var(--ink); }
+.sh-lista{ display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:14px; } .sh-card{ border:1px solid var(--border); border-radius:18px; padding:16px; background:var(--card); display:flex; flex-direction:column; gap:12px; min-width:0; }
+.sh-card header{ display:flex; justify-content:space-between; gap:10px; align-items:flex-start; } .sh-t{ min-width:0; } .sh-t b{ display:block; font-size:14.5px; overflow-wrap:anywhere; } .sh-t small{ display:block; margin-top:3px; font-size:12px; color:var(--ink-soft); line-height:1.4; overflow-wrap:anywhere; }
+.sh-chip{ flex:0 0 auto; font-size:11px; font-weight:800; padding:4px 10px; border-radius:99px; background:rgba(2,163,157,.12); color:var(--secondary); } .sh-chip.ok{ background:rgba(46,158,99,.14); color:#1B7A3F; } body.dark .sh-chip.ok{ color:#8CE0A0; }
+.sh-seed{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:9px 12px; border-radius:12px; background:rgba(2,163,157,.08); border:1px dashed rgba(2,163,157,.35); font-size:12.5px; } .sh-seed svg{ width:16px; height:16px; color:var(--primary); flex:0 0 auto; } .sh-seed span{ font-weight:700; color:var(--ink-soft); } .sh-seed code{ font-family:'IBM Plex Mono',ui-monospace,monospace; font-weight:800; letter-spacing:.5px; font-size:13px; word-break:break-all; } .sh-seed em{ color:var(--ink-soft); font-size:12px; }
+.sh-gan{ display:flex; flex-wrap:wrap; gap:6px; } .sh-w{ font-size:12.5px; padding:5px 10px; border-radius:99px; background:var(--bg); border:1px solid var(--border); overflow-wrap:anywhere; } .sh-w b{ color:var(--primary); margin-right:2px; } .sh-w small{ color:var(--ink-soft); }
+.sh-card footer{ display:flex; gap:8px; flex-wrap:wrap; }
+@media(max-width:560px){ .sh-lista{ grid-template-columns:minmax(0,1fr); } }
+
+/* ===== v29 — complementar rodada importada, dossiê, foto com fundo ===== */
+.fm-comp{ margin-top:16px; padding:16px; border:1px dashed rgba(2,163,157,.45); border-radius:16px; background:rgba(2,163,157,.06); } .fm-comp h4{ display:flex; align-items:center; gap:8px; margin:0 0 4px; font-size:14px; } .fm-comp h4 svg{ width:17px; height:17px; color:var(--primary); }
+.fm-comp-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:8px; } .fm-comp-arq{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; } .fm-comp-acoes{ margin-top:12px; display:flex; justify-content:flex-end; }
+@media(max-width:560px){ .fm-comp-grid{ grid-template-columns:minmax(0,1fr); } }
+.avatar.av-foto img, .perfil-prev.av-foto img{ border-radius:50%; width:100%; height:100%; object-fit:cover; display:block; }
 </style>
 </head>
 <body data-app-url="<?= urlApp ?>" data-campanha="<?= campanhaParam ?>">
@@ -2965,6 +3009,12 @@ body .login-card .lc-head{ margin-bottom:22px !important; }
  <button class="btn btn-outline" id="btnRelatorioOficial"><i data-lucide="file-text"></i> Gerar relatório oficial</button>
  </div>
  </div>
+ 
+ <div class="panel sorteio-hist">
+ <div class="palco-topo"><span class="palco-ic"><i data-lucide="history"></i></span><div><h3>Sorteios realizados</h3><span class="hint">Pesquise pela semente, campanha, ganhador ou matrícula — fica tudo guardado como registro oficial</span></div></div>
+ <div class="sh-busca"><i data-lucide="search"></i><input type="search" id="sorteioBusca" placeholder="Buscar por semente, campanha, ganhador ou matrícula…" autocomplete="off" aria-label="Buscar sorteios realizados"></div>
+ <div id="sorteiosFeitos" class="sh-lista"></div>
+ </div>
  </section>
 
       <!-- ================= RELATÓRIOS (Qualidade) ================= -->
@@ -2987,6 +3037,9 @@ body .login-card .lc-head{ margin-bottom:22px !important; }
         <div class="hist-pane" id="histPane-rodadas"><div class="panel"><div class="timeline" id="timeline"></div></div></div>
         <div class="hist-pane" id="histPane-auditoria" style="display:none">
         <p class="hint" style="margin:4px 0 14px;">Rastreabilidade completa de cada participação, com filtros, gráficos e exportação.</p>
+ <div class="panel sorteio-hist"><div class="palco-topo"><span class="palco-ic"><i data-lucide="shield-check"></i></span><div><h3>Sorteios e sementes</h3><span class="hint">Cada sorteio guarda a semente que permite refazer e conferir o resultado</span></div></div>
+ <div class="sh-busca"><i data-lucide="search"></i><input type="search" id="audSorteioBusca" placeholder="Buscar sorteio por semente, campanha, ganhador ou matrícula…" autocomplete="off" aria-label="Buscar sorteios por semente"></div>
+ <div id="audSorteios" class="sh-lista"></div></div>
 
         <div class="panel">
           <h3>Filtros</h3>
@@ -6789,6 +6842,7 @@ function logAction(acao, detalhe){
   backendCall('registrarEvento', {tipo, acao, detalhe: String(detalhe || '')});
 }
 function renderAuditoria(){
+  try{ renderSorteiosFeitos('audSorteios', (document.getElementById('audSorteioBusca') || {}).value || ''); }catch(e){}
   const tbody = document.getElementById('tblAuditoria');
   if(!tbody) return;
   tbody.innerHTML = actionLog.map(a=>`<tr><td>${fmtDateTime(a.data)}</td><td>${a.usuario}</td><td>${a.acao}</td><td>${a.detalhe}</td></tr>`).join('') ||
@@ -7166,7 +7220,7 @@ function ajustarTituloDuplicado(sec){
 }
 /* o item do menu destacado é sempre o da tela aberta — escolhe o botão visível do PERFIL atual (os dois perfis compartilham alguns destinos) */
 /* menu recolhido: sem texto, então cada ícone ganha uma dica (e nome para leitores de tela) */
-function rotularMenu(){ document.querySelectorAll('#menu .menu-item, #menu .menu-group-header').forEach(b=>{ const t = (b.querySelector('.label') || {}).textContent; if(t){ b.title = t.trim(); b.setAttribute('aria-label', t.trim()); } }); }
+function rotularMenu(){ document.querySelectorAll('#menu .menu-item, #menu .menu-group-header').forEach(b=>{ const t = (b.querySelector('.label') || {}).textContent; if(t){ b.removeAttribute('title'); b.setAttribute('aria-label', t.trim()); } }); }
 /* números pequenos no menu (campanhas ativas, rodadas, banco, elegíveis…): só leitura do que o app já tem */
 /* anel de progresso do cartão da rodada */
 function anelProgresso(pct, n, total){
@@ -7316,7 +7370,7 @@ function linkCampanha(id){ return `${APP_URL}${APP_URL.includes('?') ? '&' : '?'
 /* ======================= LOGIN ======================= */
 /* A autenticação de verdade agora mora na planilha (via Google Apps Script).
    Não existe mais senha nenhuma escrita aqui no código. */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbzEfd-_-hJDXijLS_jKMq4k3FQxiVMuzh3Zv13tJUnMUoNFxLWOttBB9SGV0BVepWdaxA/exec";
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxNTmLbDf_qQwwohT4GE5mw9vHgw72bAe__f7Het_cYibLvbdhD7aDiIA7ZCGaEkoXfWQ/exec";
 
 function urlDoApp(){ try{ return APP_URL.split('#')[0].split('?')[0]; }catch(e){ return ''; } }
 
@@ -7762,7 +7816,7 @@ document.getElementById('btnTrocarMinhaSenha')?.addEventListener('click', ()=> a
    Se mudou, redesenha sem piscar: mantém a rolagem, não interrompe quem está
    digitando e adia enquanto houver janela aberta ou prova em andamento. */
 let sincronizando = false, _ultimaAssinatura = null, _falhasSync = 0, _renderPendente = false;
-let historicoServidor = [];
+let historicoServidor = [], histMetaServidor = {};
 
 async function sincronizarColaboradores(){
   if(!currentUser || currentRole !== 'qualidade') return; // só a Qualidade precisa (e só ela recebe) o quadro de pessoas
@@ -8012,26 +8066,138 @@ window.goToHistoricoAdmin = function(){ document.querySelector('[data-target="hi
 
 /* ======================= CAMPANHAS / RODADAS (Qualidade) ======================= */
 /* detalhes da campanha: resumo em KPIs e, para quem quiser, cada bloco abre com mais informações */
+/* ======================= DOSSIÊ DA RODADA (documento probatório) ======================= */
+/* SHA-256 escrito à mão: garante o mesmo código de integridade mesmo onde o navegador não oferece a função nativa (conexão sem HTTPS) */
+function sha256Puro(txt){
+  const rotr = (x, n)=> (x >>> n) | (x << (32 - n)), bytes = Array.from(new TextEncoder().encode(String(txt))), K = [], H = []; const primos = []; for(let p = 2; primos.length < 64; p++) if(primos.every(q=> p % q)) primos.push(p);
+  primos.forEach((q, i)=>{ K[i] = Math.floor((Math.cbrt(q) % 1) * 4294967296) >>> 0; if(i < 8) H[i] = Math.floor((Math.sqrt(q) % 1) * 4294967296) >>> 0; });
+  const bits = bytes.length * 8; bytes.push(0x80); while(bytes.length % 64 !== 56) bytes.push(0); [Math.floor(bits / 4294967296), bits >>> 0].forEach(v=>{ for(let s = 24; s >= 0; s -= 8) bytes.push((v >>> s) & 255); });
+  for(let o = 0; o < bytes.length; o += 64){
+    const w = new Array(64); for(let i = 0; i < 16; i++) w[i] = ((bytes[o + i * 4] << 24) | (bytes[o + i * 4 + 1] << 16) | (bytes[o + i * 4 + 2] << 8) | bytes[o + i * 4 + 3]) >>> 0;
+    for(let i = 16; i < 64; i++){ const s0 = rotr(w[i - 15], 7) ^ rotr(w[i - 15], 18) ^ (w[i - 15] >>> 3), s1 = rotr(w[i - 2], 17) ^ rotr(w[i - 2], 19) ^ (w[i - 2] >>> 10); w[i] = (w[i - 16] + s0 + w[i - 7] + s1) >>> 0; }
+    let [a, b, c, d, e, f, g, hh] = H;
+    for(let i = 0; i < 64; i++){ const S1 = rotr(e, 6) ^ rotr(e, 11) ^ rotr(e, 25), ch = (e & f) ^ (~e & g), t1 = (hh + S1 + ch + K[i] + w[i]) >>> 0, S0 = rotr(a, 2) ^ rotr(a, 13) ^ rotr(a, 22), mj = (a & b) ^ (a & c) ^ (b & c), t2 = (S0 + mj) >>> 0; hh = g; g = f; f = e; e = (d + t1) >>> 0; d = c; c = b; b = a; a = (t1 + t2) >>> 0; }
+    [a, b, c, d, e, f, g, hh].forEach((v, i)=>{ H[i] = (H[i] + v) >>> 0; });
+  }
+  return H.map(x=> x.toString(16).padStart(8, '0')).join('');
+}
+async function sha256Hex(txt){ try{ const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(txt)); return [...new Uint8Array(d)].map(x=> x.toString(16).padStart(2, '0')).join(''); }catch(e){ return sha256Puro(txt); } }
+const _fdh = d=>{ if(!d) return '—'; const x = new Date(d); return isNaN(x) ? '—' : x.toLocaleString('pt-BR'); };
+function montarDossie(c){
+  const ps = campaignParticipants(c.id).slice().sort((a, b)=> String(a.nome).localeCompare(String(b.nome), 'pt-BR')), ev = c.importada ? null : evaluateEligibility(c.id), gan = c.ganhadores || [], qs = c.questoes || [];
+  const notas = ps.filter(p=> p.pct != null), media = notas.length ? Math.round(notas.reduce((a, p)=> a + p.pct, 0) / notas.length * 10) / 10 : (c.mediaInformada != null ? c.mediaInformada : null);
+  const n100 = notas.filter(p=> p.pct === 100).length, pct100 = notas.length ? Math.round(n100 / notas.length * 1000) / 10 : (c.pct100Informado != null ? c.pct100Informado : null);
+  const regras = (typeof REGRAS_ELEGIBILIDADE !== 'undefined' && Array.isArray(REGRAS_ELEGIBILIDADE) ? REGRAS_ELEGIBILIDADE : []).map(r=> typeof r === 'string' ? r : (r.txt || r.texto || r.regra || r.descricao || JSON.stringify(r)));
+  const dist = campo=>{ const m = {}; const toca = (k, f)=>{ k = k || '(não informado)'; m[k] = m[k] || { p:0, g:0 }; m[k][f]++; }; ps.forEach(p=> toca(p[campo], 'p')); gan.forEach(w=> toca(w[campo], 'g')); return Object.keys(m).sort((a, b)=> m[b].p - m[a].p).map(k=> [k, m[k].p, m[k].g]); };
+  const canonico = JSON.stringify({ id:c.id, nome:c.nome, inicio:c.inicio, fim:c.fim, semente:c.randomSeed || null, ganhadores:gan.map(w=> [String(w.matricula), w.nome]), participantes:ps.map(p=> [String(p.matricula), p.pct == null ? null : p.pct]).sort((a, b)=> a[0].localeCompare(b[0])), perguntas:qs.map(q=> [q.texto, (q.options || []).map(o=> [o.text, !!o.correct])]) });
+  return { c, ps, ev, gan, qs, media, n100, pct100, regras, setor:dist('setor'), filial:dist('filial'), canonico, gerado:new Date(), por:(typeof currentUser !== 'undefined' && currentUser ? `${currentUser.nome} (matrícula ${currentUser.matricula})` : 'Qualidade') };
+}
+function linhasDossie(D){
+  const c = D.c, crit = e=> Array.isArray(e.criterios) ? e.criterios.join('; ') : String(e.criterios || '');
+  return {
+    resumo:[['Rodada', c.nome], ['Código da rodada', c.id], ['Período', `${fmtPeriodoValor(c.inicio)} a ${fmtPeriodoValor(c.fim)}`], ['Situação', c.importada ? 'Importada (anterior ao sistema)' : (c.status === 'finalizada' ? 'Finalizada (sorteio registrado)' : c.status)], ['Prêmio', c.premio || '—'], ['Vagas de ganhadores', c.qtdGanhadores || D.gan.length || '—'], ['Responsável pelo sorteio', c.responsavel || '—'], ['Participantes', D.ps.length], ['Média de acertos', D.media == null ? '—' : D.media + '%'], ['Acertaram 100%', D.pct100 == null ? '—' : D.pct100 + '%'], ['Elegíveis', D.ev ? D.ev.eligible.length : '—'], ['Fora pelas regras', D.ev ? D.ev.excluded.length : '—'], ['Ganhadores', D.gan.length], ['Semente do sorteio', c.randomSeed || 'não registrada'], ['Critério de distribuição', c.justificativa || c.criterios || '—'], ['Documento gerado em', _fdh(D.gerado)], ['Gerado por', D.por]],
+    regras:D.regras.map((r, i)=> [i + 1, r]),
+    perguntas:D.qs.flatMap((q, i)=> (q.options || []).map((o, j)=> [i + 1, j === 0 ? q.texto : '', String.fromCharCode(65 + j), o.text, o.correct ? 'CERTA' : ''])),
+    ganhadores:D.gan.map((w, i)=> [i + 1, w.nome, w.matricula, w.setor || '', w.filial || '', w.funcao || '', w.premio || c.premio || '']),
+    elegiveis:D.ev ? D.ev.eligible.map(e=> [e.nome, e.matricula, e.setor || '', e.filial || '', 'Elegível', crit(e)]).concat(D.ev.excluded.map(e=> [e.nome, e.matricula, e.setor || '', e.filial || '', 'Não elegível', e.motivo || ''])) : [],
+    participantes:D.ps.map(p=> [p.nome, p.matricula, p.setor || '', p.filial || '', p.funcao || '', p.pct == null ? '—' : p.pct + '%', p.acertosQtd != null ? `${p.acertosQtd}/${p.totalQuestoes}` : '—', _fdh(p.dataInicio), _fdh(p.dataFim)]),
+    setor:D.setor, filial:D.filial
+  };
+}
+function abasDossie(D){
+  const L = linhasDossie(D);
+  return [{ nome:'Resumo', cab:['Item', 'Informação'], linhas:L.resumo }, { nome:'Regras', cab:['Nº', 'Regra de elegibilidade aplicada'], linhas:L.regras }, { nome:'Perguntas', cab:['Nº', 'Pergunta', 'Letra', 'Alternativa', 'Gabarito'], linhas:L.perguntas }, { nome:'Ganhadores', cab:['Pos.', 'Nome', 'Matrícula', 'Setor', 'Filial', 'Função', 'Prêmio'], linhas:L.ganhadores },
+    { nome:'Elegíveis', cab:['Nome', 'Matrícula', 'Setor', 'Filial', 'Situação', 'Critérios / motivo'], linhas:L.elegiveis }, { nome:'Participantes', cab:['Nome', 'Matrícula', 'Setor', 'Filial', 'Função', '% de acertos', 'Acertos', 'Início', 'Fim'], linhas:L.participantes },
+    { nome:'Distribuição', cab:['Grupo', 'Participantes', 'Ganhadores'], linhas:L.setor.map(r=> ['Setor: ' + r[0], r[1], r[2]]).concat(L.filial.map(r=> ['Filial: ' + r[0], r[1], r[2]])) },
+    { nome:'Integridade', cab:['Item', 'Valor'], linhas:[['Código de integridade (SHA-256)', D.hash || ''], ['Tamanho do conteúdo conferido (caracteres)', D.canonico.length], ['O que é conferido', 'rodada, período, semente, ganhadores, participantes (matrícula e % de acertos) e perguntas com gabarito'], ['Gerado em', _fdh(D.gerado)], ['Gerado por', D.por]] }];
+}
+function htmlDossie(D){
+  const c = D.c, L = linhasDossie(D), tab = (cab, linhas, vazio)=> linhas.length ? `<table><thead><tr>${cab.map(x=> `<th>${escH(x)}</th>`).join('')}</tr></thead><tbody>${linhas.map(r=> `<tr>${r.map(x=> `<td>${escH(x == null ? '' : x)}</td>`).join('')}</tr>`).join('')}</tbody></table>` : `<p class="vz">${escH(vazio || 'Sem registros.')}</p>`;
+  const logo = (document.querySelector('.login-logo') || {}).src || '', nomeCurto = String(c.nome).length > 60 ? String(c.nome).slice(0, 57) + '…' : String(c.nome);
+  return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Dossiê — ${escH(c.nome)}</title><style>
+@page{ size:A4; margin:16mm 13mm 18mm; @bottom-left{ content:"Dossiê da rodada · ${escH(nomeCurto).replace(/"/g, '')}"; font:8px Arial; color:#587571; } @bottom-right{ content:"Página " counter(page) " de " counter(pages); font:8px Arial; color:#587571; } }
+*{ box-sizing:border-box; } body{ font-family:Arial,Helvetica,sans-serif; color:#12302d; font-size:11px; line-height:1.4; margin:0; }
+.cap{ display:flex; align-items:center; justify-content:space-between; gap:14px; padding-bottom:10px; border-bottom:3px solid #02A39D; } .cap img{ height:34px; } .cap small{ color:#587571; font-size:10px; text-align:right; }
+h1{ font-size:21px; margin:14px 0 2px; } .sub{ color:#587571; font-size:11.5px; margin-bottom:6px; } h2{ font-size:13px; margin:20px 0 6px; padding:5px 8px; background:#E6F4F2; border-left:4px solid #02A39D; break-after:avoid; }
+table{ width:100%; border-collapse:collapse; margin:4px 0 8px; } thead{ display:table-header-group; } th{ background:#F1F7F6; text-align:left; font-size:9.5px; padding:5px 6px; border:1px solid #cfe3e0; } td{ padding:4px 6px; border:1px solid #dbe9e6; font-size:10px; vertical-align:top; overflow-wrap:anywhere; } tr{ break-inside:avoid; }
+.vz{ color:#587571; font-style:italic; } .sel{ border:1.5px solid #02A39D; border-radius:8px; padding:11px 13px; margin-top:8px; background:#F3FAF9; break-inside:avoid; } .sel code{ display:block; margin:6px 0; font:700 11px 'Courier New',monospace; word-break:break-all; color:#0B6B66; } .sel p{ margin:4px 0; font-size:10px; color:#3d5a56; }
+.assin{ display:flex; gap:36px; margin-top:38px; break-inside:avoid; } .assin div{ flex:1; border-top:1px solid #12302d; padding-top:5px; text-align:center; font-size:10px; }
+</style></head><body>
+<div class="cap">${logo ? `<img src="${logo}" alt="">` : '<b>PPG</b>'}<small>Programa Política de Gestão<br>Documento de caráter probatório</small></div>
+<h1>Dossiê da rodada</h1><div class="sub">${escH(c.nome)} · ${escH(fmtPeriodoValor(c.inicio))} a ${escH(fmtPeriodoValor(c.fim))}</div>
+<h2>1. Identificação e indicadores</h2>${tab(['Item', 'Informação'], L.resumo)}
+<h2>2. Regras de elegibilidade aplicadas</h2>${tab(['Nº', 'Regra'], L.regras, 'Regras não disponíveis para esta rodada.')}
+<h2>3. Perguntas e gabarito</h2>${tab(['Nº', 'Pergunta', 'Letra', 'Alternativa', 'Gabarito'], L.perguntas, 'Esta rodada não tem perguntas registradas no sistema.')}
+<h2>4. Sorteio e ganhadores</h2><p>Semente do sorteio: <b>${escH(c.randomSeed || 'não registrada')}</b>${c.responsavel ? ` · responsável: <b>${escH(c.responsavel)}</b>` : ''}. ${c.justificativa ? escH(c.justificativa) : ''}</p>${tab(['Pos.', 'Nome', 'Matrícula', 'Setor', 'Filial', 'Função', 'Prêmio'], L.ganhadores, 'Sorteio ainda não realizado.')}
+<h2>5. Elegíveis e fora pelas regras</h2>${tab(['Nome', 'Matrícula', 'Setor', 'Filial', 'Situação', 'Critérios / motivo'], L.elegiveis, 'Não se aplica a rodadas importadas.')}
+<h2>6. Participantes</h2>${tab(['Nome', 'Matrícula', 'Setor', 'Filial', 'Função', '% acertos', 'Acertos', 'Início', 'Fim'], L.participantes, 'Nenhum participante registrado.')}
+<h2>7. Distribuição por setor e filial</h2>${tab(['Setor', 'Participantes', 'Ganhadores'], L.setor)}${tab(['Filial', 'Participantes', 'Ganhadores'], L.filial)}
+<h2>8. Integridade e responsabilidade</h2><div class="sel"><b>Código de integridade (SHA-256)</b><code>${escH(D.hash || '')}</code><p>O código é calculado sobre o conteúdo essencial desta rodada (período, semente, ganhadores, participantes com matrícula e % de acertos, e perguntas com gabarito). Se qualquer um desses dados for alterado depois, o código muda — por isso ele permite provar que o documento corresponde ao registro original.</p><p>Gerado em <b>${escH(_fdh(D.gerado))}</b> por <b>${escH(D.por)}</b>.</p></div>
+<div class="assin"><div>Responsável pela Qualidade</div><div>Testemunha / auditoria</div></div></body></html>`;
+}
+function baixarXlsxMulti(nomeArq, abas){
+  if(!window.XLSX) return false;
+  try{ const wb = XLSX.utils.book_new(); abas.forEach(a=>{ const ws = XLSX.utils.aoa_to_sheet([a.cab].concat(a.linhas)); ws['!cols'] = a.cab.map((_, i)=> ({ wch:Math.min(60, Math.max(12, String(a.cab[i]).length, ...a.linhas.slice(0, 200).map(r=> String(r[i] == null ? '' : r[i]).length))) })); XLSX.utils.book_append_sheet(wb, ws, a.nome.slice(0, 31)); });
+    const out = XLSX.write(wb, { bookType:'xlsx', type:'array' }); salvarBlob(new Blob([out], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), nomeArq); return true; }catch(e){ return false; }
+}
+async function exportarDossie(id, tipo){
+  const c = campanhaPorId(id); if(!c){ showToast('Escolha uma rodada.', 'warning'); return; }
+  const D = montarDossie(c); D.hash = await sha256Hex(D.canonico); const base = `Dossie_${String(c.nome).replace(/[^\wÀ-ÿ]+/g, '_').slice(0, 50)}_${new Date().toISOString().slice(0, 10)}`;
+  const pdf = ()=>{ const html = htmlDossie(D); imprimirHtml(html).then(ok=>{ if(!ok) abrirHtmlEmAba(html); }); };
+  if(/pdf/i.test(tipo)) pdf(); else if(!baixarXlsxMulti(base + '.xlsx', abasDossie(D))){ showToast('Não consegui montar a planilha neste navegador — abri o PDF no lugar.', 'warning'); pdf(); }
+  logAction('Dossiê da rodada exportado', `${c.nome} (${tipo})`);
+}
+/* os cartões de exportação: 5 relatórios viram 1 dossiê completo; sobram o histórico, o comparativo e a evolução */
+(function ajustarCartoesExport(){
+  const g = document.querySelector('.rel-exp-grid'); if(!g) return; const cartao = k=>{ const b = g.querySelector(`[data-report="${k}"]`); return b ? b.closest('.rel-exp-card') : null; };
+  const base = cartao('participantes'); if(!base) return;
+  base.querySelector('.rec-txt b').textContent = 'Dossiê da rodada (documento probatório)';
+  base.querySelector('.rec-txt span').textContent = 'Num arquivo só: identificação, regras, perguntas e gabarito, participantes, elegíveis, ganhadores, semente do sorteio, distribuição e código de integridade';
+  base.querySelectorAll('[data-report]').forEach(b=> { b.dataset.report = 'dossie'; }); const ic = base.querySelector('.rec-ic'); if(ic) ic.innerHTML = '<i data-lucide="file-check-2"></i>';
+  ['elegiveis', 'ganhadores', 'distribuicao', 'auditoria'].forEach(k=>{ const x = cartao(k); if(x) x.remove(); });
+})();
 function htmlFormularioImpressao(c){
   const qs = c.questoes || [], L = i=> String.fromCharCode(65 + i);
   return `<!doctype html><html><head><meta charset="utf-8"><title>Formulário — ${escH(c.nome)}</title><style>@page{ size:A4; margin:16mm; } body{ font-family:Arial,Helvetica,sans-serif; color:#12302d; } h1{ font-size:20px; margin:0 0 4px; } .sub{ color:#587571; font-size:12px; margin-bottom:16px; } .q{ break-inside:avoid; margin:0 0 14px; padding:10px 12px; border:1px solid #d6e4e2; border-radius:10px; } .q b{ font-size:13.5px; } ul{ list-style:none; margin:8px 0 0; padding:0; } li{ font-size:12.5px; padding:4px 8px; border-radius:6px; } li.ok{ background:#e3f5ea; font-weight:bold; }</style></head><body><h1>${escH(c.nome)}</h1><div class="sub">${escH(fmtPeriodoValor(c.inicio))} → ${escH(fmtPeriodoValor(c.fim))} · ${qs.length} pergunta(s) · documento interno da Qualidade (contém o gabarito)</div>${qs.map((q, i)=> `<div class="q"><b>${i + 1}. ${escH(q.texto)}</b><ul>${(q.options || []).filter(o=> String(o && o.text || '').trim()).map((o, j)=> `<li class="${o.correct ? 'ok' : ''}">${L(j)}) ${escH(o.text)}${o.correct ? ' &nbsp;✓ correta' : ''}</li>`).join('')}</ul></div>`).join('')}</body></html>`;
 }
+function htmlComplementarImportada(c){
+  return `<div class="fm-comp" id="fmComp"><h4><i data-lucide="file-plus-2"></i> Complementar esta rodada</h4><p class="hint">Rodadas de antes do sistema não trazem as perguntas nem a média. Informe aqui para constarem nos relatórios, no comparativo e no dossiê.</p>
+    <div class="fm-comp-grid"><div class="field"><label for="fcMedia">Média de acertos (%)</label><input type="number" id="fcMedia" min="0" max="100" step="0.1" inputmode="decimal" placeholder="Ex.: 82,5" value="${c.mediaInformada != null ? c.mediaInformada : ''}"></div><div class="field"><label for="fcP100">Acertaram tudo (%)</label><input type="number" id="fcP100" min="0" max="100" step="0.1" inputmode="decimal" placeholder="Ex.: 35" value="${c.pct100Informado != null ? c.pct100Informado : ''}"></div></div>
+    <div class="field"><label>Perguntas e gabarito</label><div class="fm-comp-arq"><label class="btn btn-outline btn-sm" for="fcArquivo"><i data-lucide="upload"></i> Importar de um arquivo</label><input type="file" id="fcArquivo" hidden accept=".xlsx,.xls,.csv,.txt,.docx,.pdf,.png,.jpg,.jpeg"><span class="hint" id="fcInfo">Excel, Word, PDF, texto ou foto da prova — o leitor entende a maioria dos formatos.</span></div></div>
+    <div class="fm-comp-acoes"><button type="button" class="btn btn-primary" id="fcSalvar" data-cid="${escH(c.id)}"><i data-lucide="save"></i> Salvar na rodada</button></div></div>`;
+}
+let _fcPerguntas = null;
+document.addEventListener('change', async e=>{
+  if(!e.target || e.target.id !== 'fcArquivo') return; const f = e.target.files && e.target.files[0], info = document.getElementById('fcInfo'); if(!f) return; if(info) info.textContent = 'Lendo o arquivo…';
+  try{ const doc = await PPGImport.lerArquivoUniversal(f), r = PPGImport.parsearPerguntas(doc), ps = (r.perguntas || []).filter(p=> p.texto && (p.options || []).length >= 2), com = ps.filter(p=> p.options.some(o=> o.correct)).length; _fcPerguntas = ps;
+    if(info) info.textContent = ps.length ? `${ps.length} pergunta(s) lida(s), ${com} com gabarito. Clique em "Salvar na rodada".` : 'Não encontrei perguntas nesse arquivo.'; if(ps.length && com < ps.length) showToast(`${ps.length - com} pergunta(s) ficaram sem gabarito — confira antes de salvar.`, 'warning'); }
+  catch(x){ _fcPerguntas = null; if(info) info.textContent = 'Não consegui ler esse arquivo.'; }
+});
+document.addEventListener('click', async e=>{
+  const b = e.target.closest && e.target.closest('#fcSalvar'); if(!b) return; const c = todasCampanhas().find(x=> x.id === b.dataset.cid); if(!c) return;
+  const media = document.getElementById('fcMedia').value, p100 = document.getElementById('fcP100').value, meta = {}; if(media !== '') meta.media = media; if(p100 !== '') meta.pct100 = p100;
+  if(_fcPerguntas && _fcPerguntas.length) meta.questoes = _fcPerguntas.map(p=> ({ texto:p.texto, options:p.options.map(o=> ({ text:o.text, correct:!!o.correct })) }));
+  if(!Object.keys(meta).length){ showToast('Informe a média, o percentual ou importe as perguntas.', 'warning'); return; }
+  b.disabled = true; const r = await backendCall('salvarHistMeta', { token:currentUser.token, chave:c.nome, meta }); b.disabled = false;
+  if(!r || !r.ok){ showToast((r && r.erro) || 'Não foi possível salvar agora.', 'error'); return; }
+  const m = r.meta || {}; histMetaServidor[c.nome] = m; c.questoes = m.questoes || c.questoes || []; c.mediaInformada = m.media; c.pct100Informado = m.pct100; _fcPerguntas = null; showToast('Dados da rodada salvos.', 'success'); fecharMiniPagina(); setTimeout(()=> verFormularioCampanha(c.id), 260);
+});
 function verFormularioCampanha(id){
-  const c = todasCampanhas().find(x=>x.id === id); if(!c) return; const qs = c.questoes || [];
-  if(!qs.length){ abrirMiniPagina({ titulo:'Formulário · ' + c.nome, corpo:`<p class="hint" style="padding:12px 2px;">${c.importada ? 'Esta é uma rodada importada do histórico: o arquivo não trazia as perguntas.' : 'Esta rodada ainda não tem perguntas.'}</p>` }); return; }
+  const c = todasCampanhas().find(x=>x.id === id); if(!c) return; const qs = c.questoes || [], comp = c.importada ? htmlComplementarImportada(c) : '';
+  if(!qs.length){ abrirMiniPagina({ titulo:'Formulário · ' + c.nome, subtitulo:c.importada ? 'Rodada importada do histórico' : '', corpo:`<p class="hint" style="padding:6px 2px 12px;">${c.importada ? 'Esta rodada é de antes do sistema e o arquivo importado não trazia as perguntas. Você pode complementar logo abaixo.' : 'Esta rodada ainda não tem perguntas.'}</p>${comp}`, largura:820 }); if(window.lucide) lucide.createIcons(); return; }
   const L = i=> String.fromCharCode(65 + i);
   const corpo = qs.map((q, i)=>{ const ops = (q.options || []).filter(o=> String(o && o.text || '').trim()), multi = ops.filter(o=>o.correct).length > 1;
     return `<div class="fm-q"><div class="fm-head"><span class="dt-n">${i + 1}</span><b>${escH(q.texto)}</b><em class="fm-tipo">${multi ? 'Várias corretas' : 'Resposta única'}</em></div><ul class="fm-ops">${ops.map((o, j)=> `<li class="${o.correct ? 'ok' : ''}"><span class="fm-l">${L(j)}</span><span class="fm-t">${escH(o.text)}</span>${o.correct ? '<span class="fm-ok"><i data-lucide="check"></i> certa</span>' : ''}</li>`).join('')}</ul></div>`; }).join('');
   const rodape = document.createElement('div'); rodape.className = 'pop-actions';
   rodape.innerHTML = `<span class="hint">${qs.length} pergunta(s) · a alternativa certa aparece em verde</span><div style="display:flex; gap:8px;"><button type="button" class="btn btn-outline" id="fmImprimir"><i data-lucide="printer"></i> Imprimir / PDF</button><button type="button" class="btn btn-primary" id="fmFechar">Fechar</button></div>`;
-  abrirMiniPagina({ titulo:'Formulário · ' + c.nome, subtitulo:`${statusBadge(c.status).replace(/<[^>]+>/g, '')} · ${fmtPeriodoValor(c.inicio)} → ${fmtPeriodoValor(c.fim)} · visível só para a Qualidade`, corpo, rodape, largura:820 });
+  abrirMiniPagina({ titulo:'Formulário · ' + c.nome, subtitulo:`${statusBadge(c.status).replace(/<[^>]+>/g, '')} · ${fmtPeriodoValor(c.inicio)} → ${fmtPeriodoValor(c.fim)} · visível só para a Qualidade`, corpo:corpo + comp, rodape, largura:820 });
   rodape.querySelector('#fmFechar').addEventListener('click', fecharMiniPagina);
   rodape.querySelector('#fmImprimir').addEventListener('click', ()=>{ const html = htmlFormularioImpressao(c); imprimirHtml(html).then(ok=>{ if(!ok) abrirHtmlEmAba(html); }); });
   if(window.lucide) lucide.createIcons();
 }
 function verDetalhesCampanha(id){
   const c = todasCampanhas().find(x=>x.id === id); if(!c) return;
-  const parts = campaignParticipants(id), notas = parts.filter(p=>p.pct != null), media = notas.length ? Math.round(notas.reduce((a, p)=>a + p.pct, 0) / notas.length) : null;
+  const parts = campaignParticipants(id), notas = parts.filter(p=>p.pct != null), media = notas.length ? Math.round(notas.reduce((a, p)=>a + p.pct, 0) / notas.length) : (c.mediaInformada != null ? c.mediaInformada : null);
   const ev = c.importada ? null : evaluateEligibility(id), gan = c.ganhadores || [], qs = c.questoes || [];
   const kpi = (ic, n, rot)=> `<div class="dt-kpi"><i data-lucide="${ic}"></i><b>${n}</b><span>${rot}</span></div>`;
   const perguntas = qs.length ? qs.map((q, i)=>{ const ops = (q.options || []).filter(o=> String(o && o.text || '').trim()), certa = ops.filter(o=>o.correct).map(o=>escH(o.text)).join(' / ');
@@ -9079,6 +9245,10 @@ function renderMeuResultado(){ renderHistoricoColaborador(); }
 let sorteioRunning = false;
 function renderSorteioSetup(){
   const sel = document.getElementById('selectCampanhaSorteio');
+  if(!sel.dataset.escolhido && sel.options.length){   // ao abrir: mostra a rodada que precisa de sorteio, ou o último sorteio já feito (nunca a tela em branco)
+    const pend = campaigns.find(c=> !c.importada && campanhaTerminou(c) && !(c.ganhadores && c.ganhadores.length)), feito = campaigns.filter(c=> !c.importada && c.ganhadores && c.ganhadores.length).sort((a, b)=> new Date(b.fim) - new Date(a.fim))[0], alvo = pend || feito;
+    if(alvo && [...sel.options].some(o=> o.value === alvo.id)) sel.value = alvo.id;
+  }
   if(!sel.value) return;
   const id = sel.value, c = campaigns.find(x=>x.id === id);
   const {eligible, excluded} = evaluateEligibility(id);
@@ -9092,6 +9262,7 @@ function renderSorteioSetup(){
   document.getElementById('randomSeedWrap').style.display = "none";
   document.getElementById('justificationBox').style.display = "none";
   buildEmptySlots(id);
+  renderSorteiosFeitos('sorteiosFeitos', (document.getElementById('sorteioBusca') || {}).value || '');
   if(window.lucide) lucide.createIcons();
 }
 /* etapas do sorteio: 1 Sortear → 2 Validar → 3 Registrar (o ponto atual acende; as feitas ganham ✓) */
@@ -9111,8 +9282,33 @@ function confeteSorteio(){
   (function f(t){ const dt = t - t0; ctx.clearRect(0, 0, cv.width, cv.height); P.forEach(p=>{ p.vy += .38; p.x += p.vx; p.y += p.vy; p.rot += p.vr; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.fillStyle = p.c; ctx.globalAlpha = Math.max(0, 1 - dt / 2600); ctx.fillRect(-p.r, -p.r / 2, p.r * 2, p.r); ctx.restore(); }); if(dt < 2600) requestAnimationFrame(f); else cv.remove(); })(t0);
 }
 document.addEventListener('click', e=>{ if(!(e.target.closest && e.target.closest('#btnCopiarSemente'))) return; const s = (document.getElementById('randomSeedValue') || {}).textContent || ''; try{ navigator.clipboard.writeText(s); showToast('Semente copiada.', 'success'); }catch(x){ showToast('Não consegui copiar: ' + s, 'warning'); } });
-document.getElementById('selectCampanhaSorteio').addEventListener('change', renderSorteioSetup);
+document.getElementById('selectCampanhaSorteio').addEventListener('change', ()=>{ document.getElementById('selectCampanhaSorteio').dataset.escolhido = '1'; renderSorteioSetup(); });
 function sorteioJaFeito(id){ const c = campaigns.find(x=>x.id === id); return !!(c && !c.importada && c.ganhadores && c.ganhadores.length); }
+/* ===== sorteios realizados: lista pesquisável (também por SEMENTE) ===== */
+const _nrm = s=> String(s == null ? '' : s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+function listaSorteios(termo){
+  const q = _nrm(termo).trim(), todas = todasCampanhas().filter(c=> c.ganhadores && c.ganhadores.length).sort((a, b)=> new Date(b.fim) - new Date(a.fim));
+  if(!q) return todas;
+  return todas.filter(c=>{ const hay = _nrm([c.nome, c.randomSeed, c.premio, c.responsavel, ...(c.ganhadores || []).map(w=> `${w.nome} ${w.matricula} ${w.setor || ''} ${w.filial || ''}`)].join(' ')); return q.split(/\s+/).every(p=> hay.indexOf(p) !== -1); });
+}
+function renderSorteiosFeitos(idEl, termo){
+  const el = document.getElementById(idEl); if(!el) return; const lista = listaSorteios(termo);
+  if(!lista.length){ el.innerHTML = `<p class="hint" style="padding:14px 4px;">${String(termo || '').trim() ? 'Nenhum sorteio encontrado para essa busca.' : 'Nenhum sorteio foi realizado ainda.'}</p>`; return; }
+  el.innerHTML = lista.map(c=>{
+    const gan = c.ganhadores || [], semente = c.randomSeed ? escH(String(c.randomSeed)) : '', imp = !!c.importada;
+    return `<article class="sh-card"><header><div class="sh-t"><b>${escH(c.nome)}</b><small>${escH(fmtPeriodoValor(c.inicio))} → ${escH(fmtPeriodoValor(c.fim))}${c.premio ? ' · Prêmio: ' + escH(c.premio) : ''}${c.responsavel ? ' · por ' + escH(c.responsavel) : ''}</small></div>${imp ? '<span class="sh-chip">Importada</span>' : '<span class="sh-chip ok">Oficial</span>'}</header>
+      <div class="sh-seed"><i data-lucide="shield-check"></i><span>Semente</span>${semente ? `<code>${semente}</code><button type="button" class="btn btn-ghost btn-sm" data-sh-copiar="${semente}"><i data-lucide="copy"></i> Copiar</button>` : '<em>não registrada (campanha anterior ao sistema)</em>'}</div>
+      <div class="sh-gan">${gan.map((w, i)=> `<span class="sh-w"><b>${i + 1}º</b> ${escH(w.nome)}${w.setor ? ` <small>${escH(w.setor)}</small>` : ''}</span>`).join('')}</div>
+      <footer>${imp ? '' : `<button type="button" class="btn btn-outline btn-sm" data-sh-abrir="${escH(c.id)}"><i data-lucide="eye"></i> Abrir no sorteio</button><button type="button" class="btn btn-outline btn-sm" data-sh-rel="${escH(c.id)}"><i data-lucide="file-text"></i> Relatório oficial</button>`}</footer></article>`; }).join('');
+  if(window.lucide) lucide.createIcons();
+}
+document.addEventListener('input', e=>{ const t = e.target; if(t && t.id === 'sorteioBusca') renderSorteiosFeitos('sorteiosFeitos', t.value); else if(t && t.id === 'audSorteioBusca') renderSorteiosFeitos('audSorteios', t.value); });
+document.addEventListener('click', e=>{
+  const c = e.target.closest && e.target.closest('[data-sh-copiar], [data-sh-abrir], [data-sh-rel]'); if(!c) return;
+  if(c.dataset.shCopiar){ try{ navigator.clipboard.writeText(c.dataset.shCopiar); showToast('Semente copiada.', 'success'); }catch(x){ showToast('Semente: ' + c.dataset.shCopiar, 'info'); } return; }
+  const id = c.dataset.shAbrir || c.dataset.shRel, sel = document.getElementById('selectCampanhaSorteio'); goToSection('sorteio'); if(sel){ sel.value = id; sel.dataset.escolhido = '1'; renderSorteioSetup(); }
+  if(c.dataset.shRel) setTimeout(()=>{ const b = document.getElementById('btnRelatorioOficial'); if(b) b.click(); }, 120); else { const p = document.querySelector('.sorteio-palco'); if(p) p.scrollIntoView({ behavior:'smooth', block:'start' }); }
+});
 function buildEmptySlots(campaignId){
   const c = campaigns.find(x=>x.id === campaignId), feito = sorteioJaFeito(campaignId), btn = document.getElementById('btnSortear'), reset = document.getElementById('btnResetSorteio'), slotsEl = document.getElementById('slots'), ra = document.getElementById('sorteioResultActions');
   const botoes = ['btnValidarSorteio', 'btnRegistrarHistorico'].map(i=> document.getElementById(i));
@@ -9454,7 +9650,7 @@ function renderRelatorios(){
   const linhasC = todas.slice().reverse().map((x, k, arr)=>{ const pp = campaignParticipants(x.id), cn = pp.filter(p=>p.pct != null), ant = arr[k + 1] ? campaignParticipants(arr[k + 1].id).length : null;
     const seta = ant == null || !pp.length ? '' : pp.length > ant ? ' <em class="sobe" title="mais que a rodada anterior">▲</em>' : pp.length < ant ? ' <em class="desce" title="menos que a rodada anterior">▼</em>' : '';
     const m = (rot, v)=> `<div><small>${rot}</small><b>${v}</b></div>`;
-    return `<div class="rel-item rodada ${x.id === c.id ? 'sel' : ''}"><div class="rr-nome"><b>${escH(x.nome)}</b><span>${escH(fmtPeriodoValor(x.inicio))} – ${escH(fmtPeriodoValor(x.fim))}</span></div><div class="rr-met">${m('Participantes', (pp.length || '—') + seta)}${m('Acertaram 100%', cn.length ? _pc(cn.filter(p=>p.pct === 100).length, cn.length) + '%' : '—')}${m('Média', cn.length ? Math.round(cn.reduce((a, p)=>a + p.pct, 0) / cn.length) + '%' : '—')}${m('Ganhadores', (x.ganhadores || []).length || '—')}</div></div>`; }).join('');
+    return `<div class="rel-item rodada ${x.id === c.id ? 'sel' : ''}"><div class="rr-nome"><b>${escH(x.nome)}</b><span>${escH(fmtPeriodoValor(x.inicio))} – ${escH(fmtPeriodoValor(x.fim))}</span></div><div class="rr-met">${m('Participantes', (pp.length || '—') + seta)}${m('Acertaram 100%', cn.length ? _pc(cn.filter(p=>p.pct === 100).length, cn.length) + '%' : (x.pct100Informado != null ? x.pct100Informado + '%' : '—'))}${m('Média', cn.length ? Math.round(cn.reduce((a, p)=>a + p.pct, 0) / cn.length) + '%' : (x.mediaInformada != null ? x.mediaInformada + '%' : '—'))}${m('Ganhadores', (x.ganhadores || []).length || '—')}</div></div>`; }).join('');
   box.innerHTML = `<div class="rel-tiles">${tiles}</div>
     <div class="panel rel-atencao"><h3><i data-lucide="bell-ring"></i> O que merece atenção</h3><div class="rel-alertas">${alertas}</div></div>
     <div class="two-col">
@@ -9473,6 +9669,7 @@ document.getElementById('selectCampanhaRelatorio')?.addEventListener('change', (
 document.querySelectorAll('.report-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     const campaignId = document.getElementById('selectCampanhaRelatorio').value;
+    if(btn.dataset.report === 'dossie'){ exportarDossie(campaignId, btn.dataset.type); return; }
     const data = buildReportData(btn.dataset.report, campaignId);
     if(!data.rows.length){ showToast("Não há dados para exportar neste relatório.","warning"); return; }
     if(btn.dataset.type === "Excel"){
@@ -10098,8 +10295,7 @@ window.irParaBannerGanhadores = function(id){
   const sel = document.getElementById('divCampanhaGanhadores'); if(sel) sel.value = id;
 };
 function todosParticipantes(){ return [...participants, ...participantesAntigos]; }
-function construirAntigas(hist){
-  const grupos = {};
+function construirAntigas(hist, meta){ const META = meta || {}; const grupos = {};
   (hist || []).forEach(h=>{
     const nome = String(h.campanha || '').trim() || '(sem nome)';
     const fim = (window.PPGImport ? PPGImport.normalizarData(h.periodoFim) : '') || '';
@@ -10113,7 +10309,7 @@ function construirAntigas(hist){
     const g = grupos[k], id = 'hist:' + hashTxt(k);
     const fimISO = g.fim ? g.fim + 'T23:59' : '', iniISO = (g.ini || g.fim) ? (g.ini || g.fim) + 'T00:00' : '';
     const ganhadores = g.linhas.filter(h=>String(h.ganhador).toLowerCase() === 'sim').map(h=>({nome:h.nome, matricula:String(h.matricula || ''), setor:h.setor || '', filial:h.filial || '', funcao:h.funcao || '', premio:h.premio || ''}));
-    cs.push({id, nome:g.nome, descricao:'Campanha anterior ao sistema (importada)', objetivo:'', inicio:iniISO, fim:fimISO, status:'finalizada', premio:(ganhadores.find(w=>w.premio) || {}).premio || '', qtdGanhadores:ganhadores.length, criterios:'', questoes:[], ganhadores, importada:true, arquivo:g.linhas[0].origemArquivo || '', importadoEm:g.linhas[0].importadoEm || ''});
+    cs.push({id, nome:g.nome, descricao:'Campanha anterior ao sistema (importada)', objetivo:'', inicio:iniISO, fim:fimISO, status:'finalizada', premio:(ganhadores.find(w=>w.premio) || {}).premio || '', qtdGanhadores:ganhadores.length, criterios:'', questoes:((META[g.nome] || {}).questoes || []), mediaInformada:(META[g.nome] || {}).media, pct100Informado:(META[g.nome] || {}).pct100, ganhadores, importada:true, arquivo:g.linhas[0].origemArquivo || '', importadoEm:g.linhas[0].importadoEm || ''});
     const dt = fimISO ? new Date(fimISO) : new Date(g.linhas[0].importadoEm || Date.now());
     g.linhas.forEach(h=>{
       const n = (h.percentualAcertos === '' || h.percentualAcertos == null) ? null : Number(h.percentualAcertos);
@@ -10171,8 +10367,8 @@ function aplicarSnapshot(resp){
     data: r.dataFim ? new Date(r.dataFim) : new Date(),
     dataInicio: r.dataInicio ? new Date(r.dataInicio) : null, dataFim: r.dataFim ? new Date(r.dataFim) : null
   }));
-  historicoServidor = resp.historico || [];
-  const antigas = construirAntigas(historicoServidor);
+  historicoServidor = resp.historico || []; if(resp.histMeta) histMetaServidor = resp.histMeta;
+  const antigas = construirAntigas(historicoServidor, histMetaServidor);
   campanhasAntigas = antigas.campanhas; participantesAntigos = antigas.participantes;
   const ganhosImportados = historicoServidor
     .filter(h => String(h.ganhador).toLowerCase() === 'sim')
@@ -11010,7 +11206,7 @@ function iniciarFundo(){
 /* ======================= DATAS COMEMORATIVAS: o visual acompanha o calendário ======================= */
 /* ======================= ÍCONE DO SITE: o da aba acompanha a data (no Natal ganha gorro) ======================= */
 const FAVICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#14BDB1"/><stop offset="1" stop-color="#00695C"/></linearGradient><radialGradient id="h" cx=".25" cy=".12" r=".85"><stop offset="0" stop-color="#fff" stop-opacity=".30"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><rect width="512" height="512" rx="116" fill="url(#g)"/><rect width="512" height="512" rx="116" fill="url(#h)"/><g transform="translate(78 112) scale(.84) translate(-698 -29)"><path fill="#FFFFFF" fill-rule="evenodd" d="M760.9 54.1C758.5 56.9 754.8 61.5 752.4 64.6C750.0 67.8 749.6 68.2 746.4 73.1C743.2 78.0 738.7 84.9 733.1 94.1C727.6 103.4 717.2 121.1 713.1 128.6C709.0 136.1 709.5 136.2 708.4 139.1C707.2 142.1 706.7 144.0 706.1 146.4C705.5 148.8 705.1 151.2 704.9 153.6C704.6 156.1 704.4 158.2 704.6 161.1C704.8 164.0 705.5 168.3 706.1 170.9C706.7 173.4 706.8 173.7 708.1 176.4C709.5 179.1 712.4 184.2 714.4 187.1C716.4 190.0 718.0 191.7 720.1 193.9C722.2 196.1 721.2 195.6 726.9 200.4C732.6 205.2 744.4 214.9 754.4 222.6C764.4 230.3 773.7 237.3 786.9 246.6C800.1 256.0 820.9 270.2 833.6 278.6C846.3 287.1 858.1 294.0 863.1 297.4C868.1 300.8 863.6 298.9 863.6 298.9C863.6 298.9 861.6 299.4 861.6 299.4C861.6 299.4 862.0 300.0 862.4 300.1C862.7 300.2 863.2 300.3 863.6 300.1C864.1 299.9 863.5 299.0 865.1 298.9C866.7 298.8 870.4 299.0 873.1 299.4C875.9 299.8 879.0 300.3 881.6 301.1C884.2 301.9 886.7 303.0 888.6 304.1C890.6 305.2 892.1 306.8 893.4 307.9C894.6 309.0 895.2 309.5 896.1 310.9C897.0 312.2 898.3 314.6 898.9 315.9C899.4 317.1 899.0 317.7 899.4 318.4C899.7 319.0 896.2 317.3 900.9 319.9C905.6 322.5 920.9 330.5 927.6 333.9C934.3 337.2 934.7 337.4 941.1 339.9C947.5 342.4 958.3 346.4 966.1 348.9C974.0 351.4 981.1 353.3 988.1 354.9C995.2 356.4 1001.8 357.5 1008.4 358.1C1014.9 358.7 1022.9 358.4 1027.4 358.4C1031.8 358.3 1032.1 358.3 1035.1 357.9C1038.2 357.5 1042.0 356.9 1045.6 355.9C1049.3 354.9 1054.1 353.1 1057.1 351.9C1060.1 350.7 1061.3 350.0 1063.6 348.6C1066.0 347.3 1068.2 346.2 1071.1 343.9C1074.1 341.5 1078.5 337.7 1081.4 334.6C1084.3 331.5 1086.2 329.1 1088.6 325.4C1091.0 321.7 1094.1 315.9 1095.9 312.4C1097.7 308.8 1098.0 308.0 1099.4 304.1C1100.7 300.2 1102.8 293.3 1103.9 289.1C1105.0 285.0 1105.2 283.3 1105.9 279.1C1106.5 275.0 1107.5 268.8 1107.9 264.1C1108.3 259.5 1108.4 257.6 1108.4 251.4C1108.4 245.1 1108.3 233.6 1107.9 226.6C1107.5 219.7 1107.2 217.9 1105.9 209.6C1104.5 201.3 1101.6 186.4 1099.6 176.9C1097.6 167.3 1095.5 158.9 1093.9 152.4C1092.2 145.9 1091.3 143.1 1089.6 137.9C1087.9 132.6 1085.2 125.2 1083.6 120.9C1082.0 116.6 1081.9 116.2 1079.9 112.1C1077.9 108.0 1073.7 100.1 1071.6 96.4C1069.6 92.7 1068.5 91.2 1067.6 89.9C1066.7 88.5 1066.7 88.8 1066.1 88.4C1065.6 88.0 1065.0 87.6 1064.4 87.4C1063.8 87.2 1063.3 87.0 1062.4 87.1C1061.4 87.3 1059.7 87.8 1058.6 88.4C1057.6 88.9 1057.5 89.0 1056.1 90.4C1054.8 91.8 1052.6 93.8 1050.6 96.6C1048.6 99.5 1045.9 104.2 1044.1 107.4C1042.4 110.6 1041.8 111.9 1040.1 115.9C1038.5 119.9 1036.0 126.2 1034.4 131.4C1032.8 136.5 1031.4 141.8 1030.4 146.6C1029.3 151.5 1028.5 155.7 1028.1 160.4C1027.7 165.1 1027.7 170.7 1027.9 174.9C1028.0 179.0 1028.7 182.7 1029.1 185.4C1029.6 188.0 1028.8 186.3 1030.6 190.9C1032.4 195.5 1037.3 205.9 1039.9 212.9C1042.5 219.8 1044.5 226.2 1046.1 232.6C1047.8 239.0 1049.1 246.1 1049.9 251.1C1050.7 256.1 1050.8 258.2 1050.9 262.6C1050.9 267.1 1050.6 273.6 1050.1 277.9C1049.6 282.2 1048.9 285.0 1047.9 288.4C1046.9 291.7 1045.5 295.1 1044.1 297.9C1042.8 300.7 1039.6 305.1 1039.6 305.1C1039.6 305.1 1039.5 305.8 1037.9 305.1C1036.2 304.5 1033.1 303.0 1029.9 301.1C1026.7 299.3 1022.1 296.5 1018.6 294.1C1015.1 291.8 1012.8 290.2 1008.9 287.1C1005.0 284.1 999.5 279.7 995.1 275.9C990.7 272.1 987.2 269.0 982.4 264.4C977.5 259.8 972.8 255.3 966.1 248.4C959.5 241.4 951.0 232.4 942.4 222.6C933.8 212.8 924.8 202.4 914.6 189.6C904.4 176.9 890.2 158.2 881.1 146.1C872.0 134.0 867.0 126.7 860.1 116.9C853.3 107.1 845.8 96.0 840.1 87.4C834.5 78.8 829.5 70.7 826.1 65.1C822.8 59.6 821.5 56.8 819.9 54.1C818.2 51.4 817.8 50.9 816.1 48.9C814.4 46.8 811.5 43.6 809.6 41.9C807.8 40.2 806.9 39.6 805.1 38.6C803.4 37.6 801.5 36.5 799.1 35.9C796.8 35.2 793.5 34.8 791.1 34.9C788.8 34.9 786.7 35.6 784.9 36.1C783.0 36.7 782.0 37.1 780.1 38.1C778.2 39.2 775.6 40.7 773.4 42.4C771.1 44.0 768.7 46.2 766.6 48.1C764.5 50.1 763.2 51.4 760.9 54.1Z"/><path fill="#BFF6F1" fill-rule="evenodd" d="M1062.4 87.1C1061.4 87.3 1060.5 87.0 1058.6 88.4C1056.8 89.8 1053.4 93.2 1051.4 95.6C1049.4 98.0 1048.5 99.5 1046.6 102.9C1044.8 106.2 1042.2 111.1 1040.1 115.9C1038.1 120.6 1036.0 126.2 1034.4 131.4C1032.8 136.5 1031.4 141.8 1030.4 146.6C1029.3 151.5 1028.5 155.7 1028.1 160.4C1027.7 165.1 1027.8 171.3 1027.9 174.9C1027.9 178.4 1028.0 179.1 1028.4 181.6C1028.8 184.2 1028.8 185.8 1030.4 190.1C1032.0 194.5 1035.6 201.8 1037.9 207.6C1040.1 213.4 1042.2 219.3 1043.9 224.9C1045.6 230.4 1047.1 236.2 1048.1 240.9C1049.2 245.6 1049.7 248.5 1050.1 253.1C1050.6 257.8 1050.9 264.5 1050.9 268.9C1050.8 273.3 1050.4 276.4 1049.9 279.6C1049.4 282.9 1048.5 286.3 1047.9 288.4C1047.3 290.4 1046.6 290.7 1046.4 291.9C1046.1 293.0 1046.6 294.5 1046.4 295.4C1046.2 296.2 1045.5 296.4 1045.1 297.1C1044.8 297.8 1044.8 299.0 1044.4 299.6C1044.0 300.2 1043.5 299.8 1042.9 300.9C1042.2 301.9 1040.6 305.9 1040.6 305.9C1040.6 305.9 1043.3 307.3 1045.6 308.1C1048.0 308.9 1051.2 310.1 1054.6 310.6C1058.0 311.1 1063.5 311.2 1066.1 311.1C1068.8 311.1 1069.0 310.8 1070.6 310.4C1072.3 309.9 1074.0 309.5 1076.1 308.4C1078.2 307.2 1081.3 305.4 1083.4 303.6C1085.4 301.9 1087.1 299.5 1088.4 297.9C1089.7 296.2 1089.8 296.1 1091.1 293.6C1092.4 291.1 1094.5 287.6 1096.1 282.9C1097.8 278.2 1099.7 271.5 1100.9 265.4C1102.1 259.2 1102.8 253.0 1103.4 245.9C1104.0 238.8 1104.3 229.6 1104.4 222.6C1104.4 215.7 1103.6 204.1 1103.6 204.1C1103.6 204.1 1104.4 203.6 1104.4 203.6C1104.4 203.6 1101.0 184.1 1099.6 176.9C1098.2 169.7 1097.5 166.9 1095.9 160.4C1094.2 153.9 1091.3 143.5 1089.6 137.9C1088.0 132.3 1087.5 131.2 1085.9 126.9C1084.2 122.6 1082.5 117.7 1079.9 112.1C1077.2 106.5 1072.2 97.3 1069.9 93.4C1067.6 89.4 1067.0 89.4 1066.1 88.4C1065.2 87.4 1065.0 87.6 1064.4 87.4C1063.8 87.2 1063.3 87.0 1062.4 87.1Z"/></g><circle cx="404" cy="408" r="50" fill="#E2082D" stroke="#fff" stroke-width="12"/></svg>', FAVICON_NATAL_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#14BDB1"/><stop offset="1" stop-color="#00695C"/></linearGradient><radialGradient id="h" cx=".25" cy=".12" r=".85"><stop offset="0" stop-color="#fff" stop-opacity=".30"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><rect width="512" height="512" rx="116" fill="url(#g)"/><rect width="512" height="512" rx="116" fill="url(#h)"/><g transform="translate(78 112) scale(.84) translate(-698 -29)"><path fill="#FFFFFF" fill-rule="evenodd" d="M760.9 54.1C758.5 56.9 754.8 61.5 752.4 64.6C750.0 67.8 749.6 68.2 746.4 73.1C743.2 78.0 738.7 84.9 733.1 94.1C727.6 103.4 717.2 121.1 713.1 128.6C709.0 136.1 709.5 136.2 708.4 139.1C707.2 142.1 706.7 144.0 706.1 146.4C705.5 148.8 705.1 151.2 704.9 153.6C704.6 156.1 704.4 158.2 704.6 161.1C704.8 164.0 705.5 168.3 706.1 170.9C706.7 173.4 706.8 173.7 708.1 176.4C709.5 179.1 712.4 184.2 714.4 187.1C716.4 190.0 718.0 191.7 720.1 193.9C722.2 196.1 721.2 195.6 726.9 200.4C732.6 205.2 744.4 214.9 754.4 222.6C764.4 230.3 773.7 237.3 786.9 246.6C800.1 256.0 820.9 270.2 833.6 278.6C846.3 287.1 858.1 294.0 863.1 297.4C868.1 300.8 863.6 298.9 863.6 298.9C863.6 298.9 861.6 299.4 861.6 299.4C861.6 299.4 862.0 300.0 862.4 300.1C862.7 300.2 863.2 300.3 863.6 300.1C864.1 299.9 863.5 299.0 865.1 298.9C866.7 298.8 870.4 299.0 873.1 299.4C875.9 299.8 879.0 300.3 881.6 301.1C884.2 301.9 886.7 303.0 888.6 304.1C890.6 305.2 892.1 306.8 893.4 307.9C894.6 309.0 895.2 309.5 896.1 310.9C897.0 312.2 898.3 314.6 898.9 315.9C899.4 317.1 899.0 317.7 899.4 318.4C899.7 319.0 896.2 317.3 900.9 319.9C905.6 322.5 920.9 330.5 927.6 333.9C934.3 337.2 934.7 337.4 941.1 339.9C947.5 342.4 958.3 346.4 966.1 348.9C974.0 351.4 981.1 353.3 988.1 354.9C995.2 356.4 1001.8 357.5 1008.4 358.1C1014.9 358.7 1022.9 358.4 1027.4 358.4C1031.8 358.3 1032.1 358.3 1035.1 357.9C1038.2 357.5 1042.0 356.9 1045.6 355.9C1049.3 354.9 1054.1 353.1 1057.1 351.9C1060.1 350.7 1061.3 350.0 1063.6 348.6C1066.0 347.3 1068.2 346.2 1071.1 343.9C1074.1 341.5 1078.5 337.7 1081.4 334.6C1084.3 331.5 1086.2 329.1 1088.6 325.4C1091.0 321.7 1094.1 315.9 1095.9 312.4C1097.7 308.8 1098.0 308.0 1099.4 304.1C1100.7 300.2 1102.8 293.3 1103.9 289.1C1105.0 285.0 1105.2 283.3 1105.9 279.1C1106.5 275.0 1107.5 268.8 1107.9 264.1C1108.3 259.5 1108.4 257.6 1108.4 251.4C1108.4 245.1 1108.3 233.6 1107.9 226.6C1107.5 219.7 1107.2 217.9 1105.9 209.6C1104.5 201.3 1101.6 186.4 1099.6 176.9C1097.6 167.3 1095.5 158.9 1093.9 152.4C1092.2 145.9 1091.3 143.1 1089.6 137.9C1087.9 132.6 1085.2 125.2 1083.6 120.9C1082.0 116.6 1081.9 116.2 1079.9 112.1C1077.9 108.0 1073.7 100.1 1071.6 96.4C1069.6 92.7 1068.5 91.2 1067.6 89.9C1066.7 88.5 1066.7 88.8 1066.1 88.4C1065.6 88.0 1065.0 87.6 1064.4 87.4C1063.8 87.2 1063.3 87.0 1062.4 87.1C1061.4 87.3 1059.7 87.8 1058.6 88.4C1057.6 88.9 1057.5 89.0 1056.1 90.4C1054.8 91.8 1052.6 93.8 1050.6 96.6C1048.6 99.5 1045.9 104.2 1044.1 107.4C1042.4 110.6 1041.8 111.9 1040.1 115.9C1038.5 119.9 1036.0 126.2 1034.4 131.4C1032.8 136.5 1031.4 141.8 1030.4 146.6C1029.3 151.5 1028.5 155.7 1028.1 160.4C1027.7 165.1 1027.7 170.7 1027.9 174.9C1028.0 179.0 1028.7 182.7 1029.1 185.4C1029.6 188.0 1028.8 186.3 1030.6 190.9C1032.4 195.5 1037.3 205.9 1039.9 212.9C1042.5 219.8 1044.5 226.2 1046.1 232.6C1047.8 239.0 1049.1 246.1 1049.9 251.1C1050.7 256.1 1050.8 258.2 1050.9 262.6C1050.9 267.1 1050.6 273.6 1050.1 277.9C1049.6 282.2 1048.9 285.0 1047.9 288.4C1046.9 291.7 1045.5 295.1 1044.1 297.9C1042.8 300.7 1039.6 305.1 1039.6 305.1C1039.6 305.1 1039.5 305.8 1037.9 305.1C1036.2 304.5 1033.1 303.0 1029.9 301.1C1026.7 299.3 1022.1 296.5 1018.6 294.1C1015.1 291.8 1012.8 290.2 1008.9 287.1C1005.0 284.1 999.5 279.7 995.1 275.9C990.7 272.1 987.2 269.0 982.4 264.4C977.5 259.8 972.8 255.3 966.1 248.4C959.5 241.4 951.0 232.4 942.4 222.6C933.8 212.8 924.8 202.4 914.6 189.6C904.4 176.9 890.2 158.2 881.1 146.1C872.0 134.0 867.0 126.7 860.1 116.9C853.3 107.1 845.8 96.0 840.1 87.4C834.5 78.8 829.5 70.7 826.1 65.1C822.8 59.6 821.5 56.8 819.9 54.1C818.2 51.4 817.8 50.9 816.1 48.9C814.4 46.8 811.5 43.6 809.6 41.9C807.8 40.2 806.9 39.6 805.1 38.6C803.4 37.6 801.5 36.5 799.1 35.9C796.8 35.2 793.5 34.8 791.1 34.9C788.8 34.9 786.7 35.6 784.9 36.1C783.0 36.7 782.0 37.1 780.1 38.1C778.2 39.2 775.6 40.7 773.4 42.4C771.1 44.0 768.7 46.2 766.6 48.1C764.5 50.1 763.2 51.4 760.9 54.1Z"/><path fill="#BFF6F1" fill-rule="evenodd" d="M1062.4 87.1C1061.4 87.3 1060.5 87.0 1058.6 88.4C1056.8 89.8 1053.4 93.2 1051.4 95.6C1049.4 98.0 1048.5 99.5 1046.6 102.9C1044.8 106.2 1042.2 111.1 1040.1 115.9C1038.1 120.6 1036.0 126.2 1034.4 131.4C1032.8 136.5 1031.4 141.8 1030.4 146.6C1029.3 151.5 1028.5 155.7 1028.1 160.4C1027.7 165.1 1027.8 171.3 1027.9 174.9C1027.9 178.4 1028.0 179.1 1028.4 181.6C1028.8 184.2 1028.8 185.8 1030.4 190.1C1032.0 194.5 1035.6 201.8 1037.9 207.6C1040.1 213.4 1042.2 219.3 1043.9 224.9C1045.6 230.4 1047.1 236.2 1048.1 240.9C1049.2 245.6 1049.7 248.5 1050.1 253.1C1050.6 257.8 1050.9 264.5 1050.9 268.9C1050.8 273.3 1050.4 276.4 1049.9 279.6C1049.4 282.9 1048.5 286.3 1047.9 288.4C1047.3 290.4 1046.6 290.7 1046.4 291.9C1046.1 293.0 1046.6 294.5 1046.4 295.4C1046.2 296.2 1045.5 296.4 1045.1 297.1C1044.8 297.8 1044.8 299.0 1044.4 299.6C1044.0 300.2 1043.5 299.8 1042.9 300.9C1042.2 301.9 1040.6 305.9 1040.6 305.9C1040.6 305.9 1043.3 307.3 1045.6 308.1C1048.0 308.9 1051.2 310.1 1054.6 310.6C1058.0 311.1 1063.5 311.2 1066.1 311.1C1068.8 311.1 1069.0 310.8 1070.6 310.4C1072.3 309.9 1074.0 309.5 1076.1 308.4C1078.2 307.2 1081.3 305.4 1083.4 303.6C1085.4 301.9 1087.1 299.5 1088.4 297.9C1089.7 296.2 1089.8 296.1 1091.1 293.6C1092.4 291.1 1094.5 287.6 1096.1 282.9C1097.8 278.2 1099.7 271.5 1100.9 265.4C1102.1 259.2 1102.8 253.0 1103.4 245.9C1104.0 238.8 1104.3 229.6 1104.4 222.6C1104.4 215.7 1103.6 204.1 1103.6 204.1C1103.6 204.1 1104.4 203.6 1104.4 203.6C1104.4 203.6 1101.0 184.1 1099.6 176.9C1098.2 169.7 1097.5 166.9 1095.9 160.4C1094.2 153.9 1091.3 143.5 1089.6 137.9C1088.0 132.3 1087.5 131.2 1085.9 126.9C1084.2 122.6 1082.5 117.7 1079.9 112.1C1077.2 106.5 1072.2 97.3 1069.9 93.4C1067.6 89.4 1067.0 89.4 1066.1 88.4C1065.2 87.4 1065.0 87.6 1064.4 87.4C1063.8 87.2 1063.3 87.0 1062.4 87.1Z"/></g><circle cx="404" cy="408" r="50" fill="#E2082D" stroke="#fff" stroke-width="12"/><g transform="translate(318 50) rotate(18 70 60) scale(.8)"><path d="M10 112C14 56 52 20 110 26c-26 10-32 36-32 58l44 36z" fill="#B3263E"/><path d="M2 108c20 14 96 18 130 2l8 16c-44 18-110 16-146-2z" fill="#FDFBF6"/><circle cx="112" cy="26" r="19" fill="#FDFBF6"/></g></svg>';
-const VERSAO_APP = '15.9';
+const VERSAO_APP = '16.1';
 const _est = (cx, cy, r)=>{ let p = ''; for(let k = 0; k < 10; k++){ const a = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? r * .45 : r; p += `${(cx + rr * Math.cos(a)).toFixed(0)},${(cy + rr * Math.sin(a)).toFixed(0)} `; } return `<polygon points="${p.trim()}"/>`; };
 const _cor = (cx, cy, s)=> `<path d="M${cx} ${cy + s}C${cx - 2 * s} ${cy - s * .2} ${cx - 1.1 * s} ${cy - 1.3 * s} ${cx} ${cy - s * .3}C${cx + 1.1 * s} ${cy - 1.3 * s} ${cx + 2 * s} ${cy - s * .2} ${cx} ${cy + s}Z"/>`;
 const _spk = (cx, cy, r)=> `<path d="M${cx} ${cy - r}C${cx + r * .1} ${cy - r * .3} ${cx + r * .3} ${cy - r * .1} ${cx + r} ${cy}C${cx + r * .3} ${cy + r * .1} ${cx + r * .1} ${cy + r * .3} ${cx} ${cy + r}C${cx - r * .1} ${cy + r * .3} ${cx - r * .3} ${cy + r * .1} ${cx - r} ${cy}C${cx - r * .3} ${cy - r * .1} ${cx - r * .1} ${cy - r * .3} ${cx} ${cy - r}Z"/>`;
@@ -11152,7 +11348,7 @@ const Sazonal = (function(){
       alvo = deco.g === 'luzes' ? (lt < 600 ? 38 : 50) : (lt < 600 ? 46 : 64), n = Math.max(3, Math.round(util / alvo)), passo = util / n;
     let d = `M${ini} 2`; for(let i = 0; i < n; i++) d += ` Q${(ini + (i + .5) * passo).toFixed(1)} ${deco.g === 'luzes' ? 15 : 11} ${(ini + (i + 1) * passo).toFixed(1)} 2`;
     const cores = deco.cores, c = document.createElement('div'); c.className = 'sz-luzes' + (deco.g === 'luzes' ? ' grande' : ''); c.setAttribute('aria-hidden', 'true');
-    if(o.esq != null){ c.style.left = o.esq + 'px'; c.style.right = 'auto'; c.style.width = lt + 'px'; c.style.top = o.topo + 'px'; c.style.bottom = 'auto'; }
+    if(o.cartao){ c.classList.add('cartao'); c.style.width = lt + 'px'; } if(o.esq != null){ c.style.left = o.esq + 'px'; c.style.right = 'auto'; c.style.width = lt + 'px'; c.style.top = o.topo + 'px'; c.style.bottom = 'auto'; }
     /* as duas pontas terminam num prendedor encostado na borda de cima: nada de fio solto para fora */
     const pino = [ini, lt - ini].map(x=> `<path d="M${x} 0V2" stroke="#8d9d9a" stroke-width="1.6"/><circle cx="${x}" cy="2" r="2.3" fill="#8d9d9a"/>`).join('');
     if(deco.g === 'luzes'){
@@ -11170,7 +11366,7 @@ const Sazonal = (function(){
         bg.push(`radial-gradient(circle at ${x}px ${y}px, ${cor} 0, ${cor} ${(r * .6).toFixed(1)}px, ${anel} ${r.toFixed(1)}px, transparent ${(r + 1.8).toFixed(1)}px)`); }
       return `<div class="sz-camada" style="--t:${k.t}px; top:-${k.t}px; background-image:${bg.join(',')}; background-size:${k.t}px ${k.t}px; animation-duration:${k.d}s"></div>`; }).join(''); pai.appendChild(c);
   }
-  function limpar(){ document.querySelectorAll('.sz-luzes, .sz-neve, .sz-emblema, .sz-flut, .sz-ao, .sz-fundo').forEach(e=>e.remove()); document.body.classList.remove('tem-emblema'); document.body.classList.remove('tem-fio'); }
+  function limpar(){ _topoAtual = null; document.querySelectorAll('.sz-luzes, .sz-neve, .sz-emblema, .sz-flut, .sz-ao, .sz-fundo').forEach(e=>e.remove()); document.body.classList.remove('tem-emblema'); document.body.classList.remove('tem-fio'); }
   const S = (vb, w, h, dentro, cls)=> `<svg class="${cls || ''}" viewBox="${vb}" width="${w}" height="${h}" aria-hidden="true">${dentro}</svg>`;
   const fagulha = (cx, cy, r, cor)=> `<path d="M${cx} ${cy - r}C${cx + r * .1} ${cy - r * .3} ${cx + r * .3} ${cy - r * .1} ${cx + r} ${cy}C${cx + r * .3} ${cy + r * .1} ${cx + r * .1} ${cy + r * .3} ${cx} ${cy + r}C${cx - r * .1} ${cy + r * .3} ${cx - r * .3} ${cy + r * .1} ${cx - r} ${cy}C${cx - r * .3} ${cy - r * .1} ${cx - r * .1} ${cy - r * .3} ${cx} ${cy - r}Z" fill="${cor}"/>`;
   const laco = (cor)=> `<g class="sz-a sz-pulsa"><path d="M25 40C6 18 18 2 25 16C32 2 44 18 25 40" stroke="${cor}" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M25 38l-10 24M25 38l10 24" stroke="${cor}" stroke-width="5.5" stroke-linecap="round" fill="none"/><path d="M17 12c-3 3-4 6-3.4 9" stroke="#fff" stroke-width="1.6" stroke-linecap="round" fill="none" opacity=".55"/></g>`;
@@ -11203,11 +11399,22 @@ const Sazonal = (function(){
     const mk = local=>{ const c = document.createElement('div'); c.className = 'sz-flut' + (local ? ' local' : ''); c.setAttribute('aria-hidden', 'true'); const n = innerWidth < 700 ? 2 : 3; let s = ''; for(let i = 0; i < n; i++) s += `<i style="right:${(5 + Math.random() * (tipo === 'coracoes' ? 14 : 30)).toFixed(1)}%; animation-duration:${(20 + Math.random() * 10).toFixed(1)}s; animation-delay:-${(Math.random() * 24).toFixed(1)}s">${item(cores[i % cores.length])}</i>`; c.innerHTML = s; return c; };
     document.body.appendChild(mk(false)); const hero = document.querySelector('.login-hero'); if(hero) hero.appendChild(mk(true));
   }
+  /* o pisca-pisca agora fica DENTRO do cartão da rodada (nada de faixa solta embaixo do topo) */
+  function luzesNoCartao(){
+    document.querySelectorAll('.qh:not(.qh-carregando), .home-hero').forEach(c=>{
+      const ex = c.querySelector(':scope > .sz-luzes'), w = Math.round(c.clientWidth);
+      if(!_topoAtual){ if(ex) ex.remove(); return; } if(ex && ex.dataset.w === String(w)) return; if(ex) ex.remove();
+      guirlanda(c, _topoAtual, { largura:w, inset:26, cartao:true }); const n = c.querySelector(':scope > .sz-luzes'); if(n) n.dataset.w = String(w);
+    });
+  }
+  function agendarLuzesCartao(){ if(_rafCartao) return; _rafCartao = requestAnimationFrame(()=>{ _rafCartao = 0; luzesNoCartao(); }); }
+  try{ const alvoObs = document.querySelector('.content'); if(alvoObs) new MutationObserver(()=>{ if(_topoAtual) agendarLuzesCartao(); }).observe(alvoObs, { childList:true, subtree:true }); }catch(e){}
+  window.addEventListener('resize', ()=>{ if(_topoAtual) agendarLuzesCartao(); });
   function decorar(){
     limpar(); const t = atual, d = t && def(t.id), dc = d && d.deco; if(!dc) return;
     const hero = document.querySelector('.login-hero'), shell = document.querySelector('.login-shell');
     if(dc.topo){
-      const topo = { g:dc.topo, cores:dc.cores }; guirlanda(document.querySelector('.topbar'), topo, { inset:30 }); document.body.classList.add('tem-fio');
+      const topo = { g:dc.topo, cores:dc.cores }; _topoAtual = topo; luzesNoCartao();
       if(hero && shell){
         const montar = ()=>{ const velho = hero.querySelector(':scope > .sz-luzes'); if(velho) velho.remove(); const rh = hero.getBoundingClientRect(), rs = shell.getBoundingClientRect(); if(rs.width > 160) guirlanda(hero, topo, { largura:Math.round(rs.width), esq:Math.round(rs.left - rh.left), topo:Math.round(rs.top - rh.top) - 3, inset:32 }); };
         const anims = shell.getAnimations ? shell.getAnimations().filter(a=> a.playState === 'running') : [];
@@ -11218,7 +11425,7 @@ const Sazonal = (function(){
     emblema(dc, t); if(dc.flutua) flutuar(dc);
     if(dc.queda && t.fase !== 'chegando'){ queda(document.body, false, dc.queda); queda(hero, true, dc.queda); }
   }
-  let atual = null;
+  let atual = null, _topoAtual = null, _rafCartao = 0;
   const cssCustom = ()=> CFG.personalizados.map(c=> `body[data-sazon="${c.id}"]{--sz-acc:${c.cor}}`).join('');
   let ultimaAssinatura = null, emPrevia = false, avisouVersao = false;
   const assinatura = t=> JSON.stringify([t && t.id, t && t.fase, t && t.dias, t && t.previa, innerWidth < 700, lerPref(), CFG.personalizados.map(c=>[c.id, c.cor, c.deco, c.icone, c.nome, c.msg])]);
@@ -11381,10 +11588,10 @@ function svgIcone(nome, tam){
   return (_svgIcones[k] = s);
 }
 function aplicarAvatarEm(el, av, nome){
-  if(!el) return; el.classList.remove('av-custom', 'av-icone', 'av-foto'); el.style.background = '';
+  if(!el) return; el.classList.remove('av-custom', 'av-icone', 'av-foto'); el.style.removeProperty('background'); el.style.background = ''; el.style.padding = '';
   if(av && av.tipo === 'emoji'){ el.classList.add('av-custom'); el.innerHTML = `<span class="av-emoji">${escH(av.valor)}</span>`; if(av.cor) el.style.background = av.cor; }
   else if(av && av.tipo === 'icone'){ el.classList.add('av-custom', 'av-icone'); const s = svgIcone(av.valor, 20); if(s) el.innerHTML = s; else { el.innerHTML = `<i data-lucide="${escH(av.valor)}"></i>`; if(window.lucide) lucide.createIcons(); } if(av.cor) el.style.background = av.cor; }
-  else if(av && av.tipo === 'foto' && /^data:image\//.test(av.valor || '')){ el.classList.add('av-custom', 'av-foto'); el.innerHTML = `<img src="${escH(av.valor)}" alt="">`; }
+  else if(av && av.tipo === 'foto' && /^data:image\//.test(av.valor || '')){ el.classList.add('av-custom', 'av-foto'); el.innerHTML = `<img src="${escH(av.valor)}" alt="">`; if(av.cor){ el.style.setProperty('background', av.cor, 'important'); el.style.padding = '3px'; } }
   else el.textContent = iniciaisDe(nome);
 }
 function pintarAvatar(){
@@ -11398,7 +11605,7 @@ function avMarcar(){
   document.querySelectorAll('#avPEmoji .av-op').forEach(b=> b.classList.toggle('sel', sel.tipo === 'emoji' && b.dataset.v === sel.valor));
   document.querySelectorAll('#avPIcone .av-op').forEach(b=> b.classList.toggle('sel', sel.tipo === 'icone' && b.dataset.v === sel.valor));
   document.querySelectorAll('#avCores .av-cor').forEach(b=> b.classList.toggle('sel', (sel.cor || '') === b.dataset.v));
-  document.getElementById('avCoresBox').hidden = sel.tipo === 'foto';
+  document.getElementById('avCoresBox').hidden = !sel.tipo;
   document.querySelectorAll('#avTabs [data-av]').forEach(b=> b.classList.toggle('active', b.dataset.av === _avAba));
   document.getElementById('avPEmoji').hidden = _avAba !== 'emoji'; document.getElementById('avPFoto').hidden = _avAba !== 'foto'; document.getElementById('avPIcone').hidden = _avAba !== 'icone';
 }
@@ -11442,15 +11649,15 @@ async function avEnviar(){
 document.addEventListener('click', e=>{
   const t = e.target; if(!t.closest || !t.closest('#cfgPerfil')) return;
   const aba = t.closest('#avTabs [data-av]'); if(aba){ _avAba = aba.dataset.av; _avAbaEscolhida = true; avIconesGrade(); avMarcar(); return; }
-  const cur = MEU_AVATAR === undefined ? avLer() : MEU_AVATAR, corAtual = cur && cur.tipo !== 'foto' ? (cur.cor || '') : '';
+  const cur = MEU_AVATAR === undefined ? avLer() : MEU_AVATAR, corAtual = cur && cur.tipo ? (cur.cor || '') : '';
   const emo = t.closest('#avPEmoji .av-op'); if(emo){ avEscolher({ tipo:'emoji', valor:emo.dataset.v, cor:corAtual }); return; }
   const ico = t.closest('#avPIcone .av-op'); if(ico){ avEscolher({ tipo:'icone', valor:ico.dataset.v, cor:corAtual }); return; }
-  const cor = t.closest('#avCores .av-cor'); if(cor){ if(cur && cur.tipo !== 'foto') avEscolher({ ...cur, cor:cor.dataset.v }); else avStatus('Escolha primeiro um emoji ou um ícone.'); return; }
+  const cor = t.closest('#avCores .av-cor'); if(cor){ if(cur && cur.tipo) avEscolher({ ...cur, cor:cor.dataset.v }); else avStatus('Escolha primeiro um emoji, um ícone ou uma foto.'); return; }
   if(t.closest('#avPadrao')) avEscolher(null);
 });
 document.addEventListener('change', async e=>{
   if(!e.target || e.target.id !== 'avArquivo') return; avStatus('Ajustando a foto…');
-  try{ const dados = await avProcessarFoto(e.target.files[0]); avEscolher({ tipo:'foto', valor:dados, cor:'' }); }catch(x){ avStatus(x.message || 'Não foi possível usar essa foto.'); }
+  try{ const dados = await avProcessarFoto(e.target.files[0]); avEscolher({ tipo:'foto', valor:dados, cor:(()=>{ const a0 = MEU_AVATAR === undefined ? avLer() : MEU_AVATAR; return (a0 && a0.cor) || ''; })() }); }catch(x){ avStatus(x.message || 'Não foi possível usar essa foto.'); }
   e.target.value = '';
 });
 
