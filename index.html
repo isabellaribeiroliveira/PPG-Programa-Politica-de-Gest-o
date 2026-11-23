@@ -2439,6 +2439,229 @@ body[data-sz-hero] .qh:not(.qh-carregando), body[data-sz-hero] .home-hero:not(.h
 .fm-ops{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; } .fm-ops li{ display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:12px; font-size:13px; background:rgba(0,0,0,.035); } body.dark .fm-ops li{ background:rgba(255,255,255,.05); }
 .fm-ops li.ok{ background:rgba(46,158,99,.14); outline:1.5px solid rgba(46,158,99,.5); font-weight:700; } .fm-l{ flex:0 0 auto; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11.5px; font-weight:800; background:rgba(2,163,157,.16); color:var(--secondary); } .fm-ops li.ok .fm-l{ background:#2E9E63; color:#fff; } .fm-t{ flex:1; min-width:0; overflow-wrap:anywhere; }
 .fm-ok{ flex:0 0 auto; display:inline-flex; align-items:center; gap:4px; font-size:11.5px; font-weight:800; color:#1B7A3F; } body.dark .fm-ok{ color:#8CE0A0; } .fm-ok svg{ width:13px; height:13px; }
+
+/* ============ v22 — visual novo: neutro, leve e menos saturado (modo claro e escuro) ============ */
+:root{
+  --primary:#1F9E97; --primary-dark:#178781; --secondary:#0F6B66;
+  --bg:#F3F6F6; --card:#FFFFFF; --ink:#12302D; --ink-soft:#5C7471; --border:#E3EBEA;
+  --shadow:0 1px 2px rgba(18,48,45,.05), 0 10px 24px -14px rgba(18,48,45,.16);
+  --grad-brand:linear-gradient(135deg,#2AA9A1 0%,#157470 100%); --grad-ok:linear-gradient(135deg,#43BF82 0%,#2B9560 100%);
+  --grad-warm:linear-gradient(135deg,#F3B546 0%,#E58B3A 100%); --grad-err:linear-gradient(135deg,#EF7C7C 0%,#CF4B4B 100%); --grad-cool:linear-gradient(135deg,#46B5D6 0%,#2480A0 100%);
+  --psolid:#1F9E97;
+}
+.t-teal{ --tb:#E2F3F1; --tf:#17847E; } .t-blue{ --tb:#E6EFFA; --tf:#2B6CB5; } .t-amber{ --tb:#FFF0DA; --tf:#BE7510; } .t-purple{ --tb:#EFE8FB; --tf:#7650C4; } .t-green{ --tb:#E3F5E9; --tf:#278A52; } .t-red{ --tb:#FCE9E9; --tf:#C23F3F; } .t-slate{ --tb:#EAEDF5; --tf:#566083; } .t-sky{ --tb:#E1F2FA; --tf:#26829F; }
+body.dark{ --bg:#0D1716; --card:#142322; --ink:#E6F2F0; --ink-soft:#8FB0AC; --border:#233836; --shadow:0 1px 2px rgba(0,0,0,.4), 0 12px 26px -16px rgba(0,0,0,.65); --grad-brand:linear-gradient(135deg,#238F89 0%,#16706B 100%); --psolid:#27A39B; }
+body.dark .t-teal{ --tb:rgba(46,184,174,.16); --tf:#7CDAD2; } body.dark .t-blue{ --tb:rgba(77,140,214,.18); --tf:#8DBCF0; } body.dark .t-amber{ --tb:rgba(240,167,60,.17); --tf:#F4C277; } body.dark .t-purple{ --tb:rgba(143,106,222,.2); --tf:#BDA2F0; } body.dark .t-green{ --tb:rgba(70,185,120,.17); --tf:#86DDA6; } body.dark .t-red{ --tb:rgba(232,92,92,.18); --tf:#F29A9A; } body.dark .t-slate{ --tb:rgba(140,152,190,.17); --tf:#B5BEDD; } body.dark .t-sky{ --tb:rgba(70,170,210,.18); --tf:#8ED3EE; }
+/* fundo: sem pontilhado e com brilhos bem discretos */
+body .content{ background-image:none !important; } body::before{ opacity:.45; } #fundoOrbes{ opacity:.5; }
+/* topo */
+body .topbar{ background:rgba(255,255,255,.9) !important; border-bottom:1px solid var(--border) !important; backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); box-shadow:none; } body.dark .topbar{ background:rgba(20,35,34,.9) !important; }
+body.tem-fio .content{ padding-top:46px; }   /* o fio do pisca-pisca fica preso na borda do topo e as lâmpadas pendem dentro deste espaço: sem faixa vazia e sem cobrir os cartões */
+/* painéis e cartões: brancos, nítidos, sem vidro */
+body .panel, body .qk{ background:var(--card) !important; -webkit-backdrop-filter:none !important; backdrop-filter:none !important; border:1px solid var(--border); border-radius:20px; box-shadow:var(--shadow); }
+body .ccard, body .kpi, body .atalho{ background:var(--card) !important; -webkit-backdrop-filter:none !important; backdrop-filter:none !important; }
+body .qk-ico{ --tb:#E2F3F1; --tf:#17847E; background:var(--tb) !important; color:var(--tf) !important; border-radius:14px; } body .qk-b .qk-ico{ --tb:#E3F5E9; --tf:#278A52; } body .qk-c .qk-ico{ --tb:#FFF0DA; --tf:#BE7510; }
+body.dark .qk-ico{ --tb:rgba(46,184,174,.16); --tf:#7CDAD2; } body.dark .qk-b .qk-ico{ --tb:rgba(70,185,120,.17); --tf:#86DDA6; } body.dark .qk-c .qk-ico{ --tb:rgba(240,167,60,.17); --tf:#F4C277; }
+body .qk-val{ color:var(--ink); }
+.section-head h2{ letter-spacing:-.2px; }
+/* cartões de destaque mais calmos */
+body .qh:not(.qh-carregando){ background:linear-gradient(135deg,#238F89 0%,#15655F 100%); }
+.home-hero.hh-espera, .home-hero.hh-vazio{ background:linear-gradient(135deg,#23908A 0%,#15605B 100%); } .home-hero.hh-respondeu{ background:linear-gradient(135deg,#3FA672 0%,#1E7A63 100%); } .home-hero.hh-ganhou{ background:linear-gradient(135deg,#EDB04A 0%,#DC7F35 100%); box-shadow:0 14px 30px rgba(220,127,53,.22); }
+/* login: verde-água suave */
+body:not(.dark) .login-screen{ background:radial-gradient(120% 90% at 15% 8%, #58BBB3 0%, #309690 46%, #1F746E 100%) !important; }
+/* ============ menu em cartões ============ */
+body .sidebar{ background:var(--card) !important; color:var(--ink) !important; border-right:1px solid var(--border); box-shadow:none; }
+body .brand{ border-bottom:1px solid var(--border); padding:20px 18px 16px; } body .brand-text h1{ color:var(--ink); } body .brand-text span{ color:var(--ink-soft); } body .sidebar-foot{ border-top:1px solid var(--border); color:var(--ink-soft); }
+body .menu{ padding:12px 12px 8px; display:flex; flex-direction:column; gap:4px; overflow-y:auto; }
+body .menu-item, body .menu-group-header{ display:flex; align-items:center; gap:12px; width:100%; padding:8px 10px; min-height:54px; border-radius:16px; border:1px solid transparent; background:transparent; color:var(--ink) !important; text-align:left; cursor:pointer; font-size:14px; }
+body .menu-item:hover, body .menu-group-header:hover{ background:var(--bg) !important; color:var(--ink) !important; }
+body .menu-item.active{ background:var(--tb-ativo,#E2F3F1) !important; border-color:rgba(31,158,151,.30); box-shadow:none; color:var(--ink) !important; } body.dark .menu-item.active{ --tb-ativo:rgba(46,184,174,.14); border-color:rgba(46,184,174,.35); }
+.mi-ic{ width:38px; height:38px; border-radius:12px; display:grid; place-items:center; flex:0 0 auto; background:var(--tb); color:var(--tf); } .mi-ic svg, .mi-ic i{ width:19px !important; height:19px !important; opacity:1 !important; }
+body .menu-item.active:not(.sub) .mi-ic{ background:var(--psolid); color:#fff; }
+.mi-tx{ display:flex; flex-direction:column; gap:2px; min-width:0; flex:1; line-height:1.2; } .mi-tx .label{ font-size:14px; font-weight:700; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .mi-sub{ font-size:11.5px; color:var(--ink-soft); font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.mi-count{ margin-left:auto; flex:0 0 auto; min-width:28px; height:24px; padding:0 9px; border-radius:99px; display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; background:var(--tb); color:var(--tf); } .mi-count[hidden]{ display:none !important; } .mi-count.alerta{ background:var(--tb); color:var(--tf); }
+body .menu-item.active:not(.sub) .mi-count{ background:var(--psolid); color:#fff; }
+.menu-badge.mi-count{ position:static; }
+body .menu-group-header .chevron{ width:16px; height:16px; color:var(--ink-soft); margin-left:2px; flex:0 0 auto; }
+body .menu-group-body{ margin:2px 0 6px 31px; padding-left:12px; border-left:1.5px solid var(--border); display:flex; flex-direction:column; gap:2px; }
+body .menu-item.sub{ min-height:40px; padding:5px 8px; border-radius:12px; gap:10px; } body .menu-item.sub .label{ font-size:13px; font-weight:600; color:var(--ink); }
+.si-ic{ width:26px; height:26px; border-radius:50%; display:grid; place-items:center; flex:0 0 auto; background:var(--tb); color:var(--tf); } .si-ic svg, .si-ic i{ width:14px !important; height:14px !important; opacity:1 !important; }
+body .menu-item.sub .mi-count{ background:transparent; color:var(--tf); min-width:auto; padding:0 4px; font-size:13px; }
+body .menu-item.sub.active{ background:var(--tb) !important; border-color:transparent; }
+body .menu-item.sub.active .label{ font-weight:800; }
+body .sidebar.collapsed .mi-tx, body .sidebar.collapsed .mi-count, body .sidebar.collapsed .menu-group-header .chevron{ display:none !important; }
+body .sidebar.collapsed .menu-item, body .sidebar.collapsed .menu-group-header{ justify-content:center; padding:8px; min-height:50px; }
+body .sidebar.collapsed .menu-group-body{ margin:2px 0; padding-left:0; border-left:0; align-items:center; }
+body .sidebar.collapsed .menu-item.sub{ justify-content:center; padding:6px; }
+body .sidebar.collapsed .menu-item.sub .label{ display:none !important; }
+
+/* v22b — acabamento do menu */
+body .menu-group-header, body .menu-group-header span, body .menu-item span{ text-transform:none !important; letter-spacing:0 !important; font-family:inherit !important; }
+body .menu-group-header{ font-size:14px; font-weight:700; }
+.mi-ic{ width:36px; height:36px; } body .menu-item, body .menu-group-header{ gap:10px; padding:8px 9px; } .mi-tx .label{ font-size:13.5px; } .mi-count{ min-width:26px; padding:0 8px; }
+.mi-count.t-red:not(.alerta){ --tb:var(--border); --tf:var(--ink-soft); }
+body .menu-group-body{ margin:2px 0 6px 26px; padding-left:10px; }
+body .menu-item.sub .label{ white-space:normal; line-height:1.2; }
+
+/* v22c — nada de texto cortado no menu; contagem de mensagens vira uma bolinha no ícone */
+body .menu-item, body .menu-group-header{ position:relative; }
+.mi-tx .label, .mi-sub{ white-space:normal !important; overflow:visible !important; text-overflow:clip !important; }
+body .menu-badge.mi-count{ position:absolute; top:4px; left:33px; margin:0; min-width:19px; height:19px; padding:0 5px; font-size:11px; border:2px solid var(--card); box-sizing:content-box; }
+body .menu-item.active .menu-badge.mi-count{ border-color:var(--card); }
+
+/* v22d — acabamento: bolinha de mensagens, selo no celular e indicadores do colaborador em tons suaves */
+body .menu-badge.mi-count{ left:26px; top:1px; }
+.streak-chip{ border:1px solid var(--border); border-radius:18px; } .streak-chip .si{ --tb:#FFF0DA; --tf:#BE7510; background:var(--tb) !important; color:var(--tf) !important; }
+.streak-chip.star .si{ --tb:#FFF0DA; --tf:#BE7510; } .streak-chip.fire .si{ --tb:#FDEBDD; --tf:#C8641E; } .streak-chip.trophy .si, .streak-chip.cup .si{ --tb:#E2F3F1; --tf:#17847E; }
+body.dark .streak-chip .si{ --tb:rgba(240,167,60,.17); --tf:#F4C277; } body.dark .streak-chip.fire .si{ --tb:rgba(236,128,60,.18); --tf:#F4A877; } body.dark .streak-chip.trophy .si, body.dark .streak-chip.cup .si{ --tb:rgba(46,184,174,.16); --tf:#7CDAD2; }
+@media(max-width:700px){ .qh .sz-selo{ left:20px; right:auto; top:14px; } .qh:has(.sz-selo){ padding-top:58px; } .qh .sz-enfeite{ right:110px; } }
+
+/* v22e — o espaço do pisca-pisca depende do fio existir (não de uma marca que o login pode apagar) */
+body:has(.topbar > .sz-luzes) .content{ padding-top:46px; }
+
+/* ================================================================================================
+   v24 — INTERFACE RENOVADA mantendo as CORES ORIGINAIS do PPG (verde-água #02A39D, verde-escuro #00695C, vermelho da marca)
+   Novo: ícones de traço duplo, formas consistentes (cantos), menu e topo flutuantes, anel de progresso, menos chance de erro visual
+   ================================================================================================ */
+:root{ --primary:#02A39D; --primary-dark:#028a85; --secondary:#00695C; --bg:#F1F7F6; --card:#FFFFFF; --ink:#0F2A28; --ink-soft:#587571; --border:#D6E6E3;
+  --shadow:0 2px 10px rgba(2,163,157,.07), 0 1px 2px rgba(15,42,40,.04); --shadow-lg:0 2px 4px rgba(15,42,40,.04), 0 18px 40px -22px rgba(2,105,92,.32);
+  --grad-brand:linear-gradient(135deg,#02A39D 0%,#00695C 100%); --grad-ok:linear-gradient(135deg,#34C759 0%,#2E7D32 100%); --grad-warm:linear-gradient(135deg,#F9A825 0%,#F06543 100%); --grad-err:linear-gradient(135deg,#FF6B6B 0%,#C62828 100%); --grad-cool:linear-gradient(135deg,#00B4D8 0%,#00695C 100%);
+  --psolid:#02A39D; --tb-ativo:rgba(255,255,255,.78); }
+body.dark{ --bg:#060E0D; --card:#0C1A18; --ink:#E7F5F3; --ink-soft:#8DB8B2; --border:#16302C; --shadow:0 2px 10px rgba(0,0,0,.35); --shadow-lg:0 2px 4px rgba(0,0,0,.4), 0 24px 50px -24px rgba(0,0,0,.8);
+  --grad-brand:linear-gradient(135deg,#02A39D 0%,#00695C 100%); --psolid:#02A39D; --tb-ativo:rgba(2,163,157,.16); }
+body{ background:var(--bg); }
+/* menu: as cores de sempre (menta no claro, quase preto no escuro) */
+body .sidebar{ background:linear-gradient(180deg,rgba(238,249,246,.97) 0%,rgba(222,241,237,.97) 100%) !important; color:#08504A !important; border-right:1px solid var(--border); }
+body.dark .sidebar{ background:linear-gradient(180deg,#05100F 0%,#030A09 100%) !important; color:var(--ink) !important; }
+body .brand-text h1{ color:#08504A; } body.dark .brand-text h1{ color:#E7F5F3; } body .brand-text span{ color:var(--ink-soft); }
+body .brand{ border-bottom:1px solid rgba(2,105,92,.14); } body.dark .brand{ border-bottom-color:rgba(255,255,255,.08); }
+body .menu-item:hover, body .menu-group-header:hover{ background:rgba(2,163,157,.09) !important; } body.dark .menu-item:hover, body.dark .menu-group-header:hover{ background:rgba(255,255,255,.06) !important; }
+body .menu-item.active{ background:var(--tb-ativo) !important; border-color:rgba(2,163,157,.35); box-shadow:0 6px 16px -10px rgba(2,105,92,.45); } body.dark .menu-item.active{ box-shadow:none; }
+body .menu-item.sub.active{ box-shadow:none; }
+body .menu-group-body{ border-left-color:rgba(2,105,92,.18); } body.dark .menu-group-body{ border-left-color:rgba(255,255,255,.1); }
+body .sidebar-foot{ border-top-color:rgba(2,105,92,.14); color:var(--ink-soft); }
+/* topo */
+body .topbar{ background:rgba(255,255,255,.82) !important; } body.dark .topbar{ background:#0C1A18 !important; }
+/* cartões de destaque nas cores originais */
+body .qh:not(.qh-carregando){ background:linear-gradient(90deg,rgba(0,66,60,.30) 0%,transparent 72%), linear-gradient(135deg,#0E9B91,#087A72); box-shadow:0 14px 32px rgba(2,105,92,.22); }
+body.dark .qh:not(.qh-carregando){ background:linear-gradient(90deg,rgba(0,0,0,.10) 0%,transparent 72%), linear-gradient(135deg,#0B5E57,#042D29); box-shadow:0 14px 32px rgba(0,0,0,.55); }
+.qh-encerrada, .qh-vazio{ background:linear-gradient(135deg,#0B8F89 0%,#0B4F4A 100%); }
+.home-hero.hh-espera, .home-hero.hh-vazio{ background:linear-gradient(135deg,var(--hero-calm-a),var(--hero-calm-b)); } .home-hero.hh-respondeu{ background:linear-gradient(135deg,var(--hero-ok-a),var(--hero-ok-b)); } .home-hero.hh-ganhou{ background:linear-gradient(135deg,var(--hero-win-a),var(--hero-win-b)); box-shadow:0 16px 36px var(--hero-win-shadow); }
+body:not(.dark) .login-screen{ background:radial-gradient(120% 90% at 15% 8%, #22C4B8 0%, #0E9A92 46%, #087670 100%) !important; }
+/* ---- formas: uma escala de cantos coerente ---- */
+body .panel, body .qk, body .ccard{ border-radius:20px; } body .btn, input, select, textarea, .login-tab{ border-radius:12px; } .chip, .badge, .mi-count, .sync-chip{ border-radius:999px; }
+/* ---- ícones novos: traço duplo (a cor do tom + um miolo suave) ---- */
+svg.ico{ display:block; } svg.lucide{ stroke-width:1.75; }
+.mi-ic svg.ico{ width:20px !important; height:20px !important; } .si-ic svg.ico{ width:15px !important; height:15px !important; } .qk-ico svg.ico{ width:24px; height:24px; }
+.menu-item.active:not(.sub) .mi-ic svg.ico [fill-opacity]{ fill-opacity:.32; }
+/* ---- casca flutuante (computador) ---- */
+@media(min-width:881px){
+  body .sidebar{ top:12px; left:12px; bottom:12px; width:268px; border-radius:24px; border:1px solid var(--border); box-shadow:var(--shadow-lg); overflow:hidden; }
+  body .sidebar.collapsed{ width:80px; }
+  body .main{ margin-left:292px; width:calc(100% - 292px); } body .sidebar.collapsed ~ .main{ margin-left:104px; width:calc(100% - 104px); }
+  body .topbar{ top:12px; margin:12px 28px 0; border-radius:20px; border:1px solid var(--border) !important; box-shadow:var(--shadow); padding:11px 18px; }
+  body:has(.topbar > .sz-luzes) .content{ padding-top:42px; }
+  /* o menu inteiro cabe sem rolar em telas de notebook */
+  body .brand{ padding:16px 16px 12px; } body .menu{ padding:10px 10px 18px; gap:2px; }
+  body .menu-item, body .menu-group-header{ min-height:48px; } .mi-ic{ width:34px; height:34px; border-radius:11px; } body .menu-item.sub{ min-height:34px; }
+  body .sidebar-foot{ display:none; }
+  body .sidebar-collapse-btn{ bottom:14px; }
+}
+@media(min-width:881px) and (max-height:760px){ body .menu-item, body .menu-group-header{ min-height:44px; } body .menu-item.sub{ min-height:32px; } .mi-sub{ font-size:11px; } body .menu-group-body{ margin-bottom:3px; } }
+/* ---- anel de progresso ---- */
+.qh .qh-barra{ display:none; } .qh-dir{ position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; gap:14px; flex:0 0 auto; }
+.qh-anel{ position:relative; width:108px; height:108px; flex:0 0 auto; } .qh-anel svg{ transform:rotate(-90deg); display:block; }
+.an-trilha{ fill:none; stroke:rgba(255,255,255,.22); stroke-width:9; } .an-arco{ fill:none; stroke:#fff; stroke-width:9; stroke-linecap:round; animation:anel 1s .1s ease-out both; } @keyframes anel{ from{ stroke-dasharray:0 var(--c); } }
+.an-txt{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1; } .an-txt b{ font-family:'Manrope',system-ui,sans-serif; font-size:27px; font-weight:800; } .an-txt span{ font-size:11px; font-weight:700; opacity:.92; margin-top:4px; }
+@media(prefers-reduced-motion:reduce){ .an-arco{ animation:none !important; } }
+@media(max-width:700px){ .qh{ flex-direction:column; align-items:stretch; } .qh-dir{ flex-direction:row; justify-content:space-between; align-items:center; width:100%; } .qh-anel, .qh-anel svg{ width:92px; height:92px; } .an-txt b{ font-size:23px; } }
+
+/* v24b — contagem de mensagens volta para o canto direito (o menu agora é mais largo) */
+body .menu-badge.mi-count{ position:static !important; margin-left:auto !important; border:0 !important; box-sizing:border-box; min-width:26px; height:24px; padding:0 8px; font-size:12px; }
+
+/* ================================================================================================
+   v25 — INICIAL reorganizada, KPIs coloridos de volta e TEMAS encaixados na tela
+   ================================================================================================ */
+/* ---- indicadores: cada um com a sua cor (como antes) ---- */
+body .qk-ico{ background:var(--grad-brand) !important; color:#fff !important; border-radius:15px; box-shadow:0 8px 16px -8px rgba(2,105,92,.55); }
+body .qk-b .qk-ico{ background:var(--grad-ok) !important; box-shadow:0 8px 16px -8px rgba(46,125,50,.55); }
+body .qk-c .qk-ico{ background:var(--grad-warm) !important; box-shadow:0 8px 16px -8px rgba(240,101,67,.5); }
+body .qk-d .qk-ico{ background:var(--grad-cool) !important; box-shadow:0 8px 16px -8px rgba(0,130,160,.5); }
+body .qk{ position:relative; overflow:hidden; } body .qk::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--grad-brand); } body .qk-b::before{ background:var(--grad-ok); } body .qk-c::before{ background:var(--grad-warm); } body .qk-d::before{ background:var(--grad-cool); }
+body .qk-d.qk-pend .qk-val{ color:#C62828; } body.dark .qk-d.qk-pend .qk-val{ color:#FF8A8A; }   /* só o número fica vermelho quando há sorteio pendente */
+body .qk-val{ color:var(--ink); }
+body .qk-grid{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin-bottom:18px; }
+@media(max-width:1179px){ body .qk-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); } } @media(max-width:560px){ body .qk-grid{ grid-template-columns:minmax(0,1fr); } }
+/* relatórios: cada indicador com a sua cor */
+.rel-tile .rt-ic{ color:#fff !important; background:var(--grad-brand) !important; box-shadow:0 8px 16px -10px rgba(2,105,92,.55); }
+.rel-tile:nth-child(2) .rt-ic{ background:var(--grad-cool) !important; } .rel-tile:nth-child(3) .rt-ic{ background:var(--grad-ok) !important; } .rel-tile:nth-child(4) .rt-ic{ background:linear-gradient(135deg,#8B6BE3 0%,#5A3FB0 100%) !important; } .rel-tile:nth-child(5) .rt-ic{ background:var(--grad-warm) !important; } .rel-tile:nth-child(6) .rt-ic{ background:linear-gradient(135deg,#46B5D6 0%,#2480A0 100%) !important; } .rel-tile.alerta .rt-ic{ background:var(--grad-err) !important; }
+/* ---- "Precisa da sua atenção": ícones coloridos por tipo ---- */
+#homeAtalhos .atalho > svg:first-child{ width:34px !important; height:34px !important; padding:8px; border-radius:11px; flex:0 0 auto; background:rgba(2,163,157,.13); color:var(--primary) !important; }
+#homeAtalhos .atalho.warn > svg:first-child{ background:rgba(226,8,45,.11); color:var(--red) !important; }
+#homeAtalhos .atalho > svg.lucide-megaphone:first-child{ background:rgba(124,92,214,.13); color:#7650C4 !important; } #homeAtalhos .atalho > svg.lucide-calendar-clock:first-child{ background:rgba(43,108,181,.13); color:#2B6CB5 !important; }
+#homeAtalhos .atalho > svg.lucide-plus-circle:first-child, #homeAtalhos .atalho > svg.lucide-check-circle-2:first-child{ background:rgba(46,158,99,.14); color:#278A52 !important; }
+body.dark #homeAtalhos .atalho > svg.lucide-megaphone:first-child{ color:#BDA2F0 !important; } body.dark #homeAtalhos .atalho > svg.lucide-calendar-clock:first-child{ color:#8DBCF0 !important; } body.dark #homeAtalhos .atalho.warn > svg:first-child{ color:#F29A9A !important; }
+#homeAtalhos .atalho > span{ flex:1; min-width:0; font-weight:600; line-height:1.35; overflow-wrap:anywhere; }
+/* ---- nova disposição da inicial (telas largas): cartão da rodada + painel de atenção lado a lado ---- */
+@media(min-width:1180px){
+  #sec-inicio.active{ display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); gap:18px; align-items:start; }
+  #sec-inicio.active > *{ grid-column:1 / -1; min-width:0; margin-top:0; margin-bottom:0; }
+  #sec-inicio.active > #homeHero{ grid-column:1 / span 8; grid-row:1; align-self:stretch; display:flex; } #sec-inicio.active > #homeHero > .qh{ flex:1; margin:0; }
+  #sec-inicio.active > #homeAtalhos{ grid-column:9 / span 4; grid-row:1; align-self:stretch; display:flex; flex-direction:column; gap:6px; padding:16px; background:var(--card); border:1px solid var(--border); border-radius:20px; box-shadow:var(--shadow); }
+  #sec-inicio.active > #homeAtalhos:empty{ display:none; }
+  #sec-inicio.active:has(#homeAtalhos:empty) > #homeHero{ grid-column:1 / -1; }
+  #homeAtalhos .atalhos-rot{ padding:2px 4px 8px; }
+  #homeAtalhos .atalho{ width:100%; border:0; background:transparent; border-radius:14px; padding:9px 8px; }
+  #homeAtalhos button.atalho:hover{ background:var(--bg); box-shadow:none; transform:none; }
+  #homeAtalhos .atalho.ok{ background:rgba(46,158,99,.10); }
+  #sec-inicio.active > .qk-grid{ margin-bottom:0; } #sec-inicio.active > .two-col{ margin:0; }
+}
+/* ---- TEMAS encaixados: selo à esquerda, enfeites logo antes do anel, nada se sobrepõe ---- */
+.qh .sz-selo{ left:30px; right:auto; top:16px; } .qh:has(.sz-selo){ padding-top:60px; }
+.qh .sz-enfeite{ right:152px; width:118px; height:auto; } .home-hero .sz-enfeite{ right:150px; }
+body .sz-enfeite.longo{ right:152px; }
+@media(max-width:700px){
+  .qh .sz-selo, .home-hero .sz-selo{ left:20px; top:14px; right:auto; }
+  .qh .sz-enfeite, .home-hero .sz-enfeite{ right:8px; width:104px; height:auto; } .qh .sz-enfeite.longo, .home-hero .sz-enfeite.longo{ display:none; }
+}
+
+/* v25b — selo comprido quebra em duas linhas em vez de encostar nos enfeites; telas minúsculas ficam só com o selo */
+.qh .sz-selo{ max-width:calc(100% - 316px); white-space:normal; line-height:1.25; } .qh:has(.sz-enfeite.longo){ padding-top:74px; }
+@media(max-width:700px){ .qh .sz-selo, .home-hero .sz-selo{ max-width:calc(100% - 150px); white-space:normal; line-height:1.25; } }
+@media(max-width:359px){ .qh .sz-enfeite, .home-hero .sz-enfeite{ display:none !important; } .qh .sz-selo, .home-hero .sz-selo{ max-width:calc(100% - 40px); } }
+
+/* ================================================================================================
+   v26 — cores-chave mais harmônicas, menu em um único tom da marca e LOGIN refinado
+   ================================================================================================ */
+:root{ --grad-ok:linear-gradient(135deg,#34B27B 0%,#1F7F5C 100%); --grad-warm:linear-gradient(135deg,#F2B04A 0%,#E9794A 100%); --grad-cool:linear-gradient(135deg,#2DB3CC 0%,#1B7F99 100%); --grad-err:linear-gradient(135deg,#EC6B6B 0%,#C93A3A 100%); }
+/* menu: todos os ícones no mesmo verde-água da marca (o vermelho só aparece para pendências) */
+body .menu .t-teal, body .menu .t-blue, body .menu .t-amber, body .menu .t-purple, body .menu .t-green, body .menu .t-slate, body .menu .t-sky, body .menu .t-red{ --tb:rgba(2,163,157,.12); --tf:#0B7F78; }
+body.dark .menu .t-teal, body.dark .menu .t-blue, body.dark .menu .t-amber, body.dark .menu .t-purple, body.dark .menu .t-green, body.dark .menu .t-slate, body.dark .menu .t-sky, body.dark .menu .t-red{ --tb:rgba(2,163,157,.18); --tf:#5FD6CF; }
+body .menu .mi-count.t-red.alerta{ --tb:rgba(226,8,45,.12); --tf:#C2102B; } body.dark .menu .mi-count.t-red.alerta{ --tb:rgba(255,106,106,.16); --tf:#FF9A9A; }
+body .menu .mi-count.t-red:not(.alerta){ --tb:var(--border); --tf:var(--ink-soft); }
+/* avisos da inicial e relatórios: mesma família de cores */
+#homeAtalhos .atalho > svg.lucide-megaphone:first-child{ background:rgba(242,176,74,.18); color:#B9791A !important; } #homeAtalhos .atalho > svg.lucide-calendar-clock:first-child{ background:rgba(2,163,157,.13); color:var(--primary) !important; } body.dark #homeAtalhos .atalho > svg.lucide-megaphone:first-child{ color:#F4C277 !important; } body.dark #homeAtalhos .atalho > svg.lucide-calendar-clock:first-child{ color:#5FD6CF !important; }
+.rel-tile:nth-child(4) .rt-ic{ background:linear-gradient(135deg,#0E9B91 0%,#087A72 100%) !important; } .rel-tile:nth-child(6) .rt-ic{ background:linear-gradient(135deg,#5BC0BE 0%,#2E8F8D 100%) !important; }
+/* ================= LOGIN ================= */
+body:not(.dark) .login-screen{ background:radial-gradient(120% 90% at 12% 0%, #2FB9AF 0%, #0E8F88 48%, #065F5A 100%) !important; }
+.lb-ico, .lb-orbes{ opacity:.55; }
+body .login-shell{ border-radius:28px; box-shadow:0 40px 90px -34px rgba(0,30,28,.65), 0 0 0 1px rgba(255,255,255,.14); }
+body .login-screen .login-card{ padding:44px 40px; }
+body .login-card .lc-head{ gap:14px; margin-bottom:6px; } body .login-card .lc-ico{ width:48px; height:48px; border-radius:15px; background:var(--grad-brand); color:#fff; box-shadow:0 10px 20px -10px rgba(2,105,92,.7); } body .login-card .lc-ico svg{ width:22px; height:22px; }
+body .login-card h2{ font-size:23px; font-weight:800; letter-spacing:-.4px; } body .login-card .lc-head p{ font-size:13px; line-height:1.45; margin:4px 0 0; }
+body .login-card .field label{ font-size:11.5px; font-weight:800; letter-spacing:.5px; text-transform:uppercase; color:var(--ink-soft); }
+body .login-card .input-ico input{ height:50px; border-radius:14px; border:1.5px solid var(--border); background:var(--bg); font-size:15px; }
+body .login-card .input-ico > svg{ color:var(--primary); } body .login-card .eye-btn{ color:var(--ink-soft); }
+body .btn-login{ height:52px; border-radius:14px; font-size:15px; font-weight:800; gap:10px; box-shadow:0 14px 26px -12px rgba(2,105,92,.75); } body .btn-login:hover{ filter:brightness(1.05); transform:translateY(-1px); }
+body .login-error{ position:relative; padding:12px 14px 12px 42px; border-radius:14px; background:rgba(226,8,45,.07); border:1px solid rgba(226,8,45,.28); color:#A8102A; font-size:12.5px; line-height:1.5; overflow-wrap:anywhere; margin:12px 0 4px; }
+body .login-error::before{ content:"!"; position:absolute; left:12px; top:12px; width:20px; height:20px; border-radius:50%; background:#E2082D; color:#fff; font:800 12px/20px inherit; font-family:inherit; text-align:center; }
+body.dark .login-error{ background:rgba(255,106,106,.10); border-color:rgba(255,106,106,.35); color:#FFB0B0; }
+body .login-forgot-link{ font-weight:700; color:var(--secondary); } body.dark .login-forgot-link{ color:#5FD6CF; }
+body .login-demo-toggle{ border-radius:14px; }
+@media(max-width:880px){ body .login-screen .login-card{ padding:26px 22px 28px; } body .login-card h2{ font-size:21px; } }
+
+/* v26b — respiro entre o título do login e os campos */
+body .login-card .lc-head{ margin-bottom:22px !important; }
 </style>
 </head>
 <body data-app-url="<?= urlApp ?>" data-campanha="<?= campanhaParam ?>">
@@ -2534,36 +2757,30 @@ body[data-sz-hero] .qh:not(.qh-carregando), body[data-sz-hero] .home-hero:not(.h
       <div class="brand-text"><h1>PPG</h1><span>Programa Política de Gestão</span></div>
     </div>
     <nav class="menu" id="menu">
-      <!-- ===== Perfil Qualidade ===== -->
-      <button class="menu-item qualidade-only active" data-target="inicio"><i data-lucide="layout-dashboard"></i><span class="label">Início</span></button>
-
-      <div class="menu-group qualidade-only expanded" id="groupCampanhas">
-        <button class="menu-group-header" type="button">
-          <i data-lucide="folder-kanban"></i><span class="label">Campanhas</span><i data-lucide="chevron-down" class="chevron"></i>
-        </button>
-        <div class="menu-group-body">
-          <button class="menu-item sub" data-target="nova"><i data-lucide="plus-circle"></i><span class="label">Nova Campanha</span></button>
-          <button class="menu-item sub" data-target="campanhas"><i data-lucide="list"></i><span class="label">Rodadas</span></button>
-          <button class="menu-item sub" data-target="participantes"><i data-lucide="bar-chart-2"></i><span class="label">Resultados</span></button>
-          <button class="menu-item sub" data-target="elegiveis"><i data-lucide="user-check"></i><span class="label">Elegíveis</span></button>
-          <button class="menu-item sub" data-target="historico"><i data-lucide="history"></i><span class="label">Histórico</span></button>
-          <button class="menu-item sub" data-target="banco"><i data-lucide="database"></i><span class="label">Banco de Perguntas</span></button>
-        </div>
-      </div>
-
-      <button class="menu-item qualidade-only" data-target="sorteio"><i data-lucide="dices"></i><span class="label">Sorteio</span></button>
-      <button class="menu-item qualidade-only" data-target="divulgacao"><i data-lucide="megaphone"></i><span class="label">Divulgação</span></button>
-      <button class="menu-item qualidade-only" data-target="fale-conosco"><i data-lucide="message-circle-question"></i><span class="label">Mensagens recebidas</span><span class="menu-badge" id="badgeMsgsQ" hidden></span></button>
-      <button class="menu-item qualidade-only" data-target="relatorios"><i data-lucide="file-text"></i><span class="label">Relatórios</span></button>
-
-      <!-- ===== Perfil Colaborador ===== -->
-      <button class="menu-item colaborador-only active" data-target="campanha-atual"><i data-lucide="target"></i><span class="label">Campanha Atual</span></button>
-      <button class="menu-item colaborador-only" data-target="historico-colab"><i data-lucide="history"></i><span class="label">Minhas participações</span></button>
-      <button class="menu-item colaborador-only" data-target="regulamento"><i data-lucide="book-open"></i><span class="label">Regulamento</span></button>
-      <button class="menu-item colaborador-only" data-target="fale-conosco"><i data-lucide="message-circle-question"></i><span class="label">Fale com a Qualidade</span><span class="menu-badge" id="badgeMsgsC" hidden></span></button>
-
-      <button class="menu-item" data-target="config"><i data-lucide="settings"></i><span class="label">Configurações</span></button>
-    </nav>
+ <!-- ===== Perfil Qualidade ===== -->
+ <button class="menu-item qualidade-only active" data-target="inicio"><span class="mi-ic t-teal"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2.2" fill="currentColor" fill-opacity=".2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2.2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2.2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2.2" fill="currentColor" fill-opacity=".2"/></svg></span><span class="mi-tx"><span class="label">Início</span><span class="mi-sub">visão geral da rodada</span></span></button>
+ <div class="menu-group qualidade-only expanded" id="groupCampanhas">
+ <button class="menu-group-header" type="button"><span class="mi-ic t-blue"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 8a2.5 2.5 0 0 1 2.5-2.5h3.6l2 2.3H18a2.5 2.5 0 0 1 2.5 2.5v7.2a2.5 2.5 0 0 1-2.5 2.5H6A2.5 2.5 0 0 1 3.5 17.5z" fill="currentColor" fill-opacity=".2"/><path d="M8 13.5h8"/></svg></span><span class="mi-tx"><span class="label">Campanhas</span><span class="mi-sub">suas rodadas</span></span><span class="mi-count t-blue" data-cnt="campAtivas" hidden></span><i data-lucide="chevron-down" class="chevron"></i></button>
+ <div class="menu-group-body">
+ <button class="menu-item sub" data-target="nova"><span class="si-ic t-green"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="currentColor" fill-opacity=".2"/><path d="M12 8.2v7.6M8.2 12h7.6"/></svg></span><span class="label">Nova Campanha</span></button>
+ <button class="menu-item sub" data-target="campanhas"><span class="si-ic t-blue"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3.5" fill="currentColor" fill-opacity=".2"/><path d="M8 9h8M8 12.5h8M8 16h5"/></svg></span><span class="label">Rodadas</span><span class="mi-count t-blue" data-cnt="rodadas" hidden></span></button>
+ <button class="menu-item sub" data-target="participantes"><span class="si-ic t-teal"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="12" width="4" height="8" rx="1.4" fill="currentColor" fill-opacity=".2"/><rect x="10" y="7.5" width="4" height="12.5" rx="1.4" fill="currentColor" fill-opacity=".2"/><rect x="16" y="4" width="4" height="16" rx="1.4" fill="currentColor" fill-opacity=".2"/></svg></span><span class="label">Resultados</span><span class="mi-count t-teal" data-cnt="resp" hidden></span></button>
+ <button class="menu-item sub" data-target="elegiveis"><span class="si-ic t-purple"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9.5" cy="8.5" r="3.6" fill="currentColor" fill-opacity=".2"/><path d="M3.5 19.5c.6-3.5 3-5.6 6-5.6s5.4 2.1 6 5.6"/><path d="m16.2 9.8 2.1 2.1 3.6-4"/></svg></span><span class="label">Elegíveis</span><span class="mi-count t-purple" data-cnt="eleg" hidden></span></button>
+ <button class="menu-item sub" data-target="historico"><span class="si-ic t-amber"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="currentColor" fill-opacity=".2"/><path d="M12 7.6V12l3 1.9"/></svg></span><span class="label">Histórico</span></button>
+ <button class="menu-item sub" data-target="banco"><span class="si-ic t-slate"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6.5" rx="7.5" ry="3" fill="currentColor" fill-opacity=".2"/><path d="M4.5 6.5v11c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3v-11"/><path d="M4.5 12c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3"/></svg></span><span class="label">Banco de Perguntas</span><span class="mi-count t-slate" data-cnt="banco" hidden></span></button>
+ </div>
+ </div>
+ <button class="menu-item qualidade-only" data-target="sorteio"><span class="mi-ic t-amber"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4.5" fill="currentColor" fill-opacity=".2"/><circle cx="9" cy="9" r="1.15" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.15" fill="currentColor" stroke="none"/><circle cx="15" cy="15" r="1.15" fill="currentColor" stroke="none"/></svg></span><span class="mi-tx"><span class="label">Sorteio</span><span class="mi-sub">sorteio e ganhadores</span></span><span class="mi-count t-red" data-cnt="sorteios" hidden></span></button>
+ <button class="menu-item qualidade-only" data-target="divulgacao"><span class="mi-ic t-purple"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5v3a1.5 1.5 0 0 0 1.5 1.5H8l6.5 4V5L8 9H5.5A1.5 1.5 0 0 0 4 10.5z" fill="currentColor" fill-opacity=".2"/><path d="M18 9.4a4 4 0 0 1 0 5.2"/><path d="m8 15 1.1 4.2"/></svg></span><span class="mi-tx"><span class="label">Divulgação</span><span class="mi-sub">artes, cartazes e links</span></span></button>
+ <button class="menu-item qualidade-only" data-target="fale-conosco"><span class="mi-ic t-sky"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 7A2.5 2.5 0 0 1 7 4.5h10A2.5 2.5 0 0 1 19.5 7v7A2.5 2.5 0 0 1 17 16.5h-5.8L7 20v-3.5A2.5 2.5 0 0 1 4.5 14z" fill="currentColor" fill-opacity=".2"/><path d="M8.5 9h7M8.5 12h4.2"/></svg></span><span class="mi-tx"><span class="label">Mensagens recebidas</span><span class="mi-sub">dúvidas recebidas</span></span><span class="menu-badge mi-count t-sky" id="badgeMsgsQ" hidden></span></button>
+ <button class="menu-item qualidade-only" data-target="relatorios"><span class="mi-ic t-green"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 3.5h7l4.5 4.5v10.5a2 2 0 0 1-2 2h-9.5a2 2 0 0 1-2-2v-13a2 2 0 0 1 2-2z" fill="currentColor" fill-opacity=".2"/><path d="M13.5 3.5V8H18"/><path d="M8.2 17v-2.6M11.5 17v-5M14.8 17v-3.2"/></svg></span><span class="mi-tx"><span class="label">Relatórios</span><span class="mi-sub">números e exportação</span></span></button>
+ <!-- ===== Perfil Colaborador ===== -->
+ <button class="menu-item colaborador-only active" data-target="campanha-atual"><span class="mi-ic t-teal"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="currentColor" fill-opacity=".2"/><circle cx="12" cy="12" r="4.7"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/></svg></span><span class="mi-tx"><span class="label">Campanha Atual</span><span class="mi-sub">responda a rodada</span></span></button>
+ <button class="menu-item colaborador-only" data-target="historico-colab"><span class="mi-ic t-amber"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="currentColor" fill-opacity=".2"/><path d="M12 7.6V12l3 1.9"/></svg></span><span class="mi-tx"><span class="label">Minhas participações</span><span class="mi-sub">seu histórico</span></span></button>
+ <button class="menu-item colaborador-only" data-target="regulamento"><span class="mi-ic t-blue"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.6A2.6 2.6 0 0 1 7.6 3H19v15H7.6A2.6 2.6 0 0 0 5 20.6z" fill="currentColor" fill-opacity=".2"/><path d="M5 5.6v15M9.2 7.5h6"/></svg></span><span class="mi-tx"><span class="label">Regulamento</span><span class="mi-sub">regras do programa</span></span></button>
+ <button class="menu-item colaborador-only" data-target="fale-conosco"><span class="mi-ic t-sky"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 7A2.5 2.5 0 0 1 7 4.5h10A2.5 2.5 0 0 1 19.5 7v7A2.5 2.5 0 0 1 17 16.5h-5.8L7 20v-3.5A2.5 2.5 0 0 1 4.5 14z" fill="currentColor" fill-opacity=".2"/><path d="M8.5 9h7M8.5 12h4.2"/></svg></span><span class="mi-tx"><span class="label">Fale com a Qualidade</span><span class="mi-sub">tire suas dúvidas</span></span><span class="menu-badge mi-count t-sky" id="badgeMsgsC" hidden></span></button>
+ <button class="menu-item " data-target="config"><span class="mi-ic t-slate"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7.5h8.5M17.5 7.5H20M4 16.5h2.5M11.5 16.5H20"/><circle cx="15" cy="7.5" r="2.4" fill="currentColor" fill-opacity=".2"/><circle cx="9" cy="16.5" r="2.4" fill="currentColor" fill-opacity=".2"/></svg></span><span class="mi-tx"><span class="label">Configurações</span><span class="mi-sub">perfil e preferências</span></span></button>
+ </nav>
     <div class="sidebar-foot">PPG · Programa Política de Gestão</div>
   </aside>
 
@@ -2592,20 +2809,25 @@ body[data-sz-hero] .qh:not(.qh-carregando), body[data-sz-hero] .home-hero:not(.h
 
     <div class="qk-grid">
       <div class="qk clickable" onclick="kpiPopup('total')">
-        <div class="qk-ico"><i data-lucide="layers"></i></div>
+        <div class="qk-ico"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3.8 8 4-8 4-8-4z" fill="currentColor" fill-opacity=".2"/><path d="m4 12 8 4 8-4M4 16l8 4 8-4"/></svg></div>
         <div class="qk-corpo"><span class="qk-rot">Campanhas</span><b class="qk-val" id="kpiTotalCampanhas">0</b>
           <span class="qk-sub"><a onclick="event.stopPropagation();kpiPopup('andamento')"><em id="kpiAndamento">0</em> em andamento</a> · <a onclick="event.stopPropagation();kpiPopup('programadas')"><em id="kpiProgramadas">0</em> programadas</a></span></div>
       </div>
       <div class="qk qk-b clickable" onclick="kpiPopup('elegiveis')">
-        <div class="qk-ico"><i data-lucide="user-check"></i></div>
+        <div class="qk-ico"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9.5" cy="8.5" r="3.6" fill="currentColor" fill-opacity=".2"/><path d="M3.5 19.5c.6-3.5 3-5.6 6-5.6s5.4 2.1 6 5.6"/><path d="m16.2 9.8 2.1 2.1 3.6-4"/></svg></div>
         <div class="qk-corpo"><span class="qk-rot">Elegíveis na rodada</span><b class="qk-val" id="kpiElegiveis">0</b>
           <span class="qk-sub">de <em id="kpiParticipantes">0</em> participantes, após as regras</span></div>
       </div>
       <div class="qk qk-c clickable" onclick="kpiPopup('ganhadores')">
-        <div class="qk-ico"><i data-lucide="trophy"></i></div>
+        <div class="qk-ico"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4.5h8v5a4 4 0 0 1-8 0z" fill="currentColor" fill-opacity=".2"/><path d="M8 6.5H5.5v1.2A2.8 2.8 0 0 0 8.3 10.5M16 6.5h2.5v1.2a2.8 2.8 0 0 1-2.8 2.8M12 13.5v3.5M8.5 20h7M10 17h4"/></svg></div>
         <div class="qk-corpo"><span class="qk-rot">Ganhadores sorteados</span><b class="qk-val" id="kpiGanhadores">0</b>
           <span class="qk-sub">em <em id="kpiRodadasSorteadas">0</em> rodada(s) com sorteio</span></div>
       </div>
+ <div class="qk qk-d clickable" onclick="goToSection('sorteio')">
+ <div class="qk-ico"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4.5" fill="currentColor" fill-opacity=".2"/><circle cx="9" cy="9" r="1.15" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.15" fill="currentColor" stroke="none"/><circle cx="15" cy="15" r="1.15" fill="currentColor" stroke="none"/></svg></div>
+ <div class="qk-corpo"><span class="qk-rot">Sorteios pendentes</span><b class="qk-val" id="kpiSorteiosPend">0</b>
+ <span class="qk-sub">rodada(s) encerrada(s) sem sorteio</span></div>
+ </div>
     </div>
 
     <div class="two-col">
@@ -6945,7 +7167,27 @@ function ajustarTituloDuplicado(sec){
 /* o item do menu destacado é sempre o da tela aberta — escolhe o botão visível do PERFIL atual (os dois perfis compartilham alguns destinos) */
 /* menu recolhido: sem texto, então cada ícone ganha uma dica (e nome para leitores de tela) */
 function rotularMenu(){ document.querySelectorAll('#menu .menu-item, #menu .menu-group-header').forEach(b=>{ const t = (b.querySelector('.label') || {}).textContent; if(t){ b.title = t.trim(); b.setAttribute('aria-label', t.trim()); } }); }
+/* números pequenos no menu (campanhas ativas, rodadas, banco, elegíveis…): só leitura do que o app já tem */
+/* anel de progresso do cartão da rodada */
+function anelProgresso(pct, n, total){
+  const R = 44, C = 2 * Math.PI * R, p = Math.max(0, Math.min(100, pct)), igual = window._anelPct === p; window._anelPct = p;
+  return `<div class="qh-anel" role="img" aria-label="${p}% dos colaboradores responderam (${n} de ${total})"><svg viewBox="0 0 108 108" width="108" height="108" aria-hidden="true"><circle cx="54" cy="54" r="${R}" class="an-trilha"/><circle cx="54" cy="54" r="${R}" class="an-arco" style="--c:${C.toFixed(1)}; stroke-dasharray:${(p / 100 * C).toFixed(1)} ${C.toFixed(1)}${igual ? '; animation:none' : ''}"/></svg><div class="an-txt"><b>${p}%</b><span>responderam</span></div></div>`;
+}
+let _memoElegMenu = { k:'', v:null };
+function atualizarContagensMenu(){
+  try{
+    if(typeof _dadosCarregados === 'undefined' || !_dadosCarregados || document.body.classList.contains('role-colaborador')) return;
+    const set = (k, v, alerta)=> document.querySelectorAll(`[data-cnt="${k}"]`).forEach(el=>{ if(v == null){ el.hidden = true; return; } el.hidden = false; if(el.textContent !== String(v)) el.textContent = v; el.classList.toggle('alerta', !!alerta && v > 0); });
+    const reais = campaigns.filter(c=> !c.importada), todas = typeof todasCampanhas === 'function' ? todasCampanhas() : campaigns;
+    set('campAtivas', reais.filter(c=> !campanhaTerminou(c) && c.status !== 'programada').length); set('rodadas', todas.length);
+    set('banco', typeof questionBank !== 'undefined' ? questionBank.length : null); set('sorteios', reais.filter(c=> campanhaTerminou(c) && !(c.ganhadores && c.ganhadores.length)).length, true);
+    const dest = typeof rodadaDestaque === 'function' ? rodadaDestaque() : null;
+    if(dest){ const ps = campaignParticipants(dest.id); set('resp', ps.length); const k = dest.id + '|' + ps.length + '|' + (dest.ganhadores || []).length; if(_memoElegMenu.k !== k){ _memoElegMenu = { k, v:(evaluateEligibility(dest.id).eligible || []).length }; } set('eleg', _memoElegMenu.v); }
+  }catch(e){}
+}
+setInterval(atualizarContagensMenu, 3000);
 function marcarMenuAtivo(target){
+  atualizarContagensMenu();
   const col = document.body.classList.contains('role-colaborador');
   const itens = [...document.querySelectorAll('#menu .menu-item')].filter(b=> b.dataset.target === target && !b.closest(col ? '.qualidade-only' : '.colaborador-only'));
   document.querySelectorAll('#menu .menu-item').forEach(b=>b.classList.remove('active'));
@@ -7074,7 +7316,7 @@ function linkCampanha(id){ return `${APP_URL}${APP_URL.includes('?') ? '&' : '?'
 /* ======================= LOGIN ======================= */
 /* A autenticação de verdade agora mora na planilha (via Google Apps Script).
    Não existe mais senha nenhuma escrita aqui no código. */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwatQGlqK_Xgwk4CftER8B8-BFaqn2JHvpxpBXK0QV125fYArDqjwpW0OhKLOg5fGOveQ/exec";
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxNTmLbDf_qQwwohT4GE5mw9vHgw72bAe__f7Het_cYibLvbdhD7aDiIA7ZCGaEkoXfWQ/exec";
 
 function urlDoApp(){ try{ return APP_URL.split('#')[0].split('?')[0]; }catch(e){ return ''; } }
 
@@ -9727,10 +9969,11 @@ function renderHomeQualidade(){
         <button type="button" class="qh-btn ghost" onclick="verFormularioCampanha('${escH(c.id)}')"><i data-lucide="clipboard-list"></i> Ver formulário</button>
       </div>
     </div>
-    ${relogio}
+    <div class="qh-dir">${anelProgresso(pct, n, total)}${relogio}</div>
   </div>`;
 }
-function renderHomeAtalhos(){
+function atualizarKpiSorteios(){ const el = document.getElementById('kpiSorteiosPend'); if(!el) return; const n = campaigns.filter(c=> campaignAccessStatus(c) === 'encerrada' && !c.ganhadores && c.status !== 'finalizada').length; if(el.textContent !== String(n)) el.textContent = n; const card = el.closest('.qk'); if(card) card.classList.toggle('qk-pend', n > 0); }
+function renderHomeAtalhos(){ try{ atualizarKpiSorteios(); }catch(e){}
   const el = document.getElementById('homeAtalhos'); if(!el) return;
   const itens = [];
   const semSorteio = campaigns.filter(c=>campaignAccessStatus(c) === 'encerrada' && !c.ganhadores && c.status !== 'finalizada');
@@ -10767,7 +11010,7 @@ function iniciarFundo(){
 /* ======================= DATAS COMEMORATIVAS: o visual acompanha o calendário ======================= */
 /* ======================= ÍCONE DO SITE: o da aba acompanha a data (no Natal ganha gorro) ======================= */
 const FAVICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#14BDB1"/><stop offset="1" stop-color="#00695C"/></linearGradient><radialGradient id="h" cx=".25" cy=".12" r=".85"><stop offset="0" stop-color="#fff" stop-opacity=".30"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><rect width="512" height="512" rx="116" fill="url(#g)"/><rect width="512" height="512" rx="116" fill="url(#h)"/><g transform="translate(78 112) scale(.84) translate(-698 -29)"><path fill="#FFFFFF" fill-rule="evenodd" d="M760.9 54.1C758.5 56.9 754.8 61.5 752.4 64.6C750.0 67.8 749.6 68.2 746.4 73.1C743.2 78.0 738.7 84.9 733.1 94.1C727.6 103.4 717.2 121.1 713.1 128.6C709.0 136.1 709.5 136.2 708.4 139.1C707.2 142.1 706.7 144.0 706.1 146.4C705.5 148.8 705.1 151.2 704.9 153.6C704.6 156.1 704.4 158.2 704.6 161.1C704.8 164.0 705.5 168.3 706.1 170.9C706.7 173.4 706.8 173.7 708.1 176.4C709.5 179.1 712.4 184.2 714.4 187.1C716.4 190.0 718.0 191.7 720.1 193.9C722.2 196.1 721.2 195.6 726.9 200.4C732.6 205.2 744.4 214.9 754.4 222.6C764.4 230.3 773.7 237.3 786.9 246.6C800.1 256.0 820.9 270.2 833.6 278.6C846.3 287.1 858.1 294.0 863.1 297.4C868.1 300.8 863.6 298.9 863.6 298.9C863.6 298.9 861.6 299.4 861.6 299.4C861.6 299.4 862.0 300.0 862.4 300.1C862.7 300.2 863.2 300.3 863.6 300.1C864.1 299.9 863.5 299.0 865.1 298.9C866.7 298.8 870.4 299.0 873.1 299.4C875.9 299.8 879.0 300.3 881.6 301.1C884.2 301.9 886.7 303.0 888.6 304.1C890.6 305.2 892.1 306.8 893.4 307.9C894.6 309.0 895.2 309.5 896.1 310.9C897.0 312.2 898.3 314.6 898.9 315.9C899.4 317.1 899.0 317.7 899.4 318.4C899.7 319.0 896.2 317.3 900.9 319.9C905.6 322.5 920.9 330.5 927.6 333.9C934.3 337.2 934.7 337.4 941.1 339.9C947.5 342.4 958.3 346.4 966.1 348.9C974.0 351.4 981.1 353.3 988.1 354.9C995.2 356.4 1001.8 357.5 1008.4 358.1C1014.9 358.7 1022.9 358.4 1027.4 358.4C1031.8 358.3 1032.1 358.3 1035.1 357.9C1038.2 357.5 1042.0 356.9 1045.6 355.9C1049.3 354.9 1054.1 353.1 1057.1 351.9C1060.1 350.7 1061.3 350.0 1063.6 348.6C1066.0 347.3 1068.2 346.2 1071.1 343.9C1074.1 341.5 1078.5 337.7 1081.4 334.6C1084.3 331.5 1086.2 329.1 1088.6 325.4C1091.0 321.7 1094.1 315.9 1095.9 312.4C1097.7 308.8 1098.0 308.0 1099.4 304.1C1100.7 300.2 1102.8 293.3 1103.9 289.1C1105.0 285.0 1105.2 283.3 1105.9 279.1C1106.5 275.0 1107.5 268.8 1107.9 264.1C1108.3 259.5 1108.4 257.6 1108.4 251.4C1108.4 245.1 1108.3 233.6 1107.9 226.6C1107.5 219.7 1107.2 217.9 1105.9 209.6C1104.5 201.3 1101.6 186.4 1099.6 176.9C1097.6 167.3 1095.5 158.9 1093.9 152.4C1092.2 145.9 1091.3 143.1 1089.6 137.9C1087.9 132.6 1085.2 125.2 1083.6 120.9C1082.0 116.6 1081.9 116.2 1079.9 112.1C1077.9 108.0 1073.7 100.1 1071.6 96.4C1069.6 92.7 1068.5 91.2 1067.6 89.9C1066.7 88.5 1066.7 88.8 1066.1 88.4C1065.6 88.0 1065.0 87.6 1064.4 87.4C1063.8 87.2 1063.3 87.0 1062.4 87.1C1061.4 87.3 1059.7 87.8 1058.6 88.4C1057.6 88.9 1057.5 89.0 1056.1 90.4C1054.8 91.8 1052.6 93.8 1050.6 96.6C1048.6 99.5 1045.9 104.2 1044.1 107.4C1042.4 110.6 1041.8 111.9 1040.1 115.9C1038.5 119.9 1036.0 126.2 1034.4 131.4C1032.8 136.5 1031.4 141.8 1030.4 146.6C1029.3 151.5 1028.5 155.7 1028.1 160.4C1027.7 165.1 1027.7 170.7 1027.9 174.9C1028.0 179.0 1028.7 182.7 1029.1 185.4C1029.6 188.0 1028.8 186.3 1030.6 190.9C1032.4 195.5 1037.3 205.9 1039.9 212.9C1042.5 219.8 1044.5 226.2 1046.1 232.6C1047.8 239.0 1049.1 246.1 1049.9 251.1C1050.7 256.1 1050.8 258.2 1050.9 262.6C1050.9 267.1 1050.6 273.6 1050.1 277.9C1049.6 282.2 1048.9 285.0 1047.9 288.4C1046.9 291.7 1045.5 295.1 1044.1 297.9C1042.8 300.7 1039.6 305.1 1039.6 305.1C1039.6 305.1 1039.5 305.8 1037.9 305.1C1036.2 304.5 1033.1 303.0 1029.9 301.1C1026.7 299.3 1022.1 296.5 1018.6 294.1C1015.1 291.8 1012.8 290.2 1008.9 287.1C1005.0 284.1 999.5 279.7 995.1 275.9C990.7 272.1 987.2 269.0 982.4 264.4C977.5 259.8 972.8 255.3 966.1 248.4C959.5 241.4 951.0 232.4 942.4 222.6C933.8 212.8 924.8 202.4 914.6 189.6C904.4 176.9 890.2 158.2 881.1 146.1C872.0 134.0 867.0 126.7 860.1 116.9C853.3 107.1 845.8 96.0 840.1 87.4C834.5 78.8 829.5 70.7 826.1 65.1C822.8 59.6 821.5 56.8 819.9 54.1C818.2 51.4 817.8 50.9 816.1 48.9C814.4 46.8 811.5 43.6 809.6 41.9C807.8 40.2 806.9 39.6 805.1 38.6C803.4 37.6 801.5 36.5 799.1 35.9C796.8 35.2 793.5 34.8 791.1 34.9C788.8 34.9 786.7 35.6 784.9 36.1C783.0 36.7 782.0 37.1 780.1 38.1C778.2 39.2 775.6 40.7 773.4 42.4C771.1 44.0 768.7 46.2 766.6 48.1C764.5 50.1 763.2 51.4 760.9 54.1Z"/><path fill="#BFF6F1" fill-rule="evenodd" d="M1062.4 87.1C1061.4 87.3 1060.5 87.0 1058.6 88.4C1056.8 89.8 1053.4 93.2 1051.4 95.6C1049.4 98.0 1048.5 99.5 1046.6 102.9C1044.8 106.2 1042.2 111.1 1040.1 115.9C1038.1 120.6 1036.0 126.2 1034.4 131.4C1032.8 136.5 1031.4 141.8 1030.4 146.6C1029.3 151.5 1028.5 155.7 1028.1 160.4C1027.7 165.1 1027.8 171.3 1027.9 174.9C1027.9 178.4 1028.0 179.1 1028.4 181.6C1028.8 184.2 1028.8 185.8 1030.4 190.1C1032.0 194.5 1035.6 201.8 1037.9 207.6C1040.1 213.4 1042.2 219.3 1043.9 224.9C1045.6 230.4 1047.1 236.2 1048.1 240.9C1049.2 245.6 1049.7 248.5 1050.1 253.1C1050.6 257.8 1050.9 264.5 1050.9 268.9C1050.8 273.3 1050.4 276.4 1049.9 279.6C1049.4 282.9 1048.5 286.3 1047.9 288.4C1047.3 290.4 1046.6 290.7 1046.4 291.9C1046.1 293.0 1046.6 294.5 1046.4 295.4C1046.2 296.2 1045.5 296.4 1045.1 297.1C1044.8 297.8 1044.8 299.0 1044.4 299.6C1044.0 300.2 1043.5 299.8 1042.9 300.9C1042.2 301.9 1040.6 305.9 1040.6 305.9C1040.6 305.9 1043.3 307.3 1045.6 308.1C1048.0 308.9 1051.2 310.1 1054.6 310.6C1058.0 311.1 1063.5 311.2 1066.1 311.1C1068.8 311.1 1069.0 310.8 1070.6 310.4C1072.3 309.9 1074.0 309.5 1076.1 308.4C1078.2 307.2 1081.3 305.4 1083.4 303.6C1085.4 301.9 1087.1 299.5 1088.4 297.9C1089.7 296.2 1089.8 296.1 1091.1 293.6C1092.4 291.1 1094.5 287.6 1096.1 282.9C1097.8 278.2 1099.7 271.5 1100.9 265.4C1102.1 259.2 1102.8 253.0 1103.4 245.9C1104.0 238.8 1104.3 229.6 1104.4 222.6C1104.4 215.7 1103.6 204.1 1103.6 204.1C1103.6 204.1 1104.4 203.6 1104.4 203.6C1104.4 203.6 1101.0 184.1 1099.6 176.9C1098.2 169.7 1097.5 166.9 1095.9 160.4C1094.2 153.9 1091.3 143.5 1089.6 137.9C1088.0 132.3 1087.5 131.2 1085.9 126.9C1084.2 122.6 1082.5 117.7 1079.9 112.1C1077.2 106.5 1072.2 97.3 1069.9 93.4C1067.6 89.4 1067.0 89.4 1066.1 88.4C1065.2 87.4 1065.0 87.6 1064.4 87.4C1063.8 87.2 1063.3 87.0 1062.4 87.1Z"/></g><circle cx="404" cy="408" r="50" fill="#E2082D" stroke="#fff" stroke-width="12"/></svg>', FAVICON_NATAL_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#14BDB1"/><stop offset="1" stop-color="#00695C"/></linearGradient><radialGradient id="h" cx=".25" cy=".12" r=".85"><stop offset="0" stop-color="#fff" stop-opacity=".30"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><rect width="512" height="512" rx="116" fill="url(#g)"/><rect width="512" height="512" rx="116" fill="url(#h)"/><g transform="translate(78 112) scale(.84) translate(-698 -29)"><path fill="#FFFFFF" fill-rule="evenodd" d="M760.9 54.1C758.5 56.9 754.8 61.5 752.4 64.6C750.0 67.8 749.6 68.2 746.4 73.1C743.2 78.0 738.7 84.9 733.1 94.1C727.6 103.4 717.2 121.1 713.1 128.6C709.0 136.1 709.5 136.2 708.4 139.1C707.2 142.1 706.7 144.0 706.1 146.4C705.5 148.8 705.1 151.2 704.9 153.6C704.6 156.1 704.4 158.2 704.6 161.1C704.8 164.0 705.5 168.3 706.1 170.9C706.7 173.4 706.8 173.7 708.1 176.4C709.5 179.1 712.4 184.2 714.4 187.1C716.4 190.0 718.0 191.7 720.1 193.9C722.2 196.1 721.2 195.6 726.9 200.4C732.6 205.2 744.4 214.9 754.4 222.6C764.4 230.3 773.7 237.3 786.9 246.6C800.1 256.0 820.9 270.2 833.6 278.6C846.3 287.1 858.1 294.0 863.1 297.4C868.1 300.8 863.6 298.9 863.6 298.9C863.6 298.9 861.6 299.4 861.6 299.4C861.6 299.4 862.0 300.0 862.4 300.1C862.7 300.2 863.2 300.3 863.6 300.1C864.1 299.9 863.5 299.0 865.1 298.9C866.7 298.8 870.4 299.0 873.1 299.4C875.9 299.8 879.0 300.3 881.6 301.1C884.2 301.9 886.7 303.0 888.6 304.1C890.6 305.2 892.1 306.8 893.4 307.9C894.6 309.0 895.2 309.5 896.1 310.9C897.0 312.2 898.3 314.6 898.9 315.9C899.4 317.1 899.0 317.7 899.4 318.4C899.7 319.0 896.2 317.3 900.9 319.9C905.6 322.5 920.9 330.5 927.6 333.9C934.3 337.2 934.7 337.4 941.1 339.9C947.5 342.4 958.3 346.4 966.1 348.9C974.0 351.4 981.1 353.3 988.1 354.9C995.2 356.4 1001.8 357.5 1008.4 358.1C1014.9 358.7 1022.9 358.4 1027.4 358.4C1031.8 358.3 1032.1 358.3 1035.1 357.9C1038.2 357.5 1042.0 356.9 1045.6 355.9C1049.3 354.9 1054.1 353.1 1057.1 351.9C1060.1 350.7 1061.3 350.0 1063.6 348.6C1066.0 347.3 1068.2 346.2 1071.1 343.9C1074.1 341.5 1078.5 337.7 1081.4 334.6C1084.3 331.5 1086.2 329.1 1088.6 325.4C1091.0 321.7 1094.1 315.9 1095.9 312.4C1097.7 308.8 1098.0 308.0 1099.4 304.1C1100.7 300.2 1102.8 293.3 1103.9 289.1C1105.0 285.0 1105.2 283.3 1105.9 279.1C1106.5 275.0 1107.5 268.8 1107.9 264.1C1108.3 259.5 1108.4 257.6 1108.4 251.4C1108.4 245.1 1108.3 233.6 1107.9 226.6C1107.5 219.7 1107.2 217.9 1105.9 209.6C1104.5 201.3 1101.6 186.4 1099.6 176.9C1097.6 167.3 1095.5 158.9 1093.9 152.4C1092.2 145.9 1091.3 143.1 1089.6 137.9C1087.9 132.6 1085.2 125.2 1083.6 120.9C1082.0 116.6 1081.9 116.2 1079.9 112.1C1077.9 108.0 1073.7 100.1 1071.6 96.4C1069.6 92.7 1068.5 91.2 1067.6 89.9C1066.7 88.5 1066.7 88.8 1066.1 88.4C1065.6 88.0 1065.0 87.6 1064.4 87.4C1063.8 87.2 1063.3 87.0 1062.4 87.1C1061.4 87.3 1059.7 87.8 1058.6 88.4C1057.6 88.9 1057.5 89.0 1056.1 90.4C1054.8 91.8 1052.6 93.8 1050.6 96.6C1048.6 99.5 1045.9 104.2 1044.1 107.4C1042.4 110.6 1041.8 111.9 1040.1 115.9C1038.5 119.9 1036.0 126.2 1034.4 131.4C1032.8 136.5 1031.4 141.8 1030.4 146.6C1029.3 151.5 1028.5 155.7 1028.1 160.4C1027.7 165.1 1027.7 170.7 1027.9 174.9C1028.0 179.0 1028.7 182.7 1029.1 185.4C1029.6 188.0 1028.8 186.3 1030.6 190.9C1032.4 195.5 1037.3 205.9 1039.9 212.9C1042.5 219.8 1044.5 226.2 1046.1 232.6C1047.8 239.0 1049.1 246.1 1049.9 251.1C1050.7 256.1 1050.8 258.2 1050.9 262.6C1050.9 267.1 1050.6 273.6 1050.1 277.9C1049.6 282.2 1048.9 285.0 1047.9 288.4C1046.9 291.7 1045.5 295.1 1044.1 297.9C1042.8 300.7 1039.6 305.1 1039.6 305.1C1039.6 305.1 1039.5 305.8 1037.9 305.1C1036.2 304.5 1033.1 303.0 1029.9 301.1C1026.7 299.3 1022.1 296.5 1018.6 294.1C1015.1 291.8 1012.8 290.2 1008.9 287.1C1005.0 284.1 999.5 279.7 995.1 275.9C990.7 272.1 987.2 269.0 982.4 264.4C977.5 259.8 972.8 255.3 966.1 248.4C959.5 241.4 951.0 232.4 942.4 222.6C933.8 212.8 924.8 202.4 914.6 189.6C904.4 176.9 890.2 158.2 881.1 146.1C872.0 134.0 867.0 126.7 860.1 116.9C853.3 107.1 845.8 96.0 840.1 87.4C834.5 78.8 829.5 70.7 826.1 65.1C822.8 59.6 821.5 56.8 819.9 54.1C818.2 51.4 817.8 50.9 816.1 48.9C814.4 46.8 811.5 43.6 809.6 41.9C807.8 40.2 806.9 39.6 805.1 38.6C803.4 37.6 801.5 36.5 799.1 35.9C796.8 35.2 793.5 34.8 791.1 34.9C788.8 34.9 786.7 35.6 784.9 36.1C783.0 36.7 782.0 37.1 780.1 38.1C778.2 39.2 775.6 40.7 773.4 42.4C771.1 44.0 768.7 46.2 766.6 48.1C764.5 50.1 763.2 51.4 760.9 54.1Z"/><path fill="#BFF6F1" fill-rule="evenodd" d="M1062.4 87.1C1061.4 87.3 1060.5 87.0 1058.6 88.4C1056.8 89.8 1053.4 93.2 1051.4 95.6C1049.4 98.0 1048.5 99.5 1046.6 102.9C1044.8 106.2 1042.2 111.1 1040.1 115.9C1038.1 120.6 1036.0 126.2 1034.4 131.4C1032.8 136.5 1031.4 141.8 1030.4 146.6C1029.3 151.5 1028.5 155.7 1028.1 160.4C1027.7 165.1 1027.8 171.3 1027.9 174.9C1027.9 178.4 1028.0 179.1 1028.4 181.6C1028.8 184.2 1028.8 185.8 1030.4 190.1C1032.0 194.5 1035.6 201.8 1037.9 207.6C1040.1 213.4 1042.2 219.3 1043.9 224.9C1045.6 230.4 1047.1 236.2 1048.1 240.9C1049.2 245.6 1049.7 248.5 1050.1 253.1C1050.6 257.8 1050.9 264.5 1050.9 268.9C1050.8 273.3 1050.4 276.4 1049.9 279.6C1049.4 282.9 1048.5 286.3 1047.9 288.4C1047.3 290.4 1046.6 290.7 1046.4 291.9C1046.1 293.0 1046.6 294.5 1046.4 295.4C1046.2 296.2 1045.5 296.4 1045.1 297.1C1044.8 297.8 1044.8 299.0 1044.4 299.6C1044.0 300.2 1043.5 299.8 1042.9 300.9C1042.2 301.9 1040.6 305.9 1040.6 305.9C1040.6 305.9 1043.3 307.3 1045.6 308.1C1048.0 308.9 1051.2 310.1 1054.6 310.6C1058.0 311.1 1063.5 311.2 1066.1 311.1C1068.8 311.1 1069.0 310.8 1070.6 310.4C1072.3 309.9 1074.0 309.5 1076.1 308.4C1078.2 307.2 1081.3 305.4 1083.4 303.6C1085.4 301.9 1087.1 299.5 1088.4 297.9C1089.7 296.2 1089.8 296.1 1091.1 293.6C1092.4 291.1 1094.5 287.6 1096.1 282.9C1097.8 278.2 1099.7 271.5 1100.9 265.4C1102.1 259.2 1102.8 253.0 1103.4 245.9C1104.0 238.8 1104.3 229.6 1104.4 222.6C1104.4 215.7 1103.6 204.1 1103.6 204.1C1103.6 204.1 1104.4 203.6 1104.4 203.6C1104.4 203.6 1101.0 184.1 1099.6 176.9C1098.2 169.7 1097.5 166.9 1095.9 160.4C1094.2 153.9 1091.3 143.5 1089.6 137.9C1088.0 132.3 1087.5 131.2 1085.9 126.9C1084.2 122.6 1082.5 117.7 1079.9 112.1C1077.2 106.5 1072.2 97.3 1069.9 93.4C1067.6 89.4 1067.0 89.4 1066.1 88.4C1065.2 87.4 1065.0 87.6 1064.4 87.4C1063.8 87.2 1063.3 87.0 1062.4 87.1Z"/></g><circle cx="404" cy="408" r="50" fill="#E2082D" stroke="#fff" stroke-width="12"/><g transform="translate(318 50) rotate(18 70 60) scale(.8)"><path d="M10 112C14 56 52 20 110 26c-26 10-32 36-32 58l44 36z" fill="#B3263E"/><path d="M2 108c20 14 96 18 130 2l8 16c-44 18-110 16-146-2z" fill="#FDFBF6"/><circle cx="112" cy="26" r="19" fill="#FDFBF6"/></g></svg>';
-const VERSAO_APP = '15.5';
+const VERSAO_APP = '15.9';
 const _est = (cx, cy, r)=>{ let p = ''; for(let k = 0; k < 10; k++){ const a = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? r * .45 : r; p += `${(cx + rr * Math.cos(a)).toFixed(0)},${(cy + rr * Math.sin(a)).toFixed(0)} `; } return `<polygon points="${p.trim()}"/>`; };
 const _cor = (cx, cy, s)=> `<path d="M${cx} ${cy + s}C${cx - 2 * s} ${cy - s * .2} ${cx - 1.1 * s} ${cy - 1.3 * s} ${cx} ${cy - s * .3}C${cx + 1.1 * s} ${cy - 1.3 * s} ${cx + 2 * s} ${cy - s * .2} ${cx} ${cy + s}Z"/>`;
 const _spk = (cx, cy, r)=> `<path d="M${cx} ${cy - r}C${cx + r * .1} ${cy - r * .3} ${cx + r * .3} ${cy - r * .1} ${cx + r} ${cy}C${cx + r * .3} ${cy + r * .1} ${cx + r * .1} ${cy + r * .3} ${cx} ${cy + r}C${cx - r * .1} ${cy + r * .3} ${cx - r * .3} ${cy + r * .1} ${cx - r} ${cy}C${cx - r * .3} ${cy - r * .1} ${cx - r * .1} ${cy - r * .3} ${cx} ${cy - r}Z"/>`;
@@ -10927,7 +11170,7 @@ const Sazonal = (function(){
         bg.push(`radial-gradient(circle at ${x}px ${y}px, ${cor} 0, ${cor} ${(r * .6).toFixed(1)}px, ${anel} ${r.toFixed(1)}px, transparent ${(r + 1.8).toFixed(1)}px)`); }
       return `<div class="sz-camada" style="--t:${k.t}px; top:-${k.t}px; background-image:${bg.join(',')}; background-size:${k.t}px ${k.t}px; animation-duration:${k.d}s"></div>`; }).join(''); pai.appendChild(c);
   }
-  function limpar(){ document.querySelectorAll('.sz-luzes, .sz-neve, .sz-emblema, .sz-flut, .sz-ao, .sz-fundo').forEach(e=>e.remove()); document.body.classList.remove('tem-emblema'); }
+  function limpar(){ document.querySelectorAll('.sz-luzes, .sz-neve, .sz-emblema, .sz-flut, .sz-ao, .sz-fundo').forEach(e=>e.remove()); document.body.classList.remove('tem-emblema'); document.body.classList.remove('tem-fio'); }
   const S = (vb, w, h, dentro, cls)=> `<svg class="${cls || ''}" viewBox="${vb}" width="${w}" height="${h}" aria-hidden="true">${dentro}</svg>`;
   const fagulha = (cx, cy, r, cor)=> `<path d="M${cx} ${cy - r}C${cx + r * .1} ${cy - r * .3} ${cx + r * .3} ${cy - r * .1} ${cx + r} ${cy}C${cx + r * .3} ${cy + r * .1} ${cx + r * .1} ${cy + r * .3} ${cx} ${cy + r}C${cx - r * .1} ${cy + r * .3} ${cx - r * .3} ${cy + r * .1} ${cx - r} ${cy}C${cx - r * .3} ${cy - r * .1} ${cx - r * .1} ${cy - r * .3} ${cx} ${cy - r}Z" fill="${cor}"/>`;
   const laco = (cor)=> `<g class="sz-a sz-pulsa"><path d="M25 40C6 18 18 2 25 16C32 2 44 18 25 40" stroke="${cor}" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M25 38l-10 24M25 38l10 24" stroke="${cor}" stroke-width="5.5" stroke-linecap="round" fill="none"/><path d="M17 12c-3 3-4 6-3.4 9" stroke="#fff" stroke-width="1.6" stroke-linecap="round" fill="none" opacity=".55"/></g>`;
@@ -10964,7 +11207,7 @@ const Sazonal = (function(){
     limpar(); const t = atual, d = t && def(t.id), dc = d && d.deco; if(!dc) return;
     const hero = document.querySelector('.login-hero'), shell = document.querySelector('.login-shell');
     if(dc.topo){
-      const topo = { g:dc.topo, cores:dc.cores }; guirlanda(document.querySelector('.topbar'), topo);
+      const topo = { g:dc.topo, cores:dc.cores }; guirlanda(document.querySelector('.topbar'), topo, { inset:30 }); document.body.classList.add('tem-fio');
       if(hero && shell){
         const montar = ()=>{ const velho = hero.querySelector(':scope > .sz-luzes'); if(velho) velho.remove(); const rh = hero.getBoundingClientRect(), rs = shell.getBoundingClientRect(); if(rs.width > 160) guirlanda(hero, topo, { largura:Math.round(rs.width), esq:Math.round(rs.left - rh.left), topo:Math.round(rs.top - rh.top) - 3, inset:32 }); };
         const anims = shell.getAnimations ? shell.getAnimations().filter(a=> a.playState === 'running') : [];
